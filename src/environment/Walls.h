@@ -1,22 +1,29 @@
 #pragma once
 
+#include <string>
 #include "../texturing/TextureColours.h"
 
-class Wall
-{
+class Wall {
 
     double posX;
     double posY;
     Colour texColour;
+    string texture_name;
 
-public:
-    Wall(double, double, Colour);
-    double getX();
-    void setX(double);
-    double getY();
-    void setY(double);
-    Colour getColour();
-    void setColour(Colour);
+    private:
+        Wall(double x, double y, Colour colour, string texture);
+
+    public:
+        Wall(double x, double y, Colour colour);
+        Wall(double x, double y, string texture);
+        Wall();
+        ~Wall();
+        double getX();
+        void setX(double);
+        double getY();
+        void setY(double);
+        Colour getColour();
+        void setColour(Colour);
 };
 
 ///
@@ -25,14 +32,26 @@ public:
 /// @param double x: X-axis location
 /// @param double y: Y-axis location
 /// @param Colour colour: A colour to set as the wall
+/// @param string texture: Name of texture for the wall
 ///
 /// @returns Wall
 ///
-Wall::Wall(double x, double y, Colour colour)
-{
+Wall::Wall(double x, double y, Colour colour, string texture) {
     posX = x;
     posY = y;
     texColour = colour;
+    texture_name = texture;
+}
+
+Wall::Wall(double x, double y, string texture) : Wall(x, y, NONE, texture) {}
+
+Wall::Wall(double x, double y, Colour colour) : Wall(x, y, colour, "") {}
+
+Wall::~Wall() {
+    delete &posX;
+    delete &posY;
+    delete &texColour;
+    delete &texture_name;
 }
 
 ///

@@ -2,3 +2,6 @@
 
 out
 out/*
+
+.vscode
+.vscode/*

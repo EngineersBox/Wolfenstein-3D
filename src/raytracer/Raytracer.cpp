@@ -57,8 +57,7 @@ void drawSquare(int x, int y, int sidelength) {
 ///
 /// @return void
 ///
-void renderRay(float ax, float ay, float bx, float by, int line_width)
-{
+void renderRay(float ax, float ay, float bx, float by, int line_width) {
     glLineWidth((float)line_width);
 
     glBegin(GL_LINES);
@@ -74,8 +73,7 @@ void renderRay(float ax, float ay, float bx, float by, int line_width)
 ///
 /// @return void
 ///
-void drawPlayer()
-{
+void drawPlayer() {
     glColor3f(1.0, 1.0, 0.0);
     glPointSize(8);
 
@@ -93,13 +91,10 @@ void drawPlayer()
 ///
 /// @return void
 ///
-void drawMap2D()
-{
+void drawMap2D() {
     int x, y, mapS = gameMap.map_height * gameMap.map_width;
-    for (y = 0; y < gameMap.map_height; y++)
-    {
-        for (x = 0; x < gameMap.map_width; x++)
-        {
+    for (y = 0; y < gameMap.map_height; y++) {
+        for (x = 0; x < gameMap.map_width; x++) {
             // Change to colour coresponding to map location
             toColour(gameMap.getAt(x, y).getColour());
             drawSquare(x * mapS, y * mapS, mapS);
@@ -118,8 +113,7 @@ void drawMap2D()
 ///
 /// @return float
 ///
-float dist(float ax, float ay, float bx, float by, float ang)
-{
+float dist(float ax, float ay, float bx, float by, float ang) {
     return sqrtf((bx - ax) * (bx - ax) + (by - ay) * (by - ay));
 }
 
@@ -143,11 +137,9 @@ float dist(float ax, float ay, float bx, float by, float ang)
 ///
 void checkHorizontal(int &mx, int &my, int &mp, float &dof,
                      float &rx, float &ry, float &ra, float &x_off, float &y_off,
-                     float &hx, float &hy, float &disH)
-{
+                     float &hx, float &hy, float &disH) {
     float aTan = -1 / tan(ra);
-    if (ra > M_PI)
-    {
+    if (ra > M_PI) {
         // Looking up
         ry = (((int)p_y >> 6) << 6) - 0.0001f;
         rx = (p_y - ry) * aTan + p_x;
@@ -155,8 +147,7 @@ void checkHorizontal(int &mx, int &my, int &mp, float &dof,
         x_off = -y_off * aTan;
     }
 
-    if (ra < M_PI)
-    {
+    if (ra < M_PI) {
         // Looking down
         ry = (float)(((int)p_y >> 6) << 6) + 64;
         rx = (p_y - ry) * aTan + p_x;
@@ -164,29 +155,24 @@ void checkHorizontal(int &mx, int &my, int &mp, float &dof,
         x_off = -y_off * aTan;
     }
 
-    if (ra == 0 || ra == M_PI)
-    {
+    if (ra == 0 || ra == M_PI) {
         // Looking left or right
         rx = p_x;
         ry = p_y;
         dof = p_dof;
     }
 
-    while (dof < p_dof)
-    {
+    while (dof < p_dof) {
         mx = (int)(rx) >> 6;
         my = (int)(ry) >> 6;
         mp = my * gameMap.map_width + mx;
 
-        if (mp > 0 && mp < gameMap.map_width * gameMap.map_height && gameMap.getAt(mx, my).getColour() == WHITE)
-        {
+        if (mp > 0 && mp < gameMap.map_width * gameMap.map_height && gameMap.getAt(mx, my).getColour() == WHITE) {
             dof = p_dof;
             hx = rx;
             hy = ry;
             disH = dist(p_x, p_y, hx, hy, ra);
-        }
-        else
-        {
+        } else {
             rx += x_off;
             ry += y_off;
             dof += 1;
@@ -214,11 +200,9 @@ void checkHorizontal(int &mx, int &my, int &mp, float &dof,
 ///
 void checkVertical(int &mx, int &my, int &mp, float &dof,
                    float &rx, float &ry, float &ra, float &x_off, float &y_off,
-                   float &vx, float &vy, float &disV)
-{
+                   float &vx, float &vy, float &disV) {
     float nTan = -tan(ra);
-    if (ra > M_PI_2 && ra < THREE_HALF_PI)
-    {
+    if (ra > M_PI_2 && ra < THREE_HALF_PI) {
         // Looking left
         rx = (((int)p_x >> 6) << 6) - 0.0001f;
         ry = (p_x - rx) * nTan + p_y;
@@ -226,8 +210,7 @@ void checkVertical(int &mx, int &my, int &mp, float &dof,
         y_off = -x_off * nTan;
     }
 
-    if (ra < M_PI_2 || ra > THREE_HALF_PI)
-    {
+    if (ra < M_PI_2 || ra > THREE_HALF_PI) {
         // Looking right
         rx = (float)(((int)p_x >> 6) << 6) + 64;
         ry = (p_x - rx) * nTan + p_y;
@@ -235,29 +218,24 @@ void checkVertical(int &mx, int &my, int &mp, float &dof,
         y_off = -x_off * nTan;
     }
 
-    if (ra == 0 || ra == M_PI)
-    {
+    if (ra == 0 || ra == M_PI) {
         // Looking up or down
         rx = p_x;
         ry = p_y;
         dof = 8;
     }
 
-    while (dof < p_dof)
-    {
+    while (dof < p_dof) {
         mx = (int)(rx) >> 6;
         my = (int)(ry) >> 6;
         mp = my * gameMap.map_width + mx;
 
-        if (mp > 0 && mp < gameMap.map_width * gameMap.map_height && gameMap.getAt(mx, my).getColour() == WHITE)
-        {
+        if (mp > 0 && mp < gameMap.map_width * gameMap.map_height && gameMap.getAt(mx, my).getColour() == WHITE) {
             dof = p_dof;
             vx = rx;
             vy = ry;
             disV = dist(p_x, p_y, vx, vy, ra);
-        }
-        else
-        {
+        } else {
             rx += x_off;
             ry += y_off;
             dof += 1;
@@ -274,24 +252,20 @@ void checkVertical(int &mx, int &my, int &mp, float &dof,
 ///
 /// @return void
 ///
-void draw3DWalls(int &r, float &ra, float &distT)
-{
+void draw3DWalls(int &r, float &ra, float &distT) {
     // Draw 3D walls
     float ca = p_a - ra;
-    if (ca < 0)
-    {
+    if (ca < 0) {
         ca += (float)(2 * M_PI);
     }
-    else if (ca > 2 * M_PI)
-    {
+    else if (ca > 2 * M_PI) {
         ca -= (float)(2 * M_PI);
     }
     distT *= cos(ca);
 
     int mapS = gameMap.map_height *gameMap.map_width;
     float lineH = (mapS * mapScreenH) / distT;
-    if (lineH > mapScreenH)
-    {
+    if (lineH > mapScreenH) {
         lineH = (float)mapScreenH;
     }
 
@@ -305,24 +279,19 @@ void draw3DWalls(int &r, float &ra, float &distT)
 ///
 /// @return void
 ///
-void renderRays2Dto3D()
-{
+void renderRays2Dto3D() {
     int r{}, mx{}, my{}, mp{};
     float dof, rx{}, ry{}, ra, x_off{}, y_off{}, distT{};
 
     ra = p_a - (DR * (fov / 2));
 
-    if (ra < 0)
-    {
+    if (ra < 0) {
         ra += (float)(2 * M_PI);
-    }
-    else if (ra > 2 * M_PI)
-    {
+    } else if (ra > 2 * M_PI) {
         ra -= (float)(2 * M_PI);
     }
 
-    for (r = 0; r < fov; r++)
-    {
+    for (r = 0; r < fov; r++) {
         // Check horizontal lines
         dof = 0;
         float disH = numeric_limits<float>::max();
@@ -339,8 +308,7 @@ void renderRays2Dto3D()
 
         checkVertical(mx, my, mp, dof, rx, ry, ra, x_off, y_off, vx, vy, disV);
 
-        if (disV < disH)
-        {
+        if (disV < disH) {
             rx = vx;
             ry = vy;
             distT = disV;
@@ -349,9 +317,7 @@ void renderRays2Dto3D()
                     WHITE,
                     {0.9, 0.9, 0.9, 1.0},
                     PW_mul<GLdouble>));
-        }
-        else if (disH < disV)
-        {
+        } else if (disH < disV) {
             rx = hx;
             ry = hy;
             distT = disH;
@@ -362,20 +328,16 @@ void renderRays2Dto3D()
                     PW_mul<GLdouble>));
         }
 
-        if (render2DMap && renderRays)
-        {
+        if (render2DMap && renderRays) {
             renderRay(p_x, p_y, rx, ry, 1);
         }
 
         draw3DWalls(r, ra, distT);
 
         ra += DR;
-        if (ra < 0)
-        {
+        if (ra < 0) {
             ra += (float)(2 * M_PI);
-        }
-        else if (ra > 2 * M_PI)
-        {
+        } else if (ra > 2 * M_PI) {
             ra -= (float)(2 * M_PI);
         }
     }
@@ -409,8 +371,7 @@ void buttons(unsigned char key, int x, int y) {
     if (key == 'a') {
         // Turn left
         p_a -= 0.1f;
-        if (p_a < 0)
-        {
+        if (p_a < 0) {
             p_a += (float)(2 * M_PI);
         }
         p_dx = cos(p_a) * 5;
@@ -418,8 +379,7 @@ void buttons(unsigned char key, int x, int y) {
     } else if (key == 'd') {
         // Turn right
         p_a += 0.1f;
-        if (p_a > 2 * M_PI)
-        {
+        if (p_a > 2 * M_PI) {
             p_a -= (float)(2 * M_PI);
         }
         p_dx = cos(p_a) * 5;

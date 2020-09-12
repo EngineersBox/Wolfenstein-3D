@@ -5,8 +5,6 @@
 #include "../environment/Walls.h"
 #include <fstream>
 
-#define MAP_DELIM ";"
-
 using namespace std;
 
 class GameMap {
@@ -18,7 +16,6 @@ class GameMap {
         void fromArray(Wall walls[], int width, int height);
         Wall* toArray();
         void readMapFromFile(string filename);
-
         Wall getAt(int x, int y);
     private:
         int map_width;
@@ -55,16 +52,6 @@ Wall* GameMap::toArray() {
     return returnArray;
 }
 
-Wall parseWall(string wall_string, string delimiter) {
-    size_t pos = 0;
-    string token[3];
-    while((pos = wall_string.find(delimiter)) != string::npos) {
-        token[pos] = wall_string.substr(0, pos);
-        wall_string.erase(0, pos + delimiter.length());
-    }
-    return Wall(stod(token[0]), stod(token[1]), token[2]);
-}
-
 void GameMap::readMapFromFile(string filename) {
     ifstream inFile(filename);
     int width, height;
@@ -77,7 +64,7 @@ void GameMap::readMapFromFile(string filename) {
         for (int j = 0; j < width; j++) {
             string currentEntry;
             inFile >> currentEntry;
-            this->_walls.at((i * width) + j) = parseWall(currentEntry, MAP_DELIM);
+            this->_walls.at((i * width) + j) = Wall(i, j, currentEntry);
         }
     }
 }

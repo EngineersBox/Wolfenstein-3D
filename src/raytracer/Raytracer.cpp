@@ -394,11 +394,9 @@ void renderRays2Dto3D()
 ///
 /// @return void
 ///
-void display()
-{
+void display() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    if (render2DMap)
-    {
+    if (render2DMap) {
         drawMap2D();
         drawPlayer();
     }
@@ -415,10 +413,8 @@ void display()
 ///
 /// @return void
 ///
-void buttons(unsigned char key, int x, int y)
-{
-    if (key == 'a')
-    {
+void buttons(unsigned char key, int x, int y) {
+    if (key == 'a') {
         // Turn left
         p_a -= 0.1f;
         if (p_a < 0)
@@ -427,9 +423,7 @@ void buttons(unsigned char key, int x, int y)
         }
         p_dx = cos(p_a) * 5;
         p_dy = sin(p_a) * 5;
-    }
-    else if (key == 'd')
-    {
+    } else if (key == 'd') {
         // Turn right
         p_a += 0.1f;
         if (p_a > 2 * M_PI)
@@ -438,15 +432,11 @@ void buttons(unsigned char key, int x, int y)
         }
         p_dx = cos(p_a) * 5;
         p_dy = sin(p_a) * 5;
-    }
-    else if (key == 'w')
-    {
+    } else if (key == 'w') {
         // Move forward
         p_x += p_dx;
         p_y += p_dy;
-    }
-    else if (key == 's')
-    {
+    } else if (key == 's') {
         // Move backward
         p_x -= p_dx;
         p_y -= p_dy;
@@ -461,8 +451,7 @@ void buttons(unsigned char key, int x, int y)
 ///
 /// @return void
 ///
-void init(Colour background_colour)
-{
+void init(Colour background_colour) {
     glClearColor(
         (float)get<RED_IDX>(background_colour),
         (float)get<BLUE_IDX>(background_colour),
@@ -483,8 +472,7 @@ void init(Colour background_colour)
 ///
 /// @return int
 ///
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
     glutInitWindowSize(screenW, screenH);

@@ -166,13 +166,16 @@ void checkHorizontal(int &mx, int &my, int &mp, float &dof,
         mx = (int)(rx) >> 6;
         my = (int)(ry) >> 6;
         mp = my * gameMap.map_width + mx;
-
-        if (mp > 0 && mp < gameMap.map_width * gameMap.map_height && gameMap.getAt(mx, my).getColour() == WHITE) {
+        
+        if (mp > 0 && mp < gameMap.map_width * gameMap.map_height && gameMap.getAt(mx, my).getColour() != NONE)
+        {
             dof = p_dof;
             hx = rx;
             hy = ry;
             disH = dist(p_x, p_y, hx, hy, ra);
-        } else {
+        }
+        else
+        {
             rx += x_off;
             ry += y_off;
             dof += 1;
@@ -225,17 +228,21 @@ void checkVertical(int &mx, int &my, int &mp, float &dof,
         dof = 8;
     }
 
+    Colour c_colour = NONE;
     while (dof < p_dof) {
         mx = (int)(rx) >> 6;
         my = (int)(ry) >> 6;
         mp = my * gameMap.map_width + mx;
 
-        if (mp > 0 && mp < gameMap.map_width * gameMap.map_height && gameMap.getAt(mx, my).getColour() == WHITE) {
+        if (mp > 0 && mp < gameMap.map_width * gameMap.map_height && gameMap.getAt(mx, my).getColour() != NONE)
+        {
             dof = p_dof;
             vx = rx;
             vy = ry;
             disV = dist(p_x, p_y, vx, vy, ra);
-        } else {
+        }
+        else
+        {
             rx += x_off;
             ry += y_off;
             dof += 1;
@@ -272,6 +279,10 @@ void draw3DWalls(int &r, float &ra, float &distT) {
     float line_off = (mapScreenH / 2) - (lineH / 2);
     float screen_off = render2DMap ? (float)mapScreenW : 0;
     renderRay(r * gameMap.map_width + screen_off, line_off, r * gameMap.map_width + screen_off, line_off + lineH, (mapS / gameMap.map_width));
+}
+
+int radiusToCoord(float rx) {
+    return (int)(rx) >> 6;
 }
 
 ///
@@ -314,7 +325,7 @@ void renderRays2Dto3D() {
             distT = disV;
             toColour(
                 colourMask<GLdouble>(
-                    WHITE,
+                    gameMap.getAt(radiusToCoord(rx), radiusToCoord(ry)).getColour(),
                     {0.9, 0.9, 0.9, 1.0},
                     PW_mul<GLdouble>));
         } else if (disH < disV) {
@@ -323,7 +334,7 @@ void renderRays2Dto3D() {
             distT = disH;
             toColour(
                 colourMask<GLdouble>(
-                    WHITE,
+                    gameMap.getAt(radiusToCoord(rx), radiusToCoord(ry)).getColour(),
                     {0.7, 0.7, 0.7, 1.0},
                     PW_mul<GLdouble>));
         }

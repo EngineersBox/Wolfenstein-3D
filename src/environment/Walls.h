@@ -43,16 +43,13 @@ Wall::Wall(double x, double y, Colour colour, string texture) {
     texture_name = texture;
 }
 
+Wall::Wall() : Wall(0, 0, NONE, "") {}
+
 Wall::Wall(double x, double y, string texture) : Wall(x, y, NONE, texture) {}
 
 Wall::Wall(double x, double y, Colour colour) : Wall(x, y, colour, "") {}
 
-Wall::~Wall() {
-    delete &posX;
-    delete &posY;
-    delete &texColour;
-    delete &texture_name;
-}
+Wall::~Wall() {}
 
 ///
 /// Get the x value

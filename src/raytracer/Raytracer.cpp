@@ -4,6 +4,7 @@
 #include "../texturing/TextureColours.h"
 #include "../environment/Walls.h"
 #include "../texturing/ColourUtils.h"
+#include "../map/map.h"
 
 using namespace std;
 
@@ -22,18 +23,8 @@ bool renderRays = true;
 bool render2DMap = true;
 int mapScreenW = screenW / 2;
 int mapScreenH = screenH;
-int mapX = 8, mapY = 8;
-int mapS = mapX * mapY;
 
-int map[] = {
-    1, 1, 1, 1, 1, 1, 1, 1,
-    1, 0, 1, 0, 0, 0, 0, 1,
-    1, 0, 1, 0, 0, 0, 0, 1,
-    1, 0, 1, 0, 0, 0, 0, 1,
-    1, 0, 0, 0, 0, 0, 0, 1,
-    1, 0, 0, 0, 0, 1, 0, 1,
-    1, 0, 0, 0, 0, 0, 0, 1,
-    1, 1, 1, 1, 1, 1, 1, 1};
+GameMap gameMap = GameMap();
 
 ///
 /// Render a square at coodinates with top-left origin
@@ -104,13 +95,13 @@ void drawPlayer()
 ///
 void drawMap2D()
 {
-    int x, y;
-    for (y = 0; y < mapY; y++)
+    int x, y, mapS = gameMap.map_height * gameMap.map_width;
+    for (y = 0; y < gameMap.map_height; y++)
     {
-        for (x = 0; x < mapX; x++)
+        for (x = 0; x < gameMap.map_width; x++)
         {
             // Change to colour coresponding to map location
-            toColour(map[y * mapX + x] == 1 ? WHITE : BLACK);
+            toColour(gameMap.getAt(x, y).getColour());
             drawSquare(x * mapS, y * mapS, mapS);
         }
     }
@@ -185,9 +176,9 @@ void checkHorizontal(int &mx, int &my, int &mp, float &dof,
     {
         mx = (int)(rx) >> 6;
         my = (int)(ry) >> 6;
-        mp = my * mapX + mx;
+        mp = my * gameMap.map_width + mx;
 
-        if (mp > 0 && mp < mapX * mapY && map[mp] == 1)
+        if (mp > 0 && mp < gameMap.map_width * gameMap.map_height && gameMap.getAt(mx, my).getColour() == WHITE)
         {
             dof = p_dof;
             hx = rx;
@@ -256,9 +247,9 @@ void checkVertical(int &mx, int &my, int &mp, float &dof,
     {
         mx = (int)(rx) >> 6;
         my = (int)(ry) >> 6;
-        mp = my * mapX + mx;
+        mp = my * gameMap.map_width + mx;
 
-        if (mp > 0 && mp < mapX * mapY && map[mp] == 1)
+        if (mp > 0 && mp < gameMap.map_width * gameMap.map_height && gameMap.getAt(mx, my).getColour() == WHITE)
         {
             dof = p_dof;
             vx = rx;
@@ -297,6 +288,7 @@ void draw3DWalls(int &r, float &ra, float &distT)
     }
     distT *= cos(ca);
 
+    int mapS = gameMap.map_height *gameMap.map_width;
     float lineH = (mapS * mapScreenH) / distT;
     if (lineH > mapScreenH)
     {
@@ -305,7 +297,7 @@ void draw3DWalls(int &r, float &ra, float &distT)
 
     float line_off = (mapScreenH / 2) - (lineH / 2);
     float screen_off = render2DMap ? (float)mapScreenW : 0;
-    renderRay(r * mapX + screen_off, line_off, r * mapX + screen_off, line_off + lineH, (mapS / mapX));
+    renderRay(r * gameMap.map_width + screen_off, line_off, r * gameMap.map_width + screen_off, line_off + lineH, (mapS / gameMap.map_width));
 }
 
 ///
@@ -452,11 +444,12 @@ void buttons(unsigned char key, int x, int y) {
 /// @return void
 ///
 void init(Colour background_colour) {
-    glClearColor(
-        (float)get<RED_IDX>(background_colour),
-        (float)get<BLUE_IDX>(background_colour),
-        (float)get<GREEN_IDX>(background_colour),
-        (float)get<ALPHA_IDX>(background_colour));
+    gameMap.readMapFromFile("src/world_files/map1.txt");
+        glClearColor(
+            (float)get<RED_IDX>(background_colour),
+            (float)get<BLUE_IDX>(background_colour),
+            (float)get<GREEN_IDX>(background_colour),
+            (float)get<ALPHA_IDX>(background_colour));
     gluOrtho2D(0, screenW, screenH, 0);
     p_x = 250;
     p_y = 250;

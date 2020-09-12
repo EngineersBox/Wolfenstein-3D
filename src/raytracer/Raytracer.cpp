@@ -1,12 +1,15 @@
 #define GL_SILENCE_DEPRECATION
 
 #include "Raytracer.h"
-#include "../texturing/TextureColours.h"
+
 #include "../environment/Walls.h"
-#include "../texturing/ColourUtils.h"
 #include "../map/map.h"
+#include "../texturing/ColourUtils.h"
+#include "../texturing/TextureColours.h"
 
 using namespace std;
+
+#define radToCoord(r) (int)(r) >> 6
 
 // Screen
 int screenW = 1024;
@@ -38,10 +41,10 @@ GameMap gameMap = GameMap();
 void drawSquare(int x, int y, int sidelength) {
     glBegin(GL_QUADS);
 
-    glVertex2i(x + 1, y + 1);                           // Top right
-    glVertex2i(x + 1, y + sidelength - 1);              // Top left
-    glVertex2i(x + sidelength - 1, y + sidelength - 1); // Bottom left
-    glVertex2i(x + sidelength - 1, y + 1);              // Bottom right
+    glVertex2i(x + 1, y + 1);                            // Top right
+    glVertex2i(x + 1, y + sidelength - 1);               // Top left
+    glVertex2i(x + sidelength - 1, y + sidelength - 1);  // Bottom left
+    glVertex2i(x + sidelength - 1, y + 1);               // Bottom right
 
     glEnd();
 }
@@ -163,19 +166,16 @@ void checkHorizontal(int &mx, int &my, int &mp, float &dof,
     }
 
     while (dof < p_dof) {
-        mx = (int)(rx) >> 6;
-        my = (int)(ry) >> 6;
+        mx = radToCoord(rx);
+        my = radToCoord(ry);
         mp = my * gameMap.map_width + mx;
-        
-        if (mp > 0 && mp < gameMap.map_width * gameMap.map_height && gameMap.getAt(mx, my).getColour() != NONE)
-        {
+
+        if (mp > 0 && mp < gameMap.map_width * gameMap.map_height && gameMap.getAt(mx, my).getColour() != NONE) {
             dof = p_dof;
             hx = rx;
             hy = ry;
             disH = dist(p_x, p_y, hx, hy, ra);
-        }
-        else
-        {
+        } else {
             rx += x_off;
             ry += y_off;
             dof += 1;
@@ -228,21 +228,17 @@ void checkVertical(int &mx, int &my, int &mp, float &dof,
         dof = 8;
     }
 
-    Colour c_colour = NONE;
     while (dof < p_dof) {
-        mx = (int)(rx) >> 6;
-        my = (int)(ry) >> 6;
+        mx = radToCoord(rx);
+        my = radToCoord(ry);
         mp = my * gameMap.map_width + mx;
 
-        if (mp > 0 && mp < gameMap.map_width * gameMap.map_height && gameMap.getAt(mx, my).getColour() != NONE)
-        {
+        if (mp > 0 && mp < gameMap.map_width * gameMap.map_height && gameMap.getAt(mx, my).getColour() != NONE) {
             dof = p_dof;
             vx = rx;
             vy = ry;
             disV = dist(p_x, p_y, vx, vy, ra);
-        }
-        else
-        {
+        } else {
             rx += x_off;
             ry += y_off;
             dof += 1;
@@ -264,13 +260,12 @@ void draw3DWalls(int &r, float &ra, float &distT) {
     float ca = p_a - ra;
     if (ca < 0) {
         ca += (float)(2 * M_PI);
-    }
-    else if (ca > 2 * M_PI) {
+    } else if (ca > 2 * M_PI) {
         ca -= (float)(2 * M_PI);
     }
     distT *= cos(ca);
 
-    int mapS = gameMap.map_height *gameMap.map_width;
+    int mapS = gameMap.map_height * gameMap.map_width;
     float lineH = (mapS * mapScreenH) / distT;
     if (lineH > mapScreenH) {
         lineH = (float)mapScreenH;
@@ -279,10 +274,6 @@ void draw3DWalls(int &r, float &ra, float &distT) {
     float line_off = (mapScreenH / 2) - (lineH / 2);
     float screen_off = render2DMap ? (float)mapScreenW : 0;
     renderRay(r * gameMap.map_width + screen_off, line_off, r * gameMap.map_width + screen_off, line_off + lineH, (mapS / gameMap.map_width));
-}
-
-int radiusToCoord(float rx) {
-    return (int)(rx) >> 6;
 }
 
 ///
@@ -325,7 +316,7 @@ void renderRays2Dto3D() {
             distT = disV;
             toColour(
                 colourMask<GLdouble>(
-                    gameMap.getAt(radiusToCoord(rx), radiusToCoord(ry)).getColour(),
+                    gameMap.getAt(radToCoord(rx), radToCoord(ry)).getColour(),
                     {0.9, 0.9, 0.9, 1.0},
                     PW_mul<GLdouble>));
         } else if (disH < disV) {
@@ -334,7 +325,7 @@ void renderRays2Dto3D() {
             distT = disH;
             toColour(
                 colourMask<GLdouble>(
-                    gameMap.getAt(radiusToCoord(rx), radiusToCoord(ry)).getColour(),
+                    gameMap.getAt(radToCoord(rx), radToCoord(ry)).getColour(),
                     {0.7, 0.7, 0.7, 1.0},
                     PW_mul<GLdouble>));
         }
@@ -416,11 +407,11 @@ void buttons(unsigned char key, int x, int y) {
 ///
 void init(Colour background_colour) {
     gameMap.readMapFromFile("src/world_files/map1.txt");
-        glClearColor(
-            (float)get<RED_IDX>(background_colour),
-            (float)get<BLUE_IDX>(background_colour),
-            (float)get<GREEN_IDX>(background_colour),
-            (float)get<ALPHA_IDX>(background_colour));
+    glClearColor(
+        (float)get<RED_IDX>(background_colour),
+        (float)get<BLUE_IDX>(background_colour),
+        (float)get<GREEN_IDX>(background_colour),
+        (float)get<ALPHA_IDX>(background_colour));
     gluOrtho2D(0, screenW, screenH, 0);
     p_x = 250;
     p_y = 250;

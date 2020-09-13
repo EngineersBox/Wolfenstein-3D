@@ -1,10 +1,10 @@
 #pragma once
 
 #include <string>
+
 #include "../texturing/TextureColours.h"
 
 class Wall {
-
     double posX;
     double posY;
     Colour texColour;
@@ -56,8 +56,7 @@ Wall::~Wall() {}
 ///
 /// @return double
 ///
-double Wall::getX()
-{
+double Wall::getX() {
     return posX;
 }
 
@@ -68,8 +67,7 @@ double Wall::getX()
 ///
 /// @return void
 ///
-void Wall::setX(double newX)
-{
+void Wall::setX(double newX) {
     posX = newX;
 }
 
@@ -78,8 +76,7 @@ void Wall::setX(double newX)
 ///
 /// @return double
 ///
-double Wall::getY()
-{
+double Wall::getY() {
     return posY;
 }
 
@@ -90,8 +87,7 @@ double Wall::getY()
 ///
 /// @return void
 ///
-void Wall::setY(double newY)
-{
+void Wall::setY(double newY) {
     posY = newY;
 }
 
@@ -100,8 +96,7 @@ void Wall::setY(double newY)
 ///
 /// @return Colour
 ///
-Colour Wall::getColour()
-{
+Colour Wall::getColour() {
     return texColour;
 }
 
@@ -112,7 +107,6 @@ Colour Wall::getColour()
 ///
 /// @return void
 ///
-void Wall::setColour(Colour newColour)
-{
+void Wall::setColour(Colour newColour) {
     texColour = newColour;
 }

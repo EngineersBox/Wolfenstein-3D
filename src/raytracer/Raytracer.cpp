@@ -24,7 +24,7 @@ bool renderRays = true;
 
 // Map
 bool render2DMap = true;
-int mapScreenW = screenW / 2;
+int mapScreenW = screenW >> 1; // Same as div by 2
 int mapScreenH = screenH;
 
 GameMap gameMap = GameMap();
@@ -77,12 +77,13 @@ void renderRay(float ax, float ay, float bx, float by, int line_width) {
 /// @return void
 ///
 void drawPlayer() {
-    glColor3f(1.0, 1.0, 0.0);
+    toColour(YELLOW);
     glPointSize(8);
 
     // Draw player point
     glBegin(GL_POINTS);
     glVertex2d(p_x, p_y);
+
     glEnd();
 
     // Draw direction vector
@@ -95,12 +96,12 @@ void drawPlayer() {
 /// @return void
 ///
 void drawMap2D() {
-    int x, y, mapS = gameMap.map_height * gameMap.map_width;
+    int x, y, squareWidth = mapScreenH / gameMap.map_height;
     for (y = 0; y < gameMap.map_height; y++) {
         for (x = 0; x < gameMap.map_width; x++) {
             // Change to colour coresponding to map location
             toColour(gameMap.getAt(x, y).getColour());
-            drawSquare(x * mapS, y * mapS, mapS);
+            drawSquare(x * squareWidth, y * squareWidth, squareWidth);
         }
     }
 }
@@ -271,7 +272,7 @@ void draw3DWalls(int &r, float &ra, float &distT) {
         lineH = (float)mapScreenH;
     }
 
-    float line_off = (mapScreenH / 2) - (lineH / 2);
+    float line_off = (mapScreenH >> 1) - (lineH / 2);
     float screen_off = render2DMap ? (float)mapScreenW : 0;
     renderRay(r * gameMap.map_width + screen_off, line_off, r * gameMap.map_width + screen_off, line_off + lineH, (mapS / gameMap.map_width));
 }
@@ -371,7 +372,7 @@ void display() {
 ///
 void buttons(unsigned char key, int x, int y) {
     if (key == 'a') {
-        // Turn left
+        // Turn right
         p_a -= 0.1f;
         if (p_a < 0) {
             p_a += (float)(2 * M_PI);
@@ -379,7 +380,7 @@ void buttons(unsigned char key, int x, int y) {
         p_dx = cos(p_a) * 5;
         p_dy = sin(p_a) * 5;
     } else if (key == 'd') {
-        // Turn right
+        // Turn left
         p_a += 0.1f;
         if (p_a > 2 * M_PI) {
             p_a -= (float)(2 * M_PI);
@@ -434,9 +435,11 @@ int main(int argc, char *argv[]) {
     glutCreateWindow("Ray Tracer");
 
     init(bg_colour);
+    // moveCoords();
 
     glutDisplayFunc(display);
     glutKeyboardFunc(buttons);
+    glutPostRedisplay();
     glutMainLoop();
     return 0;
 }

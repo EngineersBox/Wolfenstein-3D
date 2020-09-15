@@ -8,29 +8,29 @@ OBJECTS := $(SRC:%.cpp)
 
 compile:
 	@echo ">> Compiling new build"
-	@echo "---------------------------"
+	@echo "--------------------------------"
 	@mkdir -p $(OUT_DIR)
 	$(CXX) $(CXXFLAGS) $(SRC) -o $(OUT_DIR)/$(TARGET)
-	@echo "---------------------------\n"
+	@echo "--------------------------------\n"
 
 clean:
 	@echo ">> Removing previous builds"
-	@echo "---------------------------"
+	@echo "--------------------------------"
 	-@rm -rvf $(OUT_DIR)/*
-	@echo "---------------------------\n"
+	@echo "--------------------------------\n"
 
 destroy:
 	@echo ">> Removing $(OUT_DIR) directory"
-	@echo "---------------------------"
+	@echo "--------------------------------"
 	-@rm -rvf $(OUT_DIR)
-	@echo "---------------------------\n"
+	@echo "--------------------------------\n"
 
 run:
 	@echo ">> Running new build..."
-	@echo "---------------------------\n"
+	@echo "--------------------------------\n"
 	@ $(OUT_DIR)/$(TARGET)
 	@echo ">> Stopped running"
-	@echo "---------------------------\n"
+	@echo "--------------------------------\n"
 
 build:
 	@make clean

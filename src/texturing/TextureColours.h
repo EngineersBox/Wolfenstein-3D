@@ -17,7 +17,6 @@ Colour BLUE = {0.0, 0.0, 1.0, 1.0};
 Colour BLACK = {0.0, 0.0, 0.0, 1.0};
 Colour WHITE = {1.0, 1.0, 1.0, 1.0};
 Colour NONE = {-1.0, -1.0, -1.0, 1.0};
-
 const int RED_IDX = 0;
 const int GREEN_IDX = 1;
 const int BLUE_IDX = 2;

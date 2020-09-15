@@ -15,6 +15,9 @@ This process involes havling the render space convex hull into smaller convex hu
 
 ![https://upload.wikimedia.org/wikipedia/commons/thumb/0/08/Example_of_BSP_tree_traversal.svg/1920px-Example_of_BSP_tree_traversal.svg.png](https://upload.wikimedia.org/wikipedia/commons/thumb/0/08/Example_of_BSP_tree_traversal.svg/1920px-Example_of_BSP_tree_traversal.svg.png)
 
+### Links:
+* [OpenGL BSP implementation](https://www.opengl.org/archives/resources/code/samples/bspfaq/)
+
 ## Texture hashing
 Reducing the overhead of texture references is done with custom texture hashing. Since the textures used are simple and have deterministic object structure a hash can be produced based on a rolling polynomial string hashing method. For the name of the texture. There will also be an alternative method used for the byte array describing the texture object.
 

@@ -1,9 +1,9 @@
+#pragma once
+
 #include <GLUT/glut.h>
 #include <OpenGL/gl.h>
 #include <string>
-
-#include "LoadImageError.h"
-#include "MemoryError.h"
+#include "BMPreader.h"
 
 using namespace std;
 
@@ -21,6 +21,7 @@ typedef struct Image {
 
 class Texture {
     public:
+        Texture();
         Texture(string filename, string name, int width, int height);
         ~Texture();
         Image* loadTexture();
@@ -28,50 +29,10 @@ class Texture {
 
         string name;
         string filename;
-        Image* texture;
+        BMP texture;
         int width;
         int height;
 };
-
-Texture::Texture(string filename, string name, int width, int height) {
-    this->name = name;
-    this->filename = filename;
-    this->width = width;
-    this->height = height;
-    this->texture = loadTexture();
-}
-
-Texture::~Texture() {}
-
-Image* Texture::loadTexture() {
-    Image *image = (Image *) malloc(sizeof(Image));
-
-    if (image == NULL) {
-        throw MemoryError("Error allocating space for image");
-        exit(0);
-    }
-
-    if (!imageLoad((this->filename).c_str(), image)) {
-        exit(1);
-    }
-
-    return image;
-}
-
-long long Texture::hashCode() {
-    // Hashing using rolling polynomial method
-    string texString = name;
-    texString.append(to_string(width));
-    texString.append(to_string(height));
-    texString.append(texture->data);
-
-    long long hashVal = 0;
-    for (int i = 0; i < texString.length(); i++) {
-        hashVal = (hashVal * PRIME_BASE) + texString[i];
-        hashVal %= (int)PRIME_MOD;
-    }
-    return hashVal;
-}
 
 int imageLoad(const char *filename, Image *image) {
     FILE *file;
@@ -111,7 +72,7 @@ int imageLoad(const char *filename, Image *image) {
         return 0;
     }
     if (planes != 1) {
-        throw LoadImageError("is not", filename, ImageCause::PLANE, 1);
+        throw LoadImageError("is not ", filename, ImageCause::PLANE, 1);
         return 0;
     }
 
@@ -121,7 +82,7 @@ int imageLoad(const char *filename, Image *image) {
         return 0;
     }
     if (bpp != 24) {
-        throw LoadImageError("is not", filename, ImageCause::BPP, 24);
+        throw LoadImageError("is not ", filename, ImageCause::BPP, 24);
         return 0;
     }
 
@@ -146,4 +107,51 @@ int imageLoad(const char *filename, Image *image) {
 
     // we're done.
     return 1;
+}
+
+Texture::Texture() {}
+
+Texture::Texture(string filename, string name, int width, int height) {
+    this->name = name;
+    this->filename = filename;
+    this->width = width;
+    this->height = height;
+    this->texture = BMP(filename.c_str());
+}
+
+Texture::~Texture() {}
+
+Image* Texture::loadTexture() {
+    Image *image = (Image *) malloc(sizeof(Image));
+
+    if (image == NULL) {
+        throw MemoryError("Error allocating space for image");
+        exit(0);
+    }
+
+    if (!imageLoad((this->filename).c_str(), image)) {
+        exit(1);
+    }
+
+    return image;
+}
+
+long long Texture::hashCode() {
+    // Hashing using rolling polynomial method
+    string texString = name;
+    texString.append(to_string(width));
+    texString.append(to_string(height));
+    // for (int x = 0; x < texture.GetNumRows(); x++) {
+    //     for (int y = 0; y < texture.GetNumCols(); y++) {
+    //         texString.append("t");
+    //         // texString.append(to_string((int)texture.GetRgbPixel(x, y)));
+    //     }
+    // }
+
+    long long hashVal = 0;
+    for (int i = 0; i < texString.length(); i++) {
+        hashVal = (hashVal * PRIME_BASE) + texString[i];
+        hashVal %= (int)PRIME_MOD;
+    }
+    return hashVal;
 }

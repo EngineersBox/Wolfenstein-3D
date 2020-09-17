@@ -6,10 +6,13 @@
 #include "../map/map.h"
 #include "../texturing/ColourUtils.h"
 #include "../texturing/TextureColours.h"
+#include "../texturing/texture.h"
 
 using namespace std;
 
 #define radToCoord(r) (int)(r) >> 6
+
+vector<Texture> textures(1);
 
 // Screen
 int screenW = 1024;
@@ -28,6 +31,14 @@ int mapScreenW = screenW >> 1; // Same as div by 2
 int mapScreenH = screenH;
 
 GameMap gameMap = GameMap();
+
+double posX = 22.0, posY = 11.5;     //x and y start position
+double dirX = -1.0, dirY = 0.0;      //initial direction vector
+double planeX = 0.0, planeY = 0.66;  //the 2d raycaster version of camera plane
+
+double time_l = 0;     //time of current frame
+double oldTime = 0;  //time of previous frame
+
 
 ///
 /// Render a square at coodinates with top-left origin
@@ -277,6 +288,134 @@ void draw3DWalls(int &r, float &ra, float &distT) {
     renderRay(r * gameMap.map_width + screen_off, line_off, r * gameMap.map_width + screen_off, line_off + lineH, (mapS / gameMap.map_width));
 }
 
+void renderRaysMap() {
+    for (int x = 0; x < screenW; x ++) {
+        //calculate ray position and direction
+        double cameraX = 2 * x / (double) screenW - 1;  //x-coordinate in camera space
+        double rayDirX = dirX + planeX * cameraX;
+        double rayDirY = dirY + planeY * cameraX;
+
+        //which box of the map we're in
+        int mapX = int(posX);
+        int mapY = int(posY);
+
+        //length of ray from current position to next x or y-side
+        double sideDistX;
+        double sideDistY;
+
+        //length of ray from one x or y-side to next x or y-side
+        double deltaDistX = abs(1 / rayDirX);
+        double deltaDistY = abs(1 / rayDirY);
+        double perpWallDist;
+
+        //what direction to step in x or y-direction (either +1 or -1)
+        int stepX;
+        int stepY;
+
+        int hit = 0;  //was there a wall hit?
+        int side;     //was a NS or a EW wall hit?
+
+        //calculate step and initial sideDist
+        if (rayDirX < 0) {
+            stepX = -1;
+            sideDistX = (posX - mapX) * deltaDistX;
+        } else {
+            stepX = 1;
+            sideDistX = (mapX + 1.0 - posX) * deltaDistX;
+        }
+        if (rayDirY < 0) {
+            stepY = -1;
+            sideDistY = (posY - mapY) * deltaDistY;
+        } else {
+            stepY = 1;
+            sideDistY = (mapY + 1.0 - posY) * deltaDistY;
+        }
+        //perform DDA
+        while (hit == 0) {
+            //jump to next map square, OR in x-direction, OR in y-direction
+            if (sideDistX < sideDistY) {
+                sideDistX += deltaDistX;
+                mapX += stepX;
+                side = 0;
+            } else {
+                sideDistY += deltaDistY;
+                mapY += stepY;
+                side = 1;
+            }
+            int mp = mapY * gameMap.map_width + mapX;
+            //Check if ray has hit a wall
+            if (mp > 0 && mp < gameMap.map_width * gameMap.map_height && gameMap.getAt(mapX, mapY).getColour() != NONE) {
+                hit = 1;
+            }
+        }
+
+        //Calculate distance of perpendicular ray (Euclidean distance will give fisheye effect!)
+        if (side == 0)
+            perpWallDist = (mapX - posX + (1 - stepX) / 2) / rayDirX;
+        else
+            perpWallDist = (mapY - posY + (1 - stepY) / 2) / rayDirY;
+
+        //Calculate height of line to draw on screen
+        int lineHeight = (int)(screenH / perpWallDist);
+
+        //calculate lowest and highest pixel to fill in current stripe
+        int drawStart = -lineHeight / 2 + screenH / 2;
+        if (drawStart < 0) drawStart = 0;
+        int drawEnd = lineHeight / 2 + screenH / 2;
+        if (drawEnd >= screenH) drawEnd = screenH - 1;
+
+        //texturing calculations
+        // TODO: CHANGE THIS TO GET TEXTURE FROM WALLS
+        Texture tex = textures.at(0);  //1 subtracted from it so that texture 0 can be used!
+        int texWidth = tex.width;
+        int texHeight = tex.height;
+
+        //calculate value of wallX
+        double wallX;  //where exactly the wall was hit
+        if (side == 0)
+            wallX = posY + perpWallDist * rayDirY;
+        else
+            wallX = posX + perpWallDist * rayDirX;
+        wallX -= floor((wallX));
+
+        //x coordinate on the texture
+        int texX = int(wallX * double(texWidth));
+        if (side == 0 && rayDirX > 0) texX = texWidth - texX - 1;
+        if (side == 1 && rayDirY < 0) texX = texWidth - texX - 1;
+
+        // TODO: an integer-only bresenham or DDA like algorithm could make the texture coordinate stepping faster
+        // How much to increase the texture coordinate per screen pixel
+        double step = 1.0 * texHeight / lineHeight;
+        // Starting texture coordinate
+        double texPos = (drawStart - screenH / 2 + lineHeight / 2) * step;
+        glBegin(GL_POINTS);
+        for (int y = drawStart; y < drawEnd; y++) {
+            // Cast the texture coordinate to integer, and mask with (texHeight - 1) in case of overflow
+            int texY = (int)texPos & (texHeight - 1);
+            texPos += step;
+            if (texX >= tex.texture.bmp_info_header.width) {
+                texX = 0;
+            }
+            if (texY >= tex.texture.bmp_info_header.height) {
+                texY = 0;
+            }
+            Colour colour = RED;  // tex.texture.get_pixel(texX, texY);
+            //make color darker for y-sides: R, G and B byte each divided through two with a "shift" and an "and"
+            // if (side == 1) color = (color >> 1) & 8355711;
+            // if (side == 1) {
+            //     c_r *= 0.8;
+            //     c_g *= 0.8;
+            //     c_b *= 0.8;
+            // }
+            toColour(colour);
+            glVertex2i(x, y);
+            //buffer[y][x] = color;
+        }
+        glEnd();
+        throw MemoryError("HALTING");
+    }
+}
+
 ///
 /// Cast rays from the player and render walls
 ///
@@ -353,11 +492,12 @@ void renderRays2Dto3D() {
 ///
 void display() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    if (render2DMap) {
-        drawMap2D();
-        drawPlayer();
-    }
-    renderRays2Dto3D();
+    // if (render2DMap) {
+    //     drawMap2D();
+    //     drawPlayer();
+    // }
+    // renderRays2Dto3D();
+    renderRaysMap();
     glutSwapBuffers();
 }
 
@@ -379,7 +519,8 @@ void buttons(unsigned char key, int x, int y) {
         }
         p_dx = cos(p_a) * 5;
         p_dy = sin(p_a) * 5;
-    } else if (key == 'd') {
+    }
+    if (key == 'd') {
         // Turn left
         p_a += 0.1f;
         if (p_a > 2 * M_PI) {
@@ -387,11 +528,13 @@ void buttons(unsigned char key, int x, int y) {
         }
         p_dx = cos(p_a) * 5;
         p_dy = sin(p_a) * 5;
-    } else if (key == 'w') {
+    }
+    if (key == 'w') {
         // Move forward
         p_x += p_dx;
         p_y += p_dy;
-    } else if (key == 's') {
+    }
+    if (key == 's') {
         // Move backward
         p_x -= p_dx;
         p_y -= p_dy;
@@ -407,7 +550,9 @@ void buttons(unsigned char key, int x, int y) {
 /// @return void
 ///
 void init(Colour background_colour) {
+    // throw MemoryError("test");
     gameMap.readMapFromFile("src/world_files/map1.txt");
+    textures.at(0) = Texture("src/textures/wall-texture.bmp", "wall", 1024, 1024);
     glClearColor(
         (float)get<RED_IDX>(background_colour),
         (float)get<BLUE_IDX>(background_colour),

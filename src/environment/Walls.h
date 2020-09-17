@@ -3,12 +3,14 @@
 #include <string>
 
 #include "../texturing/TextureColours.h"
+#include "../texturing/texture.h"
 
 class Wall {
     double posX;
     double posY;
     Colour texColour;
     string texture_name;
+    Texture texture;
 
     private:
         Wall(double x, double y, Colour colour, string texture);
@@ -24,6 +26,7 @@ class Wall {
         void setY(double);
         Colour getColour();
         void setColour(Colour);
+        Texture getTexture();
 };
 
 ///
@@ -41,6 +44,9 @@ Wall::Wall(double x, double y, Colour colour, string texture) {
     posY = y;
     texColour = colour;
     texture_name = texture;
+    if (texture != "") {
+        this->texture = Texture(texture, texture, 64, 64);
+    }
 }
 
 Wall::Wall() : Wall(0, 0, NONE, "") {}
@@ -109,4 +115,8 @@ Colour Wall::getColour() {
 ///
 void Wall::setColour(Colour newColour) {
     texColour = newColour;
+}
+
+Texture Wall::getTexture() {
+    return texture;
 }

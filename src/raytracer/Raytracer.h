@@ -1,13 +1,17 @@
 #pragma once
 
+#include <GLUT/glut.h>
 #include <OpenGL/GL.h>
 #include <OpenGL/GLU.h>
-#include <GLUT/glut.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <tuple>
-#include <limits>
+
 #include <iostream>
+#include <limits>
+#include <tuple>
+
+#include "../exceptions/LoadImageError.h"
+#include "../exceptions/MemoryError.h"
 
 using namespace std;
 

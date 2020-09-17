@@ -1,3 +1,5 @@
+#pragma once
+
 #include <exception>
 #include <string>
 
@@ -15,25 +17,25 @@ enum ImageCause {
 string& operator <<(string& st, ImageCause ic) {
     switch (ic) {
         case WIDTH:
-            st.append("width");
+            st.append("width ");
             break;
         case HEIGHT:
-            st.append("height");
+            st.append("height ");
             break;
         case PLANE:
-            st.append("planes");
+            st.append("planes ");
             break;
         case BPP:
-            st.append("BPP");
+            st.append("BPP ");
             break;
         case FILEEXISTS:
-            st.append("non existant file");
+            st.append("non existant file ");
             break;
         case IDATA:
-            st.append("image data");
+            st.append("image data ");
             break;
         default:
-            st.append("INVALID");
+            st.append("INVALID ");
     }
     return st;
 }
@@ -43,8 +45,8 @@ class LoadImageError: virtual public exception {
         string error_msg = "Error on ";
         string filename_val;
         ImageCause cause;
-        unsigned long l_data = NULL;
-        unsigned short s_data = NULL;
+        unsigned long l_data = (long) NULL;
+        unsigned short s_data = (short) NULL;
 
         bool isComparator = false;
     public:
@@ -86,7 +88,7 @@ class LoadImageError: virtual public exception {
             ret_msg.append(error_msg),
             ret_msg << cause;
             ret_msg.append(": ");
-            ret_msg.append(to_string(l_data == NULL ? s_data : l_data));
+            ret_msg.append(to_string(l_data == (long) NULL ? s_data : l_data));
             return ret_msg.c_str();
         };
 };

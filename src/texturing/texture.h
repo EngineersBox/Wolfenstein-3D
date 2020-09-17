@@ -10,21 +10,11 @@ using namespace std;
 #define PRIME_MOD 1e9 - 9
 #define PRIME_BASE 1
 
-#define CM_WIDTH 64
-#define CM_HEIGHT 64
-
-typedef struct Image {
-    unsigned long width;
-    unsigned long height;
-    char *data;
-} Image;
-
 class Texture {
     public:
         Texture();
         Texture(string filename, string name, int width, int height);
         ~Texture();
-        Image* loadTexture();
         long long hashCode();
 
         string name;

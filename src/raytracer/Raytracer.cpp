@@ -2,12 +2,6 @@
 
 #include "Raytracer.h"
 
-#include "../environment/Walls.h"
-#include "../map/map.h"
-#include "../texturing/ColourUtils.h"
-#include "../texturing/TextureColours.h"
-#include "../texturing/texture.h"
-
 using namespace std;
 
 #define radToCoord(r) (int)(r) >> 6
@@ -26,7 +20,7 @@ float p_dof = 8.0f;
 bool renderRays = true;
 
 // Map
-bool render2DMap = true;
+bool render2DMap = false;
 int mapScreenW = screenW >> 1; // Same as div by 2
 int mapScreenH = screenH;
 
@@ -285,7 +279,7 @@ void draw3DWalls(int &r, float &ra, float &distT) {
 
     float line_off = (mapScreenH >> 1) - (lineH / 2);
     float screen_off = render2DMap ? (float)mapScreenW : 0;
-    renderRay(r * gameMap.map_width + screen_off, line_off, r * gameMap.map_width + screen_off, line_off + lineH, (mapS / gameMap.map_width));
+    renderRay(r * gameMap.map_width + screen_off, line_off, r * gameMap.map_width + screen_off, line_off + lineH, (screenW / fov));
 }
 
 void renderRaysMap() {
@@ -412,7 +406,6 @@ void renderRaysMap() {
             //buffer[y][x] = color;
         }
         glEnd();
-        throw MemoryError("HALTING");
     }
 }
 
@@ -492,12 +485,12 @@ void renderRays2Dto3D() {
 ///
 void display() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    // if (render2DMap) {
-    //     drawMap2D();
-    //     drawPlayer();
-    // }
-    // renderRays2Dto3D();
-    renderRaysMap();
+    if (render2DMap) {
+        drawMap2D();
+        drawPlayer();
+    }
+    renderRays2Dto3D();
+    // renderRaysMap();
     glutSwapBuffers();
 }
 

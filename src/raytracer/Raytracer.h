@@ -10,8 +10,11 @@
 #include <limits>
 #include <tuple>
 
-#include "../exceptions/LoadImageError.h"
-#include "../exceptions/MemoryError.h"
+#include "../environment/Walls.h"
+#include "../map/map.h"
+#include "../texturing/ColourUtils.h"
+#include "../texturing/TextureColours.h"
+#include "../texturing/texture.h"
 
 using namespace std;
 

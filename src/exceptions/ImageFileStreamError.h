@@ -17,8 +17,7 @@ class ImageFileStreamError : virtual public exception {
         virtual ~ImageFileStreamError() throw(){};
 
         virtual const char* what() const throw() {
-            string ret_val = "Unable to open the input image file: ";
-            ret_val.append(filename_val);
+            string ret_val = "Unable to open the input image file: " + filename_val;
             return ret_val.c_str();
         };
 };

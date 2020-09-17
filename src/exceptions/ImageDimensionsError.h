@@ -18,10 +18,10 @@ class ImageDimensionsError : virtual public exception {
         virtual ~ImageDimensionsError() throw(){};
 
         virtual const char* what() const throw() {
-            string ret_val = "Image width and height must be positive numbers: ";
-            ret_val.append(to_string(img_width));
-            ret_val.append(", ");
-            ret_val.append(to_string(img_height));
+            string ret_val = "Image width and height must be positive numbers: "
+                + to_string(img_width)
+                + ", "
+                + to_string(img_height);
             return ret_val.c_str();
         };
 };

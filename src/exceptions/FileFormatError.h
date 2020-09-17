@@ -16,8 +16,7 @@ class FileFormatError : virtual public exception {
     virtual ~FileFormatError() throw(){};
 
     virtual const char* what() const throw() {
-        string ret_val = "Unrecognized file format: ";
-        ret_val.append(format_ext);
+        string ret_val = "Unrecognized file format: " + format_ext;
         return ret_val.c_str();
     };
 };

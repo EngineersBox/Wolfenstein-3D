@@ -17,8 +17,7 @@ class BMPOriginPositionError : virtual public exception {
         virtual ~BMPOriginPositionError() throw(){};
 
         virtual const char* what() const throw() {
-            string ret_val = "BMP origin not in lower left corner: ";
-            ret_val.append(to_string(height_val));
+            string ret_val = "BMP origin not in lower left corner: " + to_string(height_val);
             return ret_val.c_str();
         };
 };

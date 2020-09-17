@@ -17,8 +17,7 @@ class BPPSizeError : virtual public exception {
         virtual ~BPPSizeError() throw(){};
 
         virtual const char* what() const throw() {
-            string ret_val = "BMP must use 24 or 32 bits per pixel: ";
-            ret_val.append(to_string(bit_count));
+            string ret_val = "BMP must use 24 or 32 bits per pixel: " + to_string(bit_count);
             return ret_val.c_str();
         };
 };

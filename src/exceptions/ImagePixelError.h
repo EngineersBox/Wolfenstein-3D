@@ -17,10 +17,10 @@ class ImagePixelError : virtual public exception {
         virtual ~ImagePixelError() throw(){};
 
         virtual const char* what() const throw() {
-            string ret_val = "Pixel location outside image boundaries: ";
-            ret_val.append(to_string(x_pos));
-            ret_val.append(", ");
-            ret_val.append(to_string(y_pos));
+            string ret_val = "Pixel location outside image boundaries: "
+                + to_string(x_pos)
+                + ", "
+                + to_string(y_pos);
             return ret_val.c_str();
         };
 };

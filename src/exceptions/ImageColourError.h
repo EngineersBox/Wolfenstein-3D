@@ -23,12 +23,12 @@ class ImageColourError : virtual public exception {
         virtual ~ImageColourError() throw(){};
 
         virtual const char* what() const throw() {
-            string ret_val = "Unexpected color ";
-            ret_val.append(cAttrib);
-            ret_val.append("format! Expecting ");
-            ret_val.append(cFormat);
-            ret_val.append(" format: ");
-            ret_val.append(value_type);
+            string ret_val = "Unexpected color "
+                + cAttrib
+                + "format! Expecting "
+                + cFormat
+                + " format: "
+                + value_type;
             return ret_val.c_str();
         };
 };

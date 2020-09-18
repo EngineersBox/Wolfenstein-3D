@@ -1,3 +1,12 @@
+/*
+ * Original BMP.h provided by 'sol-prog' and 'cloudwiser' under:
+ *   GNU General Public License v3.0
+ * Repository with orginal copy can be found at:
+ *   https://github.com/sol-prog/cpp-bmp-images
+ * 
+ * Modifications are by Jack Kilrain inline with license as specified above
+*/
+
 #pragma once
 
 #include <fstream>

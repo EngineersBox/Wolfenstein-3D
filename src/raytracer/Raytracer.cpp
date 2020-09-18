@@ -31,14 +31,6 @@ int mapScreenH = screenH;
 
 GameMap gameMap = GameMap();
 
-double posX = 22.0, posY = 11.5;     //x and y start position
-double dirX = -1.0, dirY = 0.0;      //initial direction vector
-double planeX = 0.0, planeY = 0.66;  //the 2d raycaster version of camera plane
-
-double time_l = 0;     //time of current frame
-double oldTime = 0;  //time of previous frame
-
-
 ///
 /// Render a square at coodinates with top-left origin
 ///

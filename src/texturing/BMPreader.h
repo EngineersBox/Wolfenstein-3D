@@ -42,9 +42,9 @@ struct BMPInfoHeader {
 };
 
 struct BMPColorHeader {
-    uint32_t red_mask{0x00ff0000};          // Bit mask for the red channel
-    uint32_t green_mask{0x0000ff00};        // Bit mask for the green channel
-    uint32_t blue_mask{0x000000ff};         // Bit mask for the blue channel
+    uint32_t red_mask{0x0ff0000};          // Bit mask for the red channel
+    uint32_t green_mask{0x000ff00};        // Bit mask for the green channel
+    uint32_t blue_mask{0x00000ff};         // Bit mask for the blue channel
     uint32_t alpha_mask{0xff000000};        // Bit mask for the alpha channel
     uint32_t color_space_type{0x73524742};  // Default "sRGB" (0x73524742)
     uint32_t unused[16]{0};                 // Unused data for sRGB color space
@@ -80,7 +80,7 @@ struct BMP {
                 if (bmp_info_header.size >= (sizeof(BMPInfoHeader) + sizeof(BMPColorHeader))) {
                     inp.read((char *)&bmp_color_header, sizeof(bmp_color_header));
                     // Check if the pixel data is stored as BGRA and if the color space type is sRGB
-                    check_color_header(bmp_color_header);
+                    checkColorHeader(bmp_color_header);
                 } else {
                     cerr << "Error! The file \"" << fname << "\" does not seem to contain bit mask information\n";
                     string format = string(fname);
@@ -115,7 +115,7 @@ struct BMP {
                 file_header.file_size += static_cast<uint32_t>(data.size());
             } else {
                 row_stride = bmp_info_header.width * bmp_info_header.bit_count / 8;
-                uint32_t new_stride = make_stride_aligned(4);
+                uint32_t new_stride = makeStrideAligned(4);
                 vector<uint8_t> padding_row(new_stride - row_stride);
 
                 for (int y = 0; y < bmp_info_header.height; ++y) {
@@ -154,38 +154,59 @@ struct BMP {
             row_stride = width * 3;
             data.resize(row_stride * height);
 
-            uint32_t new_stride = make_stride_aligned(4);
+            uint32_t new_stride = makeStrideAligned(4);
             file_header.file_size = file_header.offset_data + static_cast<uint32_t>(data.size()) + bmp_info_header.height * (new_stride - row_stride);
         }
     }
 
-    Colour get_pixel(u_int32_t x0, u_int32_t y0) {
-        if (x0 > (uint32_t)bmp_info_header.width || y0 > (uint32_t)bmp_info_header.height) {
-            throw ImagePixelError(x0, y0);
+    vector<Colour> getCol(u_int32_t x, u_int32_t y, bool isX = true) {
+        if (x > (uint32_t)bmp_info_header.width || y > (uint32_t)bmp_info_header.height) {
+            throw ImagePixelError(x, y);
         }
-        uint32_t R, G, B, A;
+        float distIn = bmp_info_header.width - (isX ? x : y);
+        u_int32_t col = floor(bmp_info_header.width * distIn);
+        vector<Colour> colData(bmp_info_header.height);
         uint32_t channels = bmp_info_header.bit_count / 8;
-        B = data[channels * (y0 * bmp_info_header.width + x0) + 0];
-        G = data[channels * (y0 * bmp_info_header.width + x0) + 1];
-        R = data[channels * (y0 * bmp_info_header.width + x0) + 2];
-        if (channels == 4) {
-            A = data[channels * (y0 * bmp_info_header.width + x0) + 3];
-            return {R, G, B, A};
+        for (u_int32_t i = 0; i < bmp_info_header.height; i++) {
+            uint32_t R, G, B, A = 1;
+            B = data[channels * (i * bmp_info_header.width + col) + 0];
+            G = data[channels * (i * bmp_info_header.width + col) + 1];
+            R = data[channels * (i * bmp_info_header.width + col) + 2];
+            if (channels == 4) {
+                A = data[channels * (i * bmp_info_header.width + col) + 3];
+            }
+            colData.at(i) = {(GLdouble)R, (GLdouble)G, (GLdouble)B, (GLdouble)A};
+            // colData.at(i) = getPixel(i, col); // <-- Alternative using existing method
         }
-        return {R, G, B, 1.0};
+        return colData;
     }
 
-    void set_pixel(uint32_t x0, uint32_t y0, uint8_t B, uint8_t G, uint8_t R, uint8_t A) {
-        if (x0 > (uint32_t)bmp_info_header.width || y0 > (uint32_t)bmp_info_header.height) {
-            throw ImagePixelError(x0, y0);
+    Colour getPixel(u_int32_t x, u_int32_t y) {
+        if (x > (uint32_t)bmp_info_header.width || y > (uint32_t)bmp_info_header.height) {
+            throw ImagePixelError(x, y);
+        }
+        uint32_t R, G, B, A = 1;
+        uint32_t channels = bmp_info_header.bit_count / 8;
+        B = data[channels * (y * bmp_info_header.width + x) + 0];
+        G = data[channels * (y * bmp_info_header.width + x) + 1];
+        R = data[channels * (y * bmp_info_header.width + x) + 2];
+        if (channels == 4) {
+            A = data[channels * (y * bmp_info_header.width + x) + 3];
+        }
+        return {(GLdouble)R, (GLdouble)G, (GLdouble)B, (GLdouble)A};
+    }
+
+    void setPixel(uint32_t x, uint32_t y, uint8_t B, uint8_t G, uint8_t R, uint8_t A) {
+        if (x > (uint32_t)bmp_info_header.width || y > (uint32_t)bmp_info_header.height) {
+            throw ImagePixelError(x, y);
         }
 
         uint32_t channels = bmp_info_header.bit_count / 8;
-        data[channels * (y0 * bmp_info_header.width + x0) + 0] = B;
-        data[channels * (y0 * bmp_info_header.width + x0) + 1] = G;
-        data[channels * (y0 * bmp_info_header.width + x0) + 2] = R;
+        data[channels * (y * bmp_info_header.width + x) + 0] = B;
+        data[channels * (y * bmp_info_header.width + x) + 1] = G;
+        data[channels * (y * bmp_info_header.width + x) + 2] = R;
         if (channels == 4) {
-            data[channels * (y0 * bmp_info_header.width + x0) + 3] = A;
+            data[channels * (y * bmp_info_header.width + x) + 3] = A;
         }
     }
 
@@ -193,7 +214,7 @@ struct BMP {
     uint32_t row_stride{0};
 
     // Add 1 to the row_stride until it is divisible with align_stride
-    uint32_t make_stride_aligned(uint32_t align_stride) {
+    uint32_t makeStrideAligned(uint32_t align_stride) {
         uint32_t new_stride = row_stride;
         while (new_stride % align_stride != 0) {
             new_stride++;
@@ -202,7 +223,7 @@ struct BMP {
     }
 
     // Check if the pixel data is stored as BGRA and if the color space type is sRGB
-    void check_color_header(BMPColorHeader &bmp_color_header) {
+    void checkColorHeader(BMPColorHeader &bmp_color_header) {
         BMPColorHeader expected_color_header;
         if (expected_color_header.red_mask != bmp_color_header.red_mask ||
             expected_color_header.blue_mask != bmp_color_header.blue_mask ||

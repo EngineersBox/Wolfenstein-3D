@@ -28,7 +28,7 @@ bool renderRays = true;
 
 // Map
 bool render2DMap = false;
-int mapScreenW = screenW >> (render2DMap ? 1 : 0); // Same as div by 2
+int mapScreenW = screenW >> (render2DMap ? 1 : 0); // x >> 1 == x / 2
 int mapScreenH = screenH;
 
 GameMap gameMap = GameMap();

@@ -4,13 +4,14 @@
 #include <tuple>
 #include <string>
 #include <vector>
+#include <functional>
 
 using namespace std;
 template <class R, class G, class B, class A>
-using Tuple = tuple<R, G, B, A>;
-using Colour = Tuple<GLdouble, GLdouble, GLdouble, GLdouble>;
+using CTuple = tuple<R, G, B, A>;
+using Colour = CTuple<GLdouble, GLdouble, GLdouble, GLdouble>;
 
-
+// ---- DEFAULT COLOURS ---
 Colour RED = {1.0, 0.0, 0.0, 1.0};
 Colour YELLOW = {1.0, 1.0, 0.0, 1.0};
 Colour GREEN = {0.0, 1.0, 0.0, 1.0};
@@ -21,11 +22,13 @@ Colour DARK_GREY = {0.3, 0.3, 0.3, 1.0};
 Colour LIGHT_GREY = {0.7, 0.7, 0.7, 1.0};
 Colour NONE = {-1.0, -1.0, -1.0, 1.0};
 
+// ---- CTuple INDEXES
 constexpr int RED_IDX = 0;
 constexpr int GREEN_IDX = 1;
 constexpr int BLUE_IDX = 2;
 constexpr int ALPHA_IDX = 3;
 
+// ---- COLOUR COMPONENT RETRIEVERS ----
 #define GET_RED(c) get<RED_IDX>(c)
 #define GET_GREEN(c) get<GREEN_IDX>(c)
 #define GET_BLUE(c) get<BLUE_IDX>(c)
@@ -34,7 +37,7 @@ constexpr int ALPHA_IDX = 3;
 ///
 /// Render colour with OpenGL glColor3d
 ///
-/// @param ColourTuple texColour: Tuple of <R,G,B> values for colour
+/// @param Colour texColour: Tuple of <R,G,B,A> values for colour
 ///
 /// @return void
 ///
@@ -47,6 +50,13 @@ void toColour(Colour texColour) {
     );
 }
 
+///
+/// Render colour with OpenGL glClearColour
+///
+/// @param Colour texColour: Tuple of <R,G,B,A> values for colour
+///
+/// @return void
+///
 void toClearColour(Colour texColour) {
     glClearColor(
         GET_RED(texColour) / 255,
@@ -69,6 +79,10 @@ Colour toTexColour(string colour) {
         return BLACK;
     } else if (colour == "WHITE") {
         return WHITE;
+    } else if (colour == "LIGHT_GREY") {
+        return LIGHT_GREY;
+    } else if (colour == "DARK_GREY") {
+        return DARK_GREY;
     } else {
         return NONE;
     }
@@ -93,4 +107,46 @@ void printColourVector(vector<Colour> colours) {
     for (Colour c : colours) {
         printColour(c);
     }
+}
+
+template <typename T>
+using PWOperator = function<T(T, T)>;
+
+template <typename T>
+constexpr T PW_add(T a, T b) {
+    return a + b;
+}
+
+template <typename T>
+constexpr T PW_sub(T a, T b) {
+    return a - b;
+}
+
+template <typename T>
+constexpr T PW_mul(T a, T b) {
+    return a * b;
+}
+
+template <typename T>
+constexpr T PW_div(T a, T b) {
+    return a / b;
+}
+
+///
+/// Apply a piece-wise mask to a given colour via a combination method
+///
+/// @param Colour<GLdouble, GLdouble, GLdouble, GLdouble> base: Colour to apply to
+/// @param Colour<GLdouble, GLdouble, GLdouble, GLdouble> mask: Mask to apply to colour
+/// @param std::function<T(T, T)> lin_operator: An arithmetic piece-wise operator
+///
+/// @return Colour<GLdouble, GLdouble, GLdouble, GLdouble>
+///
+template <class T>
+Colour colourMask(Colour base, Colour mask, PWOperator<T> lin_operator) {
+    return {
+        lin_operator(GET_RED(base), GET_RED(mask)),
+        lin_operator(GET_GREEN(base), GET_GREEN(mask)),
+        lin_operator(GET_BLUE(base), GET_BLUE(mask)),
+        lin_operator(GET_ALPHA(base), GET_ALPHA(mask))
+    };
 }

@@ -4,6 +4,7 @@
 #include <iostream>
 #include <stdexcept>
 #include <vector>
+#include <cmath>
 
 #include "../exceptions/BMPOriginPositionError.h"
 #include "../exceptions/BPPSizeError.h"
@@ -159,12 +160,8 @@ struct BMP {
         }
     }
 
-    vector<Colour> getCol(u_int32_t x, u_int32_t y, bool isX = true) {
-        if (x > (uint32_t)bmp_info_header.width || y > (uint32_t)bmp_info_header.height) {
-            throw ImagePixelError(x, y);
-        }
-        float distIn = bmp_info_header.width - (isX ? x : y);
-        u_int32_t col = floor(bmp_info_header.width * distIn);
+    vector<Colour> getCol(float percentageDist) {
+        u_int32_t col = bmp_info_header.width * percentageDist;
         vector<Colour> colData(bmp_info_header.height);
         uint32_t channels = bmp_info_header.bit_count / 8;
         for (u_int32_t i = 0; i < bmp_info_header.height; i++) {

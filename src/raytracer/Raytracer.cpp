@@ -12,6 +12,8 @@ const string TEX_DIR = RES_DIR + "textures/";
 const string SRC_DIR = "src/";
 
 vector<Texture> textures(1);
+#define CEILING_COLOUR LIGHT_GREY
+#define FLOOR_COLOUR DARK_GREY
 
 // Screen
 int screenW = 1024;
@@ -26,10 +28,26 @@ bool renderRays = true;
 
 // Map
 bool render2DMap = false;
-int mapScreenW = screenW >> 1; // Same as div by 2
+int mapScreenW = screenW >> (render2DMap ? 1 : 0); // Same as div by 2
 int mapScreenH = screenH;
 
 GameMap gameMap = GameMap();
+#define WALL_COUNT 8
+
+void drawRectangle(float x, float y, float xSideLength, float ySideLength, bool beginEnd = true) {
+    if (beginEnd) {
+        glBegin(GL_QUADS);
+    }
+
+    glVertex2f(x + 1, y + 1);                            // Top right
+    glVertex2f(x + 1, y + ySideLength - 1);               // Top left
+    glVertex2f(x + xSideLength - 1, y + ySideLength - 1);  // Bottom left
+    glVertex2f(x + xSideLength - 1, y + 1);               // Bottom right
+
+    if (beginEnd) {
+        glEnd();
+    }
+}
 
 ///
 /// Render a square at coodinates with top-left origin
@@ -40,15 +58,8 @@ GameMap gameMap = GameMap();
 ///
 /// @return void
 ///
-void drawSquare(int x, int y, int sidelength) {
-    glBegin(GL_QUADS);
-
-    glVertex2i(x + 1, y + 1);                            // Top right
-    glVertex2i(x + 1, y + sidelength - 1);               // Top left
-    glVertex2i(x + sidelength - 1, y + sidelength - 1);  // Bottom left
-    glVertex2i(x + sidelength - 1, y + 1);               // Bottom right
-
-    glEnd();
+void drawSquare(float x, float y, float sidelength, bool beginEnd = true) {
+    drawRectangle(x, y, sidelength, sidelength, beginEnd);
 }
 
 ///
@@ -258,7 +269,7 @@ void checkVertical(int &mx, int &my, int &mp, float &dof,
 ///
 /// @return void
 ///
-void draw3DWalls(int &r, float &ra, float &distT) {
+void draw3DWalls(int &r, float &ra, float &distT, vector<Colour> *colourStrip) {
     // Draw 3D walls
     float ca = p_a - ra;
     if (ca < 0) {
@@ -276,7 +287,23 @@ void draw3DWalls(int &r, float &ra, float &distT) {
 
     float line_off = (mapScreenH >> 1) - (lineH / 2);
     float screen_off = render2DMap ? (float)mapScreenW : 0;
-    renderRay(r * gameMap.map_width + screen_off, line_off, r * gameMap.map_width + screen_off, line_off + lineH, (screenW / fov));
+
+    int cStripSize = colourStrip->size();
+    int pixelOffset = 0;
+    int pixelStepSize = cStripSize / lineH;
+    glEnable(GL_SCISSOR_TEST);
+    for (int yPos = line_off; yPos < line_off + lineH; yPos++) {
+        int pixelIndex = pixelOffset * pixelStepSize;
+        if (pixelIndex > cStripSize) {
+            pixelIndex = cStripSize - 1;
+        }
+        Colour c = colourStrip->at(pixelIndex);
+        glScissor(r * gameMap.map_width + screen_off, yPos, mapScreenW / fov, mapScreenH / fov);
+        toClearColour(c);
+        glClear(GL_COLOR_BUFFER_BIT);
+        pixelOffset++;
+    }
+    glDisable(GL_SCISSOR_TEST);
 }
 
 ///
@@ -313,31 +340,40 @@ void renderRays2Dto3D() {
 
         checkVertical(mx, my, mp, dof, rx, ry, ra, x_off, y_off, vx, vy, disV);
 
-        if (disV < disH) {
+        bool isHorizontal = disV < disH;
+        if (isHorizontal) {
             rx = vx;
             ry = vy;
             distT = disV;
-            toColour(
-                colourMask<GLdouble>(
-                    gameMap.getAt(radToCoord(rx), radToCoord(ry)).getColour(),
-                    {0.9, 0.9, 0.9, 1.0},
-                    PW_mul<GLdouble>));
+            // toColour(
+            //     colourMask<GLdouble>(
+            //         gameMap.getAt(radToCoord(rx), radToCoord(ry)).getColour(),
+            //         {0.9, 0.9, 0.9, 1.0},
+            //         PW_mul<GLdouble>));
         } else if (disH < disV) {
             rx = hx;
             ry = hy;
             distT = disH;
-            toColour(
-                colourMask<GLdouble>(
-                    gameMap.getAt(radToCoord(rx), radToCoord(ry)).getColour(),
-                    {0.7, 0.7, 0.7, 1.0},
-                    PW_mul<GLdouble>));
+            // toColour(
+            //     colourMask<GLdouble>(
+            //         gameMap.getAt(radToCoord(rx), radToCoord(ry)).getColour(),
+            //         {0.7, 0.7, 0.7, 1.0},
+            //         PW_mul<GLdouble>));
         }
 
         if (render2DMap && renderRays) {
             renderRay(p_x, p_y, rx, ry, 1);
         }
 
-        draw3DWalls(r, ra, distT);
+        int divVal = isHorizontal ? rx : ry;
+        int mapS = isHorizontal ? mapScreenW : mapScreenH;
+        float wallSize = mapS / WALL_COUNT;
+        // cout << "Wall size" << to_string(wallSize) << endl;
+        float wallOffset = (divVal - (radToCoord(divVal))) / wallSize;
+        // cout << "Wall offset" << to_string(wallOffset) << endl;
+        // throw runtime_error("BREAK");
+        vector<Colour> bmpColStrip = textures.at(0).texture.getCol(wallOffset);
+        draw3DWalls(r, ra, distT, &bmpColStrip);
 
         ra += DR;
         if (ra < 0) {
@@ -346,6 +382,23 @@ void renderRays2Dto3D() {
             ra -= (float)(2 * M_PI);
         }
     }
+}
+
+///
+/// Display the player location (x,y) in the console
+///
+void printPlayerLocation() {
+    cout << to_string(p_x) << " " << to_string(p_y) << endl;
+}
+
+void drawCeiling() {
+    toColour(CEILING_COLOUR);
+    drawRectangle(0, 0, screenW, screenH / 2, true);
+}
+
+void drawFloor() {
+    toColour(FLOOR_COLOUR);
+    drawRectangle(0, screenH / 2, screenW, screenH, true);
 }
 
 ///
@@ -359,8 +412,11 @@ void display() {
         drawMap2D();
         drawPlayer();
     }
+    drawCeiling();
+    drawFloor();
     renderRays2Dto3D();
     glutSwapBuffers();
+    // printPlayerLocation();
 }
 
 ///
@@ -415,11 +471,7 @@ void init(Colour background_colour) {
     // throw MemoryError("test");
     gameMap.readMapFromFile(MAPS_DIR + "map1.txt");
     textures.at(0) = Texture(TEX_DIR + "wall-texture.bmp", "wall", 1024, 1024);
-    glClearColor(
-        (float)get<RED_IDX>(background_colour),
-        (float)get<BLUE_IDX>(background_colour),
-        (float)get<GREEN_IDX>(background_colour),
-        (float)get<ALPHA_IDX>(background_colour));
+    toClearColour(background_colour);
     gluOrtho2D(0, screenW, screenH, 0);
     p_x = 250;
     p_y = 250;

@@ -21,10 +21,10 @@ Colour DARK_GREY = {0.3, 0.3, 0.3, 1.0};
 Colour LIGHT_GREY = {0.7, 0.7, 0.7, 1.0};
 Colour NONE = {-1.0, -1.0, -1.0, 1.0};
 
-const int RED_IDX = 0;
-const int GREEN_IDX = 1;
-const int BLUE_IDX = 2;
-const int ALPHA_IDX = 3;
+constexpr int RED_IDX = 0;
+constexpr int GREEN_IDX = 1;
+constexpr int BLUE_IDX = 2;
+constexpr int ALPHA_IDX = 3;
 
 #define GET_RED(c) get<RED_IDX>(c)
 #define GET_GREEN(c) get<GREEN_IDX>(c)

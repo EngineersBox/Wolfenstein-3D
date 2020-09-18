@@ -269,7 +269,7 @@ void checkVertical(int &mx, int &my, int &mp, float &dof,
 ///
 /// @return void
 ///
-void draw3DWalls(int &r, float &ra, float &distT, vector<Colour> *colourStrip) {
+void draw3DWalls(int &r, float &ra, float &distT, vector<Colour> *colourStrip, Colour polygonShader, PWOperator<GLdouble> shaderOperator) {
     // Draw 3D walls
     float ca = p_a - ra;
     if (ca < 0) {
@@ -300,6 +300,13 @@ void draw3DWalls(int &r, float &ra, float &distT, vector<Colour> *colourStrip) {
         Colour c = colourStrip->at(pixelIndex);
         glScissor(r * gameMap.map_width + screen_off, yPos, mapScreenW / fov, mapScreenH / fov);
         toClearColour(c);
+        toClearColour(
+            colourMask<GLdouble>(
+                c,
+                polygonShader,
+                shaderOperator
+            )
+        );
         glClear(GL_COLOR_BUFFER_BIT);
         pixelOffset++;
     }
@@ -365,15 +372,14 @@ void renderRays2Dto3D() {
             renderRay(p_x, p_y, rx, ry, 1);
         }
 
-        int divVal = isHorizontal ? rx : ry;
-        int mapS = isHorizontal ? mapScreenW : mapScreenH;
-        float wallSize = mapS / WALL_COUNT;
-        // cout << "Wall size" << to_string(wallSize) << endl;
-        float wallOffset = (divVal - (radToCoord(divVal))) / wallSize;
-        // cout << "Wall offset" << to_string(wallOffset) << endl;
-        // throw runtime_error("BREAK");
+        int wallIntersectPoint = isHorizontal ? rx : ry;
+        float wallSize = (isHorizontal ? mapScreenW : mapScreenH) / WALL_COUNT;
+        float wallOffset = (wallIntersectPoint - (radToCoord(wallIntersectPoint))) / wallSize;
+        
         vector<Colour> bmpColStrip = textures.at(0).texture.getCol(wallOffset);
-        draw3DWalls(r, ra, distT, &bmpColStrip);
+        Colour shader = isHorizontal ? Colour{0.9, 0.9, 0.9, 1.0} : Colour{0.7, 0.7, 0.7, 1.0};
+
+        draw3DWalls(r, ra, distT, &bmpColStrip, shader, PW_mul<GLdouble>);
 
         ra += DR;
         if (ra < 0) {

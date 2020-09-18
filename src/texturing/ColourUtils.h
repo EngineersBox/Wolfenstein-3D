@@ -1,29 +1,30 @@
 #pragma once
 
-#include "TextureColours.h"
 #include <functional>
 
+#include "TextureColours.h"
+
+using namespace std;
 template <typename T>
-constexpr T PW_add(T a, T b)
-{
+using PWOperator = function<T(T, T)>;
+
+template <typename T>
+constexpr T PW_add(T a, T b) {
     return a + b;
 }
 
 template <typename T>
-constexpr T PW_sub(T a, T b)
-{
+constexpr T PW_sub(T a, T b) {
     return a - b;
 }
 
 template <typename T>
-constexpr T PW_mul(T a, T b)
-{
+constexpr T PW_mul(T a, T b) {
     return a * b;
 }
 
 template <typename T>
-constexpr T PW_div(T a, T b)
-{
+constexpr T PW_div(T a, T b) {
     return a / b;
 }
 
@@ -32,16 +33,16 @@ constexpr T PW_div(T a, T b)
 ///
 /// @param Colour<GLdouble, GLdouble, GLdouble, GLdouble> base: Colour to apply to
 /// @param Colour<GLdouble, GLdouble, GLdouble, GLdouble> mask: Mask to apply to colour
-/// @param std::function<T(T, T)>: An arithmetic lin_operator, piece-wise operator
+/// @param std::function<T(T, T)> lin_operator: An arithmetic piece-wise operator
 ///
 /// @return Colour<GLdouble, GLdouble, GLdouble, GLdouble>
 ///
-template <typename T>
-Colour colourMask(Colour base, Colour mask, std::function<T(T, T)> lin_operator)
-{
+template<class T>
+Colour colourMask(Colour base, Colour mask, PWOperator<T> lin_operator) {
     return {
-        lin_operator(std::get<RED_IDX>(base), std::get<RED_IDX>(mask)),
-        lin_operator(std::get<GREEN_IDX>(base), std::get<GREEN_IDX>(mask)),
-        lin_operator(std::get<BLUE_IDX>(base), std::get<BLUE_IDX>(mask)),
-        lin_operator(std::get<ALPHA_IDX>(base), std::get<ALPHA_IDX>(mask))};
+        lin_operator(GET_RED(base), GET_RED(mask)),
+        lin_operator(GET_GREEN(base), GET_GREEN(mask)),
+        lin_operator(GET_BLUE(base), GET_BLUE(mask)),
+        lin_operator(GET_ALPHA(base), GET_ALPHA(mask))
+    };
 }

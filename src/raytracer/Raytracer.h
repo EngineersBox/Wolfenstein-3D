@@ -14,6 +14,7 @@
 #include "../map/map.h"
 #include "../texturing/TextureColours.h"
 #include "../texturing/texture.h"
+#include "../configuration/ConfigInit.h"
 
 using namespace std;
 

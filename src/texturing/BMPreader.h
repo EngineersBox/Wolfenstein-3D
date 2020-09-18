@@ -9,19 +9,19 @@
 
 #pragma once
 
+#include <cmath>
 #include <fstream>
 #include <iostream>
 #include <stdexcept>
 #include <vector>
-#include <cmath>
 
-#include "../exceptions/BMPOriginPositionError.h"
-#include "../exceptions/BPPSizeError.h"
-#include "../exceptions/FileFormatError.h"
-#include "../exceptions/ImageColourError.h"
-#include "../exceptions/ImageDimensionsError.h"
-#include "../exceptions/ImageFileStreamError.h"
-#include "../exceptions/ImagePixelError.h"
+#include "../exceptions/image/BMPOriginPositionError.h"
+#include "../exceptions/image/BPPSizeError.h"
+#include "../exceptions/image/FileFormatError.h"
+#include "../exceptions/image/ImageColourError.h"
+#include "../exceptions/image/ImageDimensionsError.h"
+#include "../exceptions/image/ImageFileStreamError.h"
+#include "../exceptions/image/ImagePixelError.h"
 #include "TextureColours.h"
 
 using namespace std;

@@ -22,14 +22,24 @@ Colour bg_colour = {0.3, 0.3, 0.3, 0.0};
 
 // Player
 float p_x, p_y, p_dx, p_dy, p_a;
-float fov = 70.0f;
-float p_dof = 8.0f;
-bool renderRays = true;
+// float fov = 70.0f;
+// float p_dof = 8.0f;
 
-// Map
-bool render2DMap = false;
-int mapScreenW = screenW >> (render2DMap ? 1 : 0); // x >> 1 == x / 2
+// // Minimap
+// bool renderRays = true;
+// MinimapPos minimapPos = MinimapPos::TOP_LEFT;
+
+// // Map
+// bool render2DMap = false;
+int mapScreenW = screenW; // x >> 1 == x / 2
 int mapScreenH = screenH;
+
+// Configs
+ConfigInit cfgInit;
+
+PlayerCfg playerCfg;
+MinimapCfg minimapCfg;
+LoggingCfg loggingCfg;
 
 GameMap gameMap = GameMap();
 #define WALL_COUNT 8
@@ -176,16 +186,16 @@ void checkHorizontal(int &mx, int &my, int &mp, float &dof,
         // Looking left or right
         rx = p_x;
         ry = p_y;
-        dof = p_dof;
+        dof = playerCfg.dof;
     }
 
-    while (dof < p_dof) {
+    while (dof < playerCfg.dof) {
         mx = radToCoord(rx);
         my = radToCoord(ry);
         mp = my * gameMap.map_width + mx;
 
         if (mp > 0 && mp < gameMap.map_width * gameMap.map_height && gameMap.getAt(mx, my).getColour() != NONE) {
-            dof = p_dof;
+            dof = playerCfg.dof;
             hx = rx;
             hy = ry;
             disH = dist(p_x, p_y, hx, hy, ra);
@@ -239,16 +249,16 @@ void checkVertical(int &mx, int &my, int &mp, float &dof,
         // Looking up or down
         rx = p_x;
         ry = p_y;
-        dof = 8;
+        dof = playerCfg.dof;
     }
 
-    while (dof < p_dof) {
+    while (dof < playerCfg.dof) {
         mx = radToCoord(rx);
         my = radToCoord(ry);
         mp = my * gameMap.map_width + mx;
 
         if (mp > 0 && mp < gameMap.map_width * gameMap.map_height && gameMap.getAt(mx, my).getColour() != NONE) {
-            dof = p_dof;
+            dof = playerCfg.dof;
             vx = rx;
             vy = ry;
             disV = dist(p_x, p_y, vx, vy, ra);
@@ -286,7 +296,7 @@ void draw3DWalls(int &r, float &ra, float &distT, vector<Colour> *colourStrip, C
     }
 
     float line_off = (mapScreenH >> 1) - (lineH / 2);
-    float screen_off = render2DMap ? (float)mapScreenW : 0;
+    float screen_off = minimapCfg.enable ? (float)mapScreenW : 0;
 
     int cStripSize = colourStrip->size();
     int pixelOffset = 0;
@@ -298,7 +308,7 @@ void draw3DWalls(int &r, float &ra, float &distT, vector<Colour> *colourStrip, C
             pixelIndex = cStripSize - 1;
         }
         Colour c = colourStrip->at(pixelIndex);
-        glScissor(r * gameMap.map_width + screen_off, yPos, mapScreenW / fov, mapScreenH / fov);
+        glScissor(r * gameMap.map_width + screen_off, yPos, mapScreenW / playerCfg.fov, mapScreenH / playerCfg.fov);
         toClearColour(c);
         toClearColour(
             colourMask<GLdouble>(
@@ -322,7 +332,7 @@ void renderRays2Dto3D() {
     int r{}, mx{}, my{}, mp{};
     float dof, rx{}, ry{}, ra, x_off{}, y_off{}, distT{};
 
-    ra = p_a - (DR * (fov / 2));
+    ra = p_a - (DR * (playerCfg.fov / 2));
 
     if (ra < 0) {
         ra += (float)(2 * M_PI);
@@ -330,7 +340,7 @@ void renderRays2Dto3D() {
         ra -= (float)(2 * M_PI);
     }
 
-    for (r = 0; r < fov; r++) {
+    for (r = 0; r < playerCfg.fov; r++) {
         // Check horizontal lines
         dof = 0;
         float disH = numeric_limits<float>::max();
@@ -368,7 +378,7 @@ void renderRays2Dto3D() {
             //         PW_mul<GLdouble>));
         }
 
-        if (render2DMap && renderRays) {
+        if (minimapCfg.enable && minimapCfg.render_rays) {
             renderRay(p_x, p_y, rx, ry, 1);
         }
 
@@ -414,7 +424,7 @@ void drawFloor() {
 ///
 void display() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    if (render2DMap) {
+    if (minimapCfg.enable) {
         drawMap2D();
         drawPlayer();
     }
@@ -474,7 +484,10 @@ void buttons(unsigned char key, int x, int y) {
 /// @return void
 ///
 void init(Colour background_colour) {
-    // throw MemoryError("test");
+    cfgInit.initAll(playerCfg, minimapCfg, loggingCfg);
+    if (minimapCfg.enable) {
+        mapScreenW >>= 1;
+    }
     gameMap.readMapFromFile(MAPS_DIR + "map1.txt");
     textures.at(0) = Texture(TEX_DIR + "wall-texture.bmp", "wall", 1024, 1024);
     toClearColour(background_colour);
@@ -506,5 +519,6 @@ int main(int argc, char *argv[]) {
     glutKeyboardFunc(buttons);
     glutPostRedisplay();
     glutMainLoop();
+
     return 0;
 }

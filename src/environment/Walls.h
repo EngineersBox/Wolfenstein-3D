@@ -59,7 +59,7 @@ class Wall {
         Colour getColour();
         void setColour(Colour);
         string getTexture();
-        NormalDir getNormDir(float x, float y, int wall_width);
+        NormalDir getNormDir(float x, float y, int wall_width, int wall_height);
 };
 
 ///
@@ -152,10 +152,9 @@ string Wall::getTexture() {
     return texture_name;
 }
 
-NormalDir Wall::getNormDir(float x, float y, int wall_width) {
-    // Theta = tan^{-1}((y2-y1)/(x2-x1))
+NormalDir Wall::getNormDir(float x, float y, int wall_width, int wall_height) {
     float centreX = (posX * wall_width) + (wall_width << 1);
-    float centreY = (posY * wall_width) + (wall_width << 1);
+    float centreY = (posY * wall_height) + (wall_height << 1);
 
     float dx = x - centreX;
     float dy = y - centreY;

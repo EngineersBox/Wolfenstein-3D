@@ -388,7 +388,7 @@ void renderRays2Dto3D() {
             renderRay(player.x, player.y, rx, ry, 1);
         }
 
-        NormalDir nDir = hitWall.getNormDir(rx, ry, 64);
+        NormalDir nDir = hitWall.getNormDir(rx, ry, gameMap.wall_width, gameMap.wall_height);
         bool isLR = nDir == NormalDir::LEFT || nDir == NormalDir::RIGHT;
 
         int wallIntersectPoint = isLR ? ry : rx;

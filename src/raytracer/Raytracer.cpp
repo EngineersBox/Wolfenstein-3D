@@ -6,7 +6,9 @@
 #define MAPS_DIR RES_DIR + "maps/"
 #define TEX_DIR RES_DIR + "textures/"
 #define SRC_DIR string("src/")
+
 #define radToCoord(r) (int)(r) >> 6
+
 #define CEILING_COLOUR LIGHT_GREY
 #define FLOOR_COLOUR DARK_GREY
 
@@ -300,7 +302,7 @@ void draw3DWalls(int &r, float &ra, float &distT, vector<Colour> *colourStrip, C
             pixelOffset = cStripSize - 1;
         }
         Colour c = colourStrip->at(pixelOffset);
-        glScissor(r * gameMap.map_width + screen_off, yPos, (mapScreenW / playerCfg.fov) * 2, mapScreenH / playerCfg.fov);
+        glScissor(r * (mapScreenW / playerCfg.fov) * 2 + screen_off, yPos, (mapScreenW / playerCfg.fov) * 2.1, mapScreenH / playerCfg.fov);
         toClearColour(
             colourMask<GLdouble>(
                 c,

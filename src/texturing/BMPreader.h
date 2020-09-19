@@ -174,15 +174,15 @@ struct BMP {
         vector<Colour> colData(bmp_info_header.height);
         uint32_t channels = bmp_info_header.bit_count / 8;
         for (u_int32_t i = 0; i < bmp_info_header.height; i++) {
-            uint32_t R, G, B, A = 1;
-            B = data[channels * (i * bmp_info_header.width + col) + 0];
-            G = data[channels * (i * bmp_info_header.width + col) + 1];
-            R = data[channels * (i * bmp_info_header.width + col) + 2];
-            if (channels == 4) {
-                A = data[channels * (i * bmp_info_header.width + col) + 3];
-            }
-            colData.at(i) = {(GLdouble)R, (GLdouble)G, (GLdouble)B, (GLdouble)A};
-            // colData.at(i) = getPixel(i, col); // <-- Alternative using existing method
+            // uint32_t R, G, B, A = 1;
+            // B = data[channels * (i * bmp_info_header.width + col) + 0];
+            // G = data[channels * (i * bmp_info_header.width + col) + 1];
+            // R = data[channels * (i * bmp_info_header.width + col) + 2];
+            // if (channels == 4) {
+            //     A = data[channels * (i * bmp_info_header.width + col) + 3];
+            // }
+            // colData.at(i) = {(GLdouble)R, (GLdouble)G, (GLdouble)B, (GLdouble)A};
+            colData.at(i) = getPixel(col, i); // <-- Alternative using existing method
         }
         return colData;
     }
@@ -199,6 +199,7 @@ struct BMP {
         if (channels == 4) {
             A = data[channels * (y * bmp_info_header.width + x) + 3];
         }
+        // printColour({(GLdouble)R, (GLdouble)G, (GLdouble)B, (GLdouble)A});
         return {(GLdouble)R, (GLdouble)G, (GLdouble)B, (GLdouble)A};
     }
 

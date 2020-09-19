@@ -2,16 +2,11 @@
 
 #include "Raytracer.h"
 
-using namespace std;
-
+#define RES_DIR string("resources/")
+#define MAPS_DIR RES_DIR + "maps/"
+#define TEX_DIR RES_DIR + "textures/"
+#define SRC_DIR string("src/")
 #define radToCoord(r) (int)(r) >> 6
-
-const string RES_DIR = "resources/";
-const string MAPS_DIR = RES_DIR + "maps/";
-const string TEX_DIR = RES_DIR + "textures/";
-const string SRC_DIR = "src/";
-
-vector<Texture> textures(1);
 #define CEILING_COLOUR LIGHT_GREY
 #define FLOOR_COLOUR DARK_GREY
 
@@ -20,17 +15,14 @@ int screenW = 1024;
 int screenH = 512;
 Colour bg_colour = {0.3, 0.3, 0.3, 0.0};
 
+TextureLoader texLoader;
+map<std::string, Texture> textures;
+vector<Colour> emptyCol(screenH);
+
 // Player
 float p_x, p_y, p_dx, p_dy, p_a;
-// float fov = 70.0f;
-// float p_dof = 8.0f;
 
-// // Minimap
-// bool renderRays = true;
-// MinimapPos minimapPos = MinimapPos::TOP_LEFT;
-
-// // Map
-// bool render2DMap = false;
+// Map
 int mapScreenW = screenW; // x >> 1 == x / 2
 int mapScreenH = screenH;
 
@@ -84,6 +76,7 @@ void drawSquare(float x, float y, float sidelength, bool beginEnd = true) {
 /// @return void
 ///
 void renderRay(float ax, float ay, float bx, float by, int line_width) {
+    toColour(WHITE);
     glLineWidth((float)line_width);
 
     glBegin(GL_LINES);
@@ -300,16 +293,14 @@ void draw3DWalls(int &r, float &ra, float &distT, vector<Colour> *colourStrip, C
 
     int cStripSize = colourStrip->size();
     int pixelOffset = 0;
-    int pixelStepSize = cStripSize / lineH;
+    int pixelStepSize = cStripSize / (line_off + lineH);
     glEnable(GL_SCISSOR_TEST);
     for (int yPos = line_off; yPos < line_off + lineH; yPos++) {
-        int pixelIndex = pixelOffset * pixelStepSize;
-        if (pixelIndex > cStripSize) {
-            pixelIndex = cStripSize - 1;
+        if (pixelOffset > cStripSize) {
+            pixelOffset = cStripSize - 1;
         }
-        Colour c = colourStrip->at(pixelIndex);
-        glScissor(r * gameMap.map_width + screen_off, yPos, mapScreenW / playerCfg.fov, mapScreenH / playerCfg.fov);
-        toClearColour(c);
+        Colour c = colourStrip->at(pixelOffset);
+        glScissor(r * gameMap.map_width + screen_off, yPos, (mapScreenW / playerCfg.fov) * 2, mapScreenH / playerCfg.fov);
         toClearColour(
             colourMask<GLdouble>(
                 c,
@@ -318,7 +309,7 @@ void draw3DWalls(int &r, float &ra, float &distT, vector<Colour> *colourStrip, C
             )
         );
         glClear(GL_COLOR_BUFFER_BIT);
-        pixelOffset++;
+        pixelOffset += pixelStepSize;
     }
     glDisable(GL_SCISSOR_TEST);
 }
@@ -329,8 +320,9 @@ void draw3DWalls(int &r, float &ra, float &distT, vector<Colour> *colourStrip, C
 /// @return void
 ///
 void renderRays2Dto3D() {
-    int r{}, mx{}, my{}, mp{};
-    float dof, rx{}, ry{}, ra, x_off{}, y_off{}, distT{};
+    int r{0}, mx{0}, my{0}, mp{0};
+    float dof, rx{0}, ry{0}, ra, x_off{0}, y_off{0}, distT{0};
+    vector<Colour> prevCol = emptyCol;
 
     ra = p_a - (DR * (playerCfg.fov / 2));
 
@@ -358,39 +350,40 @@ void renderRays2Dto3D() {
         checkVertical(mx, my, mp, dof, rx, ry, ra, x_off, y_off, vx, vy, disV);
 
         bool isHorizontal = disV < disH;
-        if (isHorizontal) {
+        bool shouldRender = true;
+        Wall hitWall;
+        if (disV < disH) {
             rx = vx;
             ry = vy;
             distT = disV;
-            // toColour(
-            //     colourMask<GLdouble>(
-            //         gameMap.getAt(radToCoord(rx), radToCoord(ry)).getColour(),
-            //         {0.9, 0.9, 0.9, 1.0},
-            //         PW_mul<GLdouble>));
+            hitWall = gameMap.getAt(radToCoord(rx), radToCoord(ry));
         } else if (disH < disV) {
             rx = hx;
             ry = hy;
             distT = disH;
-            // toColour(
-            //     colourMask<GLdouble>(
-            //         gameMap.getAt(radToCoord(rx), radToCoord(ry)).getColour(),
-            //         {0.7, 0.7, 0.7, 1.0},
-            //         PW_mul<GLdouble>));
+            hitWall = gameMap.getAt(radToCoord(rx), radToCoord(ry));
+        } else {
+            rx = 0;
+            ry = 0;
+            shouldRender = false;
         }
 
         if (minimapCfg.enable && minimapCfg.render_rays) {
             renderRay(p_x, p_y, rx, ry, 1);
         }
+        NormalDir nDir = hitWall.getNormDir(rx, ry, 64);
+        bool isLR = nDir == NormalDir::LEFT || nDir == NormalDir::RIGHT;
 
-        int wallIntersectPoint = isHorizontal ? rx : ry;
-        float wallSize = (isHorizontal ? mapScreenW : mapScreenH) / WALL_COUNT;
-        float wallOffset = (wallIntersectPoint - (radToCoord(wallIntersectPoint))) / wallSize;
-        
-        vector<Colour> bmpColStrip = textures.at(0).texture.getCol(wallOffset);
+        int wallIntersectPoint = isLR ? ry : rx;
+        int wallSize = (isLR ? mapScreenW : mapScreenH) / WALL_COUNT;
+        float wallOffset = ((wallIntersectPoint - (radToCoord(wallIntersectPoint))) % wallSize) / (float) wallSize;
+
+        vector<Colour> bmpColStrip = shouldRender ? textures.at("wall").texture.getCol(wallOffset) : prevCol;
         Colour shader = isHorizontal ? Colour{0.9, 0.9, 0.9, 1.0} : Colour{0.7, 0.7, 0.7, 1.0};
 
-        draw3DWalls(r, ra, distT, &bmpColStrip, shader, PW_mul<GLdouble>);
+        prevCol = bmpColStrip;
 
+        draw3DWalls(r, ra, distT, &bmpColStrip, shader, PW_mul<GLdouble>);
         ra += DR;
         if (ra < 0) {
             ra += (float)(2 * M_PI);
@@ -424,12 +417,12 @@ void drawFloor() {
 ///
 void display() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    drawCeiling();
+    drawFloor();
     if (minimapCfg.enable) {
         drawMap2D();
         drawPlayer();
     }
-    drawCeiling();
-    drawFloor();
     renderRays2Dto3D();
     glutSwapBuffers();
     // printPlayerLocation();
@@ -488,8 +481,12 @@ void init(Colour background_colour) {
     if (minimapCfg.enable) {
         mapScreenW >>= 1;
     }
+    texLoader = TextureLoader();
+    textures = *texLoader.loadTextures();
     gameMap.readMapFromFile(MAPS_DIR + "map1.txt");
-    textures.at(0) = Texture(TEX_DIR + "wall-texture.bmp", "wall", 1024, 1024);
+
+    fill(emptyCol.begin(), emptyCol.end(), background_colour);
+
     toClearColour(background_colour);
     gluOrtho2D(0, screenW, screenH, 0);
     p_x = 250;

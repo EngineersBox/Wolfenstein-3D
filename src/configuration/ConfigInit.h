@@ -66,7 +66,9 @@ LoggingCfg ConfigInit::initLoggingConfig() {
         reader.GetBoolean(LOGGING_SECTION, "gl_debug", false),
         reader.GetBoolean(LOGGING_SECTION, "player_pos", false),
         reader.GetBoolean(LOGGING_SECTION, "tex_processing", false),
-        reader.GetBoolean(LOGGING_SECTION, "map_processing", false)
+        reader.GetBoolean(LOGGING_SECTION, "map_processing", false),
+        reader.GetBoolean(LOGGING_SECTION, "hide_warnings", false),
+        reader.GetBoolean(LOGGING_SECTION, "hide_infos", false)
     );
 };
 

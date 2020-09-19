@@ -9,12 +9,16 @@
 #include <iostream>
 #include <limits>
 #include <tuple>
+#include <map>
+#include <string>
+#include <algorithm>
 
 #include "../environment/Walls.h"
 #include "../map/map.h"
 #include "../texturing/TextureColours.h"
 #include "../texturing/texture.h"
 #include "../configuration/ConfigInit.h"
+#include "../texturing/TextureLoader.h"
 
 using namespace std;
 

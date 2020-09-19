@@ -13,7 +13,7 @@ using namespace std;
 class Texture {
     public:
         Texture();
-        Texture(string filename, string name, int width, int height);
+        Texture(string filename, string name);
         ~Texture();
         long long hashCode();
 
@@ -26,12 +26,12 @@ class Texture {
 
 Texture::Texture() {}
 
-Texture::Texture(string filename, string name, int width, int height) {
+Texture::Texture(string filename, string name) {
     this->name = name;
     this->filename = filename;
-    this->width = width;
-    this->height = height;
     this->texture = BMP(filename.c_str());
+    this->width = this->texture.bmp_info_header.width;
+    this->height = this->texture.bmp_info_header.height;
 }
 
 Texture::~Texture() {}

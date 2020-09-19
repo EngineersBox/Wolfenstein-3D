@@ -72,7 +72,7 @@ void GameMap::readMapFromFile(string filename) {
                 this->_walls.at((y * this->map_width) + x) = Wall(x, y, toTexColour(cToken));
                 continue;
             }
-            this->_walls.at((y * this->map_width) + x) = Wall(x, y, cToken);
+            this->_walls.at((y * this->map_width) + x) = Wall(x, y, cToken == "NONE" ? NONE : WHITE, cToken);
         }
     }
 }

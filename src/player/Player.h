@@ -1,5 +1,7 @@
 #pragma once
 
+#include "../logging/GLDebug.h"
+
 using namespace std;
 
 class Player {
@@ -8,6 +10,7 @@ class Player {
         Player(float x, float y, float dx, float dy, float angle);
         ~Player();
         void printLocation();
+        void logLocation(GLDebugContext *debugContext);
 
         float x;
         float y;
@@ -30,4 +33,8 @@ Player::~Player() {};
 
 void Player::printLocation() {
     cout << "Player Position: (" << to_string(this->x) << "," << to_string(this->y) << ")" << endl;
-}
+};
+
+void Player::logLocation(GLDebugContext *debugContext) {
+    debugContext->logAppInfo(string("Player Position: (" + to_string(this->x) + "," + to_string(this->y) +")"));
+};

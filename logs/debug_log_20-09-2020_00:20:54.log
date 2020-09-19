@@ -1,6 +1,0 @@
-#### START OF LOG ####
-[00:20:54] {7|50|400 ~ 457}:  type = 0x7, severity = 0x400, message = Loaded 1 textures
-[00:20:54] {7|50|400 ~ 457}:  type = 0x7, severity = 0x400, message = Loaded map: resources/maps/map1.txt
-[00:20:54] {7|50|400 ~ 457}:  type = 0x7, severity = 0x400, message = Initialised player object
-[00:20:54] {7|50|400 ~ 457}:  type = 0x7, severity = 0x400, message = COMPLETED INIT PHASE
-[00:20:54] {7|50|400 ~ 457}:  type = 0x7, severity = 0x400, message = Initialised OpenGL/GLUT display and buttons

@@ -19,11 +19,11 @@ class TextureLoader {
         TextureLoader(std::vector<std::string>* filenames);
         ~TextureLoader();
 
-        map<std::string, Texture>* loadTextures();
+        std::map<std::string, Texture>* loadTextures();
 
-        vector<std::string>* filenames;
+        std::vector<std::string>* filenames;
     private:
-        vector<std::string>* getTextureFileNames();
+        std::vector<std::string>* getTextureFileNames();
         bool verifyFileExistance(const std::string& filename);
         bool hasExt(const std::string& filename, const std::string& extension);
         std::string stripExt(const std::string& filename, const std::string& extension);
@@ -33,7 +33,7 @@ TextureLoader::TextureLoader(){
     this->filenames = getTextureFileNames();
 };
 
-TextureLoader::TextureLoader(vector<std::string>* filenames) {
+TextureLoader::TextureLoader(std::vector<std::string>* filenames) {
     this->filenames = filenames;
 };
 
@@ -50,13 +50,13 @@ std::string TextureLoader::stripExt(const std::string& filename, const std::stri
     return filename.substr(0, filename.find("."));
 }
 
-vector<std::string>* TextureLoader::getTextureFileNames() {
+std::vector<std::string>* TextureLoader::getTextureFileNames() {
     DIR* dirp = opendir(std::string("resources/textures").c_str());
     struct dirent* dp;
-    vector<std::string> files;
+    std::vector<std::string> files;
     int texCount = 0;
     while ((dp = readdir(dirp)) != NULL && texCount < MAX_TEXTURE_AMT) {
-        string cfile = std::string(dp->d_name);
+        std::string cfile(dp->d_name);
         if (cfile.size() < 3 || !hasExt(cfile, ".bmp")) {
             continue;
         }
@@ -67,20 +67,20 @@ vector<std::string>* TextureLoader::getTextureFileNames() {
     if (texCount == MAX_TEXTURE_AMT) {
         cout << "WARNING: Maximum texture import count reached [" << MAX_TEXTURE_AMT << "]" << endl;
     }
-    return new vector<std::string>(files);
+    return new std::vector<std::string>(files);
 };
 
-map<std::string, Texture>* TextureLoader::loadTextures() {
+std::map<std::string, Texture>* TextureLoader::loadTextures() {
     int textureCount = this->filenames->size();
-    map<std::string, Texture> textures;
+    std::map<std::string, Texture> textures;
     for (int i = 0; i < textureCount; i++) {
         const std::string& fname = this->filenames->at(i);
         if (!verifyFileExistance(fname)) {
             continue;
         }
-        textures.insert(pair<string, Texture>(stripExt(fname, ".bmp"), Texture("resources/textures/" + fname, fname)));
+        textures.insert(std::pair<string, Texture>(stripExt(fname, ".bmp"), Texture("resources/textures/" + fname, fname)));
     }
-    return new map<std::string, Texture>(textures);
+    return new std::map<std::string, Texture>(textures);
 }
 
 bool TextureLoader::verifyFileExistance(const std::string& filename) {

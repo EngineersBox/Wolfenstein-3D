@@ -11,6 +11,8 @@
 #define IS_RIGHT(a) ((3 * M_PI) / 4) < a&& a <= ((5 * M_PI) / 4)
 #define IS_UP(a) ((5 * M_PI) / 4) < a&& a <= ((7 * M_PI) / 4)
 
+using namespace std;
+
 enum NormalDir {
     LEFT,
     RIGHT,
@@ -42,12 +44,12 @@ class Wall {
     double posX;
     double posY;
     Colour texColour;
-    std::string texture_name;
+    string texture_name;
 
     public:
-        Wall(double x, double y, Colour colour, std::string texture);
+        Wall(double x, double y, Colour colour, string texture);
         Wall(double x, double y, Colour colour);
-        Wall(double x, double y, std::string texture);
+        Wall(double x, double y, string texture);
         Wall();
         ~Wall();
         double getX();
@@ -56,7 +58,7 @@ class Wall {
         void setY(double);
         Colour getColour();
         void setColour(Colour);
-        std::string getTexture();
+        string getTexture();
         NormalDir getNormDir(float x, float y, int wall_width);
 };
 
@@ -70,7 +72,7 @@ class Wall {
 ///
 /// @returns Wall
 ///
-Wall::Wall(double x, double y, Colour colour, std::string texture) {
+Wall::Wall(double x, double y, Colour colour, string texture) {
     posX = x;
     posY = y;
     texColour = colour;
@@ -80,7 +82,7 @@ Wall::Wall(double x, double y, Colour colour, std::string texture) {
 
 Wall::Wall() : Wall(0, 0, NONE, "") {}
 
-Wall::Wall(double x, double y, std::string texture) : Wall(x, y, NONE, texture) {}
+Wall::Wall(double x, double y, string texture) : Wall(x, y, NONE, texture) {}
 
 Wall::Wall(double x, double y, Colour colour) : Wall(x, y, colour, "") {}
 
@@ -146,7 +148,7 @@ void Wall::setColour(Colour newColour) {
     texColour = newColour;
 }
 
-std::string Wall::getTexture() {
+string Wall::getTexture() {
     return texture_name;
 }
 

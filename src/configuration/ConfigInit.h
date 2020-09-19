@@ -2,9 +2,11 @@
 
 #include "INIReader.h"
 #include "../exceptions/config/INIReadError.h"
-#include "MinimapCfg.h"
-#include "LoggingCfg.h"
-#include "PlayerCfg.h"
+#include "mappers/MinimapCfg.h"
+#include "mappers/LoggingCfg.h"
+#include "mappers/PlayerCfg.h"
+#include "mappers/RenderCfg.h"
+
 using namespace std;
 
 const string CFG_DIR = "resources/configs/";
@@ -13,6 +15,7 @@ const string CFG_DIR = "resources/configs/";
 #define PLAYER_SECTION "player"
 #define MINIMAP_SECTION "minimap"
 #define LOGGING_SECTION "logging"
+#define RENDER_SECTION "rendering"
 
 class ConfigInit {
     private:
@@ -28,7 +31,8 @@ class ConfigInit {
         PlayerCfg initPlayerConfig();
         MinimapCfg initMinimapConfig();
         LoggingCfg initLoggingConfig();
-        void initAll(PlayerCfg& p_cfg, MinimapCfg& m_cfg, LoggingCfg& l_cfg);
+        RenderCfg initRenderConfig();
+        void initAll(PlayerCfg& p_cfg, MinimapCfg& m_cfg, LoggingCfg& l_cfg, RenderCfg& r_cfg);
 };
 
 ConfigInit::ConfigInit(const string& cfg_file) {
@@ -72,8 +76,17 @@ LoggingCfg ConfigInit::initLoggingConfig() {
     );
 };
 
-void ConfigInit::initAll(PlayerCfg& p_cfg, MinimapCfg& m_cfg, LoggingCfg& l_cfg) {
+RenderCfg ConfigInit::initRenderConfig() {
+    return RenderCfg(
+        reader.GetBoolean(RENDER_SECTION, "headless_mode", false),
+        reader.GetBoolean(RENDER_SECTION, "double_buffer", false),
+        reader.GetInteger(RENDER_SECTION, "refresh_rate", 60)
+    );
+}
+
+void ConfigInit::initAll(PlayerCfg& p_cfg, MinimapCfg& m_cfg, LoggingCfg& l_cfg, RenderCfg& r_cfg) {
     p_cfg = initPlayerConfig();
     m_cfg = initMinimapConfig();
     l_cfg = initLoggingConfig();
+    r_cfg = initRenderConfig();
 }

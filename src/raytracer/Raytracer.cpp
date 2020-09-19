@@ -12,13 +12,15 @@
 #define CEILING_COLOUR LIGHT_GREY
 #define FLOOR_COLOUR DARK_GREY
 
+using namespace std;
+
 // Screen
 int screenW = 1024;
 int screenH = 512;
 Colour bg_colour = {0.3, 0.3, 0.3, 0.0};
 
 TextureLoader texLoader;
-map<std::string, Texture> textures;
+map<string, Texture> textures;
 vector<Colour> emptyCol(screenH);
 
 // Player
@@ -34,6 +36,7 @@ ConfigInit cfgInit;
 PlayerCfg playerCfg;
 MinimapCfg minimapCfg;
 LoggingCfg loggingCfg;
+RenderCfg renderCfg;
 
 GameMap gameMap = GameMap();
 #define WALL_COUNT 8
@@ -295,12 +298,10 @@ void draw3DWalls(int &r, float &ra, float &distT, vector<Colour> *colourStrip, C
 
     int cStripSize = colourStrip->size();
     int pixelOffset = 0;
-    int pixelStepSize = cStripSize / (line_off + lineH);
+    int pixelStepSize = cStripSize / lineH;
     glEnable(GL_SCISSOR_TEST);
     for (int yPos = line_off; yPos < line_off + lineH; yPos++) {
-        if (pixelOffset > cStripSize) {
-            pixelOffset = cStripSize - 1;
-        }
+        pixelOffset = min(pixelOffset, cStripSize - 1);
         Colour c = colourStrip->at(pixelOffset);
         glScissor(r * (mapScreenW / playerCfg.fov) * 2 + screen_off, yPos, (mapScreenW / playerCfg.fov) * 2.1, mapScreenH / playerCfg.fov);
         toClearColour(
@@ -479,7 +480,7 @@ void buttons(unsigned char key, int x, int y) {
 /// @return void
 ///
 void init(Colour background_colour) {
-    cfgInit.initAll(playerCfg, minimapCfg, loggingCfg);
+    cfgInit.initAll(playerCfg, minimapCfg, loggingCfg, renderCfg);
     if (minimapCfg.enable) {
         mapScreenW >>= 1;
     }
@@ -512,7 +513,6 @@ int main(int argc, char *argv[]) {
     glutCreateWindow("Ray Tracer");
 
     init(bg_colour);
-    // moveCoords();
 
     glutDisplayFunc(display);
     glutKeyboardFunc(buttons);

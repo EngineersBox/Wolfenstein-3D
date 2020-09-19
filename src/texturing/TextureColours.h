@@ -93,10 +93,10 @@ void printColour(Colour colour) {
         cout << "EMPTY COLOUR" << endl;
         return;
     }
-    cout << "R:" << get<RED_IDX>(colour);
-    cout << " G:" << get<GREEN_IDX>(colour);
-    cout << " B:" << get<BLUE_IDX>(colour);
-    cout << " A:" << get<ALPHA_IDX>(colour) << endl;
+    cout << "R:" << GET_RED(colour);
+    cout << " G:" << GET_GREEN(colour);
+    cout << " B:" << GET_BLUE(colour);
+    cout << " A:" << GET_ALPHA(colour) << endl;
 }
 
 void printColourVector(vector<Colour> colours) {

@@ -22,6 +22,8 @@ class GameMap {
         
         int map_width;
         int map_height;
+        int wall_width;
+        int wall_height;
         vector<Wall> _walls;
 };
 

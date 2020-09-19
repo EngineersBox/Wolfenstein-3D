@@ -39,7 +39,6 @@ LoggingCfg loggingCfg;
 RenderCfg renderCfg;
 
 GameMap gameMap = GameMap();
-#define WALL_COUNT 8
 
 ///
 /// Render a square at coodinates with top-left origin
@@ -129,12 +128,12 @@ void drawPlayer() {
 /// @return void
 ///
 void drawMap2D() {
-    int x, y, squareWidth = mapScreenH / gameMap.map_height;
+    int x, y;
     for (y = 0; y < gameMap.map_height; y++) {
         for (x = 0; x < gameMap.map_width; x++) {
             // Change to colour coresponding to map location
             toColour(gameMap.getAt(x, y).getColour());
-            drawSquare(x * squareWidth, y * squareWidth, squareWidth);
+            drawSquare(x * gameMap.wall_width, y * gameMap.map_height, gameMap.wall_width);
         }
     }
 }
@@ -178,17 +177,17 @@ void checkHorizontal(int &mx, int &my, int &mp, float &dof,
     float aTan = -1 / tan(ra);
     if (ra > M_PI) {
         // Looking up
-        ry = (((int)player.y >> 6) << 6) - 0.0001f;
+        ry = ((radToCoord(player.y)) << 6) - 0.0001f;
         rx = (player.y - ry) * aTan + player.x;
-        y_off = -64;
+        y_off = -gameMap.wall_height;
         x_off = -y_off * aTan;
     }
 
     if (ra < M_PI) {
         // Looking down
-        ry = (float)(((int)player.y >> 6) << 6) + 64;
+        ry = (float)((radToCoord(player.y)) << 6) + gameMap.wall_height;
         rx = (player.y - ry) * aTan + player.x;
-        y_off = 64;
+        y_off = gameMap.wall_height;
         x_off = -y_off * aTan;
     }
 
@@ -241,17 +240,17 @@ void checkVertical(int &mx, int &my, int &mp, float &dof,
     float nTan = -tan(ra);
     if (ra > M_PI_2 && ra < THREE_HALF_PI) {
         // Looking left
-        rx = (((int)player.x >> 6) << 6) - 0.0001f;
+        rx = ((radToCoord(player.x)) << 6) - 0.0001f;
         ry = (player.x - rx) * nTan + player.y;
-        x_off = -64;
+        x_off = -gameMap.wall_width;
         y_off = -x_off * nTan;
     }
 
     if (ra < M_PI_2 || ra > THREE_HALF_PI) {
         // Looking right
-        rx = (float)(((int)player.x >> 6) << 6) + 64;
+        rx = (float)((radToCoord(player.x)) << 6) + gameMap.wall_width;
         ry = (player.x - rx) * nTan + player.y;
-        x_off = 64;
+        x_off = gameMap.wall_width;
         y_off = -x_off * nTan;
     }
 
@@ -386,11 +385,12 @@ void renderRays2Dto3D() {
         if (minimapCfg.enable && minimapCfg.render_rays) {
             renderRay(player.x, player.y, rx, ry, 1);
         }
+
         NormalDir nDir = hitWall.getNormDir(rx, ry, 64);
         bool isLR = nDir == NormalDir::LEFT || nDir == NormalDir::RIGHT;
 
         int wallIntersectPoint = isLR ? ry : rx;
-        int wallSize = (isLR ? mapScreenW : mapScreenH) / WALL_COUNT;
+        int wallSize = (isLR ? mapScreenW : mapScreenH) / (isLR ? gameMap.map_width : gameMap.map_height);
         float wallOffset = ((wallIntersectPoint - (radToCoord(wallIntersectPoint))) % wallSize) / (float) wallSize;
 
         vector<Colour> bmpColStrip = shouldRender ? textures.at(hitWall.getTexture()).texture.getCol(wallOffset) : prevCol;
@@ -399,6 +399,7 @@ void renderRays2Dto3D() {
         prevCol = bmpColStrip;
 
         draw3DWalls(r, ra, distT, &bmpColStrip, shader, PW_mul<GLdouble>);
+
         ra += DR;
         if (ra < 0) {
             ra += (float)(2 * M_PI);
@@ -420,7 +421,7 @@ void printPlayerLocation() {
 ///
 void drawCeiling() {
     toColour(CEILING_COLOUR);
-    drawRectangle(0, 0, screenW, screenH / 2, true);
+    drawRectangle(0, 0, screenW, screenH >> 1, true);
 }
 
 ///
@@ -428,7 +429,7 @@ void drawCeiling() {
 ///
 void drawFloor() {
     toColour(FLOOR_COLOUR);
-    drawRectangle(0, screenH / 2, screenW, screenH, true);
+    drawRectangle(0, screenH >> 1, screenW, screenH, true);
 }
 
 ///
@@ -502,6 +503,8 @@ void init(Colour background_colour) {
     texLoader = TextureLoader();
     textures = *texLoader.loadTextures();
     gameMap.readMapFromFile(MAPS_DIR + "map1.txt");
+    gameMap.wall_width = mapScreenW / gameMap.map_width;
+    gameMap.wall_height = mapScreenH / gameMap.map_height;
 
     fill(emptyCol.begin(), emptyCol.end(), background_colour);
 

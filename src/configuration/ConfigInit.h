@@ -69,11 +69,10 @@ LoggingCfg ConfigInit::initLoggingConfig() {
     return LoggingCfg(
         reader.GetBoolean(LOGGING_SECTION, "gl_debug", false),
         reader.GetBoolean(LOGGING_SECTION, "player_pos", false),
-        reader.GetBoolean(LOGGING_SECTION, "tex_processing", false),
-        reader.GetBoolean(LOGGING_SECTION, "map_processing", false),
+        reader.GetBoolean(LOGGING_SECTION, "tex_skip_invalid", false),
+        reader.GetBoolean(LOGGING_SECTION, "map_skip_invalid", false),
         reader.GetBoolean(LOGGING_SECTION, "hide_warnings", false),
-        reader.GetBoolean(LOGGING_SECTION, "hide_infos", false)
-    );
+        reader.GetBoolean(LOGGING_SECTION, "hide_infos", false));
 };
 
 RenderCfg ConfigInit::initRenderConfig() {

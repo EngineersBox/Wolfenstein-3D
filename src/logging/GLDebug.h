@@ -60,49 +60,31 @@ enum DEBUG_LOG_FORMAT {
     CUSTOM_PREFIX_TIME_ONLY
 };
 
-static DEBUG_NAME_FORMAT DEBUG_LOG_FORMAT_LUT[] = {
+static const DEBUG_NAME_FORMAT DEBUG_LOG_FORMAT_LUT[] = {
     DEBUG_NAME_FORMAT{"debug_log_", "%d-%m-%Y_%H:%M:%S"},
     DEBUG_NAME_FORMAT{"debug_log_", "%H:%M:%S"},
     DEBUG_NAME_FORMAT{"", "%d-%m-%Y_%H:%M:%S"},
     DEBUG_NAME_FORMAT{"", "%H:%M:%S"}};
 
-string toHex(int value) {
-    stringstream sstream;
-    sstream << hex << value;
-    return sstream.str();
-}
-
-string getCurrentTime(const char* date_format = "%d-%m-%Y_%H:%M:%S") {
-    time_t rawtime;
-    struct tm* timeinfo;
-    char date_buffer[80];
-    time(&rawtime);
-    timeinfo = localtime(&rawtime);
-    strftime(date_buffer, sizeof(date_buffer), date_format, timeinfo);
-    return string(date_buffer);
-}
-
-bool checkFileExists(const string& filename) {
-    struct stat st;
-    return stat(filename.c_str(), &st) == 0;
-}
-
 class GLDebugContext {
     private:
         string filename = LOGS_DIR;
-        LoggingCfg* l_cfg;
         DEBUG_NAME_FORMAT format;
+        string getCurrentTime(const char* date_format = "%d-%m-%Y_%H:%M:%S");
+        bool checkFileExists(const string& filename);
+        string toHex(int value);
     public:
         GLDebugContext();
-        GLDebugContext(LoggingCfg* l_cfg, DEBUG_LOG_FORMAT format = DEBUG_LOG_FORMAT::DEFAULT, string optional_prefix = "");
+        GLDebugContext(LoggingCfg* l_cfg, const DEBUG_LOG_FORMAT format = DEBUG_LOG_FORMAT::DEFAULT, string optional_prefix = "");
         ~GLDebugContext();
         void glDebugMessageCallback(GL_DEBUG_SOURCE source, GL_DEBUG_TYPE type, GL_DEBUG_SEVERITY severity, const string& message);
         void logAppInfo(const string& message);
+        LoggingCfg* l_cfg;
 };
 
 GLDebugContext::GLDebugContext(){};
 
-GLDebugContext::GLDebugContext(LoggingCfg* l_cfg, DEBUG_LOG_FORMAT format, string optional_prefix) {
+GLDebugContext::GLDebugContext(LoggingCfg* l_cfg, const DEBUG_LOG_FORMAT format, string optional_prefix) {
     this->l_cfg = l_cfg;
     this->format = DEBUG_LOG_FORMAT_LUT[format];
     this->filename += this->format.prefix + optional_prefix + getCurrentTime(this->format.suffix.c_str()) + ".log";
@@ -126,7 +108,9 @@ void GLDebugContext::glDebugMessageCallback(GL_DEBUG_SOURCE source, GL_DEBUG_TYP
         throw ExceededDebugMessageSize(message.size(), GL_MAX_DEBUG_MSG_LENGTH);
     }
 
-    string currentTime = getCurrentTime(this->format.suffix.c_str());
+    string timeFormat = this->format.suffix;
+    size_t pos_ = timeFormat.find("_");
+    string currentTime = getCurrentTime(string(timeFormat.substr(0, pos_) + timeFormat.substr(pos_, timeFormat.size() - 1)).c_str());
 
     if (l_cfg->gl_debug) {
         fprintf(stderr, "[%s] {%x|%x|%x ~ %x}: %s type = 0x%s, severity = 0x%s, message = %s\n",
@@ -159,4 +143,25 @@ void GLDebugContext::logAppInfo(const string& message) {
         DEBUG_SEVERITY_INFO,
         message
     );
-}
+};
+
+string GLDebugContext::getCurrentTime(const char* date_format) {
+    time_t rawtime;
+    struct tm* timeinfo;
+    char date_buffer[80];
+    time(&rawtime);
+    timeinfo = localtime(&rawtime);
+    strftime(date_buffer, sizeof(date_buffer), date_format, timeinfo);
+    return string(date_buffer);
+};
+
+bool GLDebugContext::checkFileExists(const string& filename) {
+    struct stat st;
+    return stat(filename.c_str(), &st) == 0;
+};
+
+string GLDebugContext::toHex(int value) {
+    stringstream sstream;
+    sstream << hex << value;
+    return sstream.str();
+};

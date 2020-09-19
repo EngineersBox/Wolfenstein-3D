@@ -26,9 +26,11 @@
 
 using namespace std;
 
+#define BMP_FILE_TYPE 0x4D42
+
 #pragma pack(push, 1)
 struct BMPFileHeader {
-    uint16_t file_type{0x4D42};  // File type always BM which is 0x4D42 (stored as hex uint16_t in little endian)
+    uint16_t file_type{BMP_FILE_TYPE};  // File type always BM which is BMP_FILE_TYPE (stored as hex uint16_t in little endian)
     uint32_t file_size{0};       // Size of the file (in bytes)
     uint16_t reserved1{0};       // Reserved, always 0
     uint16_t reserved2{0};       // Reserved, always 0
@@ -77,7 +79,7 @@ struct BMP {
         ifstream inp{fname, ios_base::binary};
         if (inp) {
             inp.read((char *)&file_header, sizeof(file_header));
-            if (file_header.file_type != 0x4D42) {
+            if (file_header.file_type != BMP_FILE_TYPE) {
                 string format = string(fname);
                 format = format.substr(format.find("."));
                 throw FileFormatError(format);

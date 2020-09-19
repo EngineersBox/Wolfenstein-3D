@@ -1,17 +1,23 @@
 #pragma once
 
-#include <iostream>
-#include <vector>
-#include "../environment/Walls.h"
 #include <fstream>
+#include <iostream>
 #include <string>
+#include <vector>
+
+#include "../environment/Walls.h"
+#include "../exceptions/map/MapFormatError.h"
+#include "../logging/GLDebug.h"
 
 using namespace std;
 #define MAP_DELIM ";"
 
 class GameMap {
+    private:
+        GLDebugContext* debugContext;
     public:
-        GameMap(vector<Wall> walls, int width, int height);
+        GameMap(vector<Wall> walls, int width, int height, GLDebugContext* debugContext);
+        GameMap(GLDebugContext* debugContext);
         GameMap();
         ~GameMap();
 
@@ -27,13 +33,16 @@ class GameMap {
         vector<Wall> _walls;
 };
 
-GameMap::GameMap(vector<Wall> walls, int width, int height){
+GameMap::GameMap(vector<Wall> walls, int width, int height, GLDebugContext* debugContext) {
     this->map_width = width;
     this->map_width = height;
     this->_walls = walls;
+    this->debugContext = debugContext;
 }
 
-GameMap::GameMap() : GameMap(vector<Wall>(0), 0, 0) {}
+GameMap::GameMap(GLDebugContext* debugContext) : GameMap(vector<Wall>(0), 0, 0, debugContext){};
+
+GameMap::GameMap() : GameMap(vector<Wall>(0), 0, 0, nullptr) {}
 
 GameMap::~GameMap(){}
 
@@ -62,6 +71,19 @@ void GameMap::readMapFromFile(string filename) {
     ifstream inFile(filename);
     int mapFormat;
     inFile >> this->map_width >> this->map_height >> mapFormat;
+    if (mapFormat != 0 && mapFormat != 1) {
+        MapFormatError err(mapFormat);
+        if (this->debugContext->l_cfg->map_skip_invalid) {
+            this->debugContext->glDebugMessageCallback(
+                DEBUG_SOURCE_API,
+                DEBUG_TYPE_ERROR,
+                DEBUG_SEVERITY_LOW,
+                string(err.what())
+            );
+        } else {
+            throw err;
+        }
+    }
     this->_walls = vector<Wall>(this->map_width * this->map_height);
 
     for (int y = 0; y < this->map_height; y++) {

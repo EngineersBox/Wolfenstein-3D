@@ -279,6 +279,15 @@ void checkVertical(int &mx, int &my, int &mp, float &dof,
     }
 }
 
+float validateAngle(float angle) {
+    if (angle < 0) {
+        angle += (float)(2 * M_PI);
+    } else if (angle > 2 * M_PI) {
+        angle -= (float)(2 * M_PI);
+    }
+    return angle;
+}
+
 ///
 /// Render a column (wall)
 ///
@@ -290,12 +299,7 @@ void checkVertical(int &mx, int &my, int &mp, float &dof,
 ///
 void draw3DWalls(int &r, float &ra, float &distT, vector<Colour> *colourStrip, Colour polygonShader, PWOperator<GLdouble> shaderOperator) {
     // Draw 3D walls
-    float ca = player.angle - ra;
-    if (ca < 0) {
-        ca += (float)(2 * M_PI);
-    } else if (ca > 2 * M_PI) {
-        ca -= (float)(2 * M_PI);
-    }
+    float ca = validateAngle(player.angle - ra);
     distT *= cos(ca);
 
     int mapS = gameMap.map_height * gameMap.map_width;
@@ -338,13 +342,7 @@ void renderRays2Dto3D() {
     float dof, rx{0}, ry{0}, ra, x_off{0}, y_off{0}, distT{0};
     vector<Colour> prevCol = emptyCol;
 
-    ra = player.angle - (DR * (playerCfg.fov / 2));
-
-    if (ra < 0) {
-        ra += (float)(2 * M_PI);
-    } else if (ra > 2 * M_PI) {
-        ra -= (float)(2 * M_PI);
-    }
+    ra = validateAngle(player.angle - (DR * (playerCfg.fov / 2)));
 
     for (r = 0; r < playerCfg.fov; r++) {
         // Check horizontal lines
@@ -401,11 +399,7 @@ void renderRays2Dto3D() {
         draw3DWalls(r, ra, distT, &bmpColStrip, shader, PW_mul<GLdouble>);
 
         ra += DR;
-        if (ra < 0) {
-            ra += (float)(2 * M_PI);
-        } else if (ra > 2 * M_PI) {
-            ra -= (float)(2 * M_PI);
-        }
+        ra = validateAngle(ra);
     }
 }
 

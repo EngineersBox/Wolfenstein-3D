@@ -408,13 +408,6 @@ void renderRays2Dto3D() {
 }
 
 ///
-/// Display the player location (x,y) in the console
-///
-void printPlayerLocation() {
-    cout << to_string(player.x) << " " << to_string(player.y) << endl;
-}
-
-///
 /// Render ceiling quad
 ///
 void drawCeiling() {

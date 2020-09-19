@@ -10,4 +10,4 @@
   * Player position
   * Texture processing
   * Map processing
-* Change renderer to query wall texture
+* ~~Change renderer to query wall texture~~

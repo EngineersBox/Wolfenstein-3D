@@ -381,7 +381,7 @@ void renderRays2Dto3D() {
         int wallSize = (isLR ? mapScreenW : mapScreenH) / WALL_COUNT;
         float wallOffset = ((wallIntersectPoint - (radToCoord(wallIntersectPoint))) % wallSize) / (float) wallSize;
 
-        vector<Colour> bmpColStrip = shouldRender ? textures.at("wall").texture.getCol(wallOffset) : prevCol;
+        vector<Colour> bmpColStrip = shouldRender ? textures.at(hitWall.getTexture()).texture.getCol(wallOffset) : prevCol;
         Colour shader = isHorizontal ? Colour{0.9, 0.9, 0.9, 1.0} : Colour{0.7, 0.7, 0.7, 1.0};
 
         prevCol = bmpColStrip;

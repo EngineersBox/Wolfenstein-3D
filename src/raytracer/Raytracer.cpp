@@ -133,7 +133,7 @@ void drawMap2D() {
         for (x = 0; x < gameMap.map_width; x++) {
             // Change to colour coresponding to map location
             toColour(gameMap.getAt(x, y).getColour());
-            drawSquare(x * gameMap.wall_width, y * gameMap.map_height, gameMap.wall_width);
+            drawRectangle(x * gameMap.wall_width, y * gameMap.wall_height, gameMap.wall_width, gameMap.wall_height);
         }
     }
 }

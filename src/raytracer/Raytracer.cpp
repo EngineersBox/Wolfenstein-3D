@@ -332,6 +332,26 @@ void draw3DWalls(int &r, float &ra, float &distT, vector<Colour> *colourStrip, C
     glDisable(GL_SCISSOR_TEST);
 }
 
+Wall validateSideRender(float &rx, float &ry, float &disH, float &hx, float &hy, float &disV, float &vx, float &vy, float &distT, bool &shouldRender) {
+    Wall hitWall;
+    if (disV < disH) {
+        rx = vx;
+        ry = vy;
+        distT = disV;
+        hitWall = gameMap.getAt(radToCoord(rx), radToCoord(ry));
+    } else if (disH < disV) {
+        rx = hx;
+        ry = hy;
+        distT = disH;
+        hitWall = gameMap.getAt(radToCoord(rx), radToCoord(ry));
+    } else {
+        rx = 0;
+        ry = 0;
+        shouldRender = false;
+    }
+    return hitWall;
+}
+
 ///
 /// Cast rays from the player and render walls
 ///
@@ -361,25 +381,9 @@ void renderRays2Dto3D() {
 
         checkVertical(mx, my, mp, dof, rx, ry, ra, x_off, y_off, vx, vy, disV);
 
-        bool isHorizontal = disV < disH;
         bool shouldRender = true;
-        Wall hitWall;
-        if (disV < disH) {
-            rx = vx;
-            ry = vy;
-            distT = disV;
-            hitWall = gameMap.getAt(radToCoord(rx), radToCoord(ry));
-        } else if (disH < disV) {
-            rx = hx;
-            ry = hy;
-            distT = disH;
-            hitWall = gameMap.getAt(radToCoord(rx), radToCoord(ry));
-        } else {
-            rx = 0;
-            ry = 0;
-            shouldRender = false;
-        }
-
+        Wall hitWall = validateSideRender(rx, ry, disH, hx, hy, disV, vx, vy, distT, shouldRender);
+        
         if (minimapCfg.enable && minimapCfg.render_rays) {
             renderRay(player.x, player.y, rx, ry, 1);
         }
@@ -392,7 +396,7 @@ void renderRays2Dto3D() {
         float wallOffset = ((wallIntersectPoint - (radToCoord(wallIntersectPoint))) % wallSize) / (float) wallSize;
 
         vector<Colour> bmpColStrip = shouldRender ? textures.at(hitWall.getTexture()).texture.getCol(wallOffset) : prevCol;
-        Colour shader = isHorizontal ? Colour{0.9, 0.9, 0.9, 1.0} : Colour{0.7, 0.7, 0.7, 1.0};
+        Colour shader = isLR ? Colour{0.9, 0.9, 0.9, 1.0} : Colour{0.7, 0.7, 0.7, 1.0};
 
         prevCol = bmpColStrip;
 

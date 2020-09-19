@@ -41,6 +41,17 @@ RenderCfg renderCfg;
 GameMap gameMap = GameMap();
 #define WALL_COUNT 8
 
+///
+/// Render a square at coodinates with top-left origin
+///
+/// @param int x: X coordinate
+/// @param int y: Y coordinate
+/// @param int xSidelength: Side length of the x-axis
+/// @param int ySideLength: Side length of the y-axis
+/// @param bool beginEnd: Whether to call glBegin() and glEnd()
+///
+/// @return void
+///
 void drawRectangle(float x, float y, float xSideLength, float ySideLength, bool beginEnd = true) {
     if (beginEnd) {
         glBegin(GL_QUADS);
@@ -62,6 +73,7 @@ void drawRectangle(float x, float y, float xSideLength, float ySideLength, bool 
 /// @param int x: X coordinate
 /// @param int y: Y coordinate
 /// @param int sidelength: Side length of the square
+/// @param bool beginEnd: Whether to call glBegin() and glEnd()
 ///
 /// @return void
 ///
@@ -403,11 +415,17 @@ void printPlayerLocation() {
     cout << to_string(p_x) << " " << to_string(p_y) << endl;
 }
 
+///
+/// Render ceiling quad
+///
 void drawCeiling() {
     toColour(CEILING_COLOUR);
     drawRectangle(0, 0, screenW, screenH / 2, true);
 }
 
+///
+/// Render floor quad
+///
 void drawFloor() {
     toColour(FLOOR_COLOUR);
     drawRectangle(0, screenH / 2, screenW, screenH, true);
@@ -449,8 +467,7 @@ void buttons(unsigned char key, int x, int y) {
         }
         p_dx = cos(p_a) * 5;
         p_dy = sin(p_a) * 5;
-    }
-    if (key == 'd') {
+    } else if (key == 'd') {
         // Turn left
         p_a += 0.1f;
         if (p_a > 2 * M_PI) {
@@ -458,18 +475,16 @@ void buttons(unsigned char key, int x, int y) {
         }
         p_dx = cos(p_a) * 5;
         p_dy = sin(p_a) * 5;
-    }
-    if (key == 'w') {
+    } else if (key == 'w') {
         // Move forward
         p_x += p_dx;
         p_y += p_dy;
-    }
-    if (key == 's') {
+    } else if (key == 's') {
         // Move backward
         p_x -= p_dx;
         p_y -= p_dy;
     }
-    glutPostRedisplay();
+    // glutPostRedisplay();
 }
 
 ///

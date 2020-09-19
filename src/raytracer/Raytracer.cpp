@@ -24,7 +24,7 @@ map<string, Texture> textures;
 vector<Colour> emptyCol(screenH);
 
 // Player
-float p_x, p_y, p_dx, p_dy, p_a;
+Player player;
 
 // Map
 int mapScreenW = screenW; // x >> 1 == x / 2
@@ -115,12 +115,12 @@ void drawPlayer() {
 
     // Draw player point
     glBegin(GL_POINTS);
-    glVertex2d(p_x, p_y);
+    glVertex2d(player.x, player.y);
 
     glEnd();
 
     // Draw direction vector
-    renderRay(p_x, p_y, p_x + p_dx * 5, p_y + p_dy * 5, 3);
+    renderRay(player.x, player.y, player.x + player.dx * 5, player.y + player.dy * 5, 3);
 }
 
 ///
@@ -178,24 +178,24 @@ void checkHorizontal(int &mx, int &my, int &mp, float &dof,
     float aTan = -1 / tan(ra);
     if (ra > M_PI) {
         // Looking up
-        ry = (((int)p_y >> 6) << 6) - 0.0001f;
-        rx = (p_y - ry) * aTan + p_x;
+        ry = (((int)player.y >> 6) << 6) - 0.0001f;
+        rx = (player.y - ry) * aTan + player.x;
         y_off = -64;
         x_off = -y_off * aTan;
     }
 
     if (ra < M_PI) {
         // Looking down
-        ry = (float)(((int)p_y >> 6) << 6) + 64;
-        rx = (p_y - ry) * aTan + p_x;
+        ry = (float)(((int)player.y >> 6) << 6) + 64;
+        rx = (player.y - ry) * aTan + player.x;
         y_off = 64;
         x_off = -y_off * aTan;
     }
 
     if (ra == 0 || ra == M_PI) {
         // Looking left or right
-        rx = p_x;
-        ry = p_y;
+        rx = player.x;
+        ry = player.y;
         dof = playerCfg.dof;
     }
 
@@ -208,7 +208,7 @@ void checkHorizontal(int &mx, int &my, int &mp, float &dof,
             dof = playerCfg.dof;
             hx = rx;
             hy = ry;
-            disH = dist(p_x, p_y, hx, hy, ra);
+            disH = dist(player.x, player.y, hx, hy, ra);
         } else {
             rx += x_off;
             ry += y_off;
@@ -241,24 +241,24 @@ void checkVertical(int &mx, int &my, int &mp, float &dof,
     float nTan = -tan(ra);
     if (ra > M_PI_2 && ra < THREE_HALF_PI) {
         // Looking left
-        rx = (((int)p_x >> 6) << 6) - 0.0001f;
-        ry = (p_x - rx) * nTan + p_y;
+        rx = (((int)player.x >> 6) << 6) - 0.0001f;
+        ry = (player.x - rx) * nTan + player.y;
         x_off = -64;
         y_off = -x_off * nTan;
     }
 
     if (ra < M_PI_2 || ra > THREE_HALF_PI) {
         // Looking right
-        rx = (float)(((int)p_x >> 6) << 6) + 64;
-        ry = (p_x - rx) * nTan + p_y;
+        rx = (float)(((int)player.x >> 6) << 6) + 64;
+        ry = (player.x - rx) * nTan + player.y;
         x_off = 64;
         y_off = -x_off * nTan;
     }
 
     if (ra == 0 || ra == M_PI) {
         // Looking up or down
-        rx = p_x;
-        ry = p_y;
+        rx = player.x;
+        ry = player.y;
         dof = playerCfg.dof;
     }
 
@@ -271,7 +271,7 @@ void checkVertical(int &mx, int &my, int &mp, float &dof,
             dof = playerCfg.dof;
             vx = rx;
             vy = ry;
-            disV = dist(p_x, p_y, vx, vy, ra);
+            disV = dist(player.x, player.y, vx, vy, ra);
         } else {
             rx += x_off;
             ry += y_off;
@@ -291,7 +291,7 @@ void checkVertical(int &mx, int &my, int &mp, float &dof,
 ///
 void draw3DWalls(int &r, float &ra, float &distT, vector<Colour> *colourStrip, Colour polygonShader, PWOperator<GLdouble> shaderOperator) {
     // Draw 3D walls
-    float ca = p_a - ra;
+    float ca = player.angle - ra;
     if (ca < 0) {
         ca += (float)(2 * M_PI);
     } else if (ca > 2 * M_PI) {
@@ -339,7 +339,7 @@ void renderRays2Dto3D() {
     float dof, rx{0}, ry{0}, ra, x_off{0}, y_off{0}, distT{0};
     vector<Colour> prevCol = emptyCol;
 
-    ra = p_a - (DR * (playerCfg.fov / 2));
+    ra = player.angle - (DR * (playerCfg.fov / 2));
 
     if (ra < 0) {
         ra += (float)(2 * M_PI);
@@ -351,16 +351,16 @@ void renderRays2Dto3D() {
         // Check horizontal lines
         dof = 0;
         float disH = numeric_limits<float>::max();
-        float hx = p_x;
-        float hy = p_y;
+        float hx = player.x;
+        float hy = player.y;
 
         checkHorizontal(mx, my, mp, dof, rx, ry, ra, x_off, y_off, hx, hy, disH);
 
         // Check vertical lines
         dof = 0;
         float disV = numeric_limits<float>::max();
-        float vx = p_x;
-        float vy = p_y;
+        float vx = player.x;
+        float vy = player.y;
 
         checkVertical(mx, my, mp, dof, rx, ry, ra, x_off, y_off, vx, vy, disV);
 
@@ -384,7 +384,7 @@ void renderRays2Dto3D() {
         }
 
         if (minimapCfg.enable && minimapCfg.render_rays) {
-            renderRay(p_x, p_y, rx, ry, 1);
+            renderRay(player.x, player.y, rx, ry, 1);
         }
         NormalDir nDir = hitWall.getNormDir(rx, ry, 64);
         bool isLR = nDir == NormalDir::LEFT || nDir == NormalDir::RIGHT;
@@ -412,7 +412,7 @@ void renderRays2Dto3D() {
 /// Display the player location (x,y) in the console
 ///
 void printPlayerLocation() {
-    cout << to_string(p_x) << " " << to_string(p_y) << endl;
+    cout << to_string(player.x) << " " << to_string(player.y) << endl;
 }
 
 ///
@@ -461,30 +461,30 @@ void display() {
 void buttons(unsigned char key, int x, int y) {
     if (key == 'a') {
         // Turn right
-        p_a -= 0.1f;
-        if (p_a < 0) {
-            p_a += (float)(2 * M_PI);
+        player.angle -= 0.1f;
+        if (player.angle < 0) {
+            player.angle += (float)(2 * M_PI);
         }
-        p_dx = cos(p_a) * 5;
-        p_dy = sin(p_a) * 5;
+        player.dx = cos(player.angle) * 5;
+        player.dy = sin(player.angle) * 5;
     } else if (key == 'd') {
         // Turn left
-        p_a += 0.1f;
-        if (p_a > 2 * M_PI) {
-            p_a -= (float)(2 * M_PI);
+        player.angle += 0.1f;
+        if (player.angle > 2 * M_PI) {
+            player.angle -= (float)(2 * M_PI);
         }
-        p_dx = cos(p_a) * 5;
-        p_dy = sin(p_a) * 5;
+        player.dx = cos(player.angle) * 5;
+        player.dy = sin(player.angle) * 5;
     } else if (key == 'w') {
         // Move forward
-        p_x += p_dx;
-        p_y += p_dy;
+        player.x += player.dx;
+        player.y += player.dy;
     } else if (key == 's') {
         // Move backward
-        p_x -= p_dx;
-        p_y -= p_dy;
+        player.x -= player.dx;
+        player.y -= player.dy;
     }
-    // glutPostRedisplay();
+    glutPostRedisplay();
 }
 
 ///
@@ -507,10 +507,13 @@ void init(Colour background_colour) {
 
     toClearColour(background_colour);
     gluOrtho2D(0, screenW, screenH, 0);
-    p_x = 250;
-    p_y = 250;
-    p_dx = cos(p_a) * 5;
-    p_dy = sin(p_a) * 5;
+    player = Player(
+        250,
+        250,
+        cos(player.angle) * 5,
+        sin(player.angle) * 5,
+        M_PI
+    );
 }
 
 ///

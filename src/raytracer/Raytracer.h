@@ -19,6 +19,7 @@
 #include "../texturing/texture.h"
 #include "../configuration/ConfigInit.h"
 #include "../texturing/TextureLoader.h"
+#include "../player/Player.h"
 
 #define _USE_MATH_DEFINES
 #include <math.h>

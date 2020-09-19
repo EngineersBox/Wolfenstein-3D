@@ -41,46 +41,6 @@ RenderCfg renderCfg;
 GameMap gameMap = GameMap();
 
 ///
-/// Render a square at coodinates with top-left origin
-///
-/// @param int x: X coordinate
-/// @param int y: Y coordinate
-/// @param int xSidelength: Side length of the x-axis
-/// @param int ySideLength: Side length of the y-axis
-/// @param bool beginEnd: Whether to call glBegin() and glEnd()
-///
-/// @return void
-///
-void drawRectangle(float x, float y, float xSideLength, float ySideLength, bool beginEnd = true) {
-    if (beginEnd) {
-        glBegin(GL_QUADS);
-    }
-
-    glVertex2f(x + 1, y + 1);                            // Top right
-    glVertex2f(x + 1, y + ySideLength - 1);               // Top left
-    glVertex2f(x + xSideLength - 1, y + ySideLength - 1);  // Bottom left
-    glVertex2f(x + xSideLength - 1, y + 1);               // Bottom right
-
-    if (beginEnd) {
-        glEnd();
-    }
-}
-
-///
-/// Render a square at coodinates with top-left origin
-///
-/// @param int x: X coordinate
-/// @param int y: Y coordinate
-/// @param int sidelength: Side length of the square
-/// @param bool beginEnd: Whether to call glBegin() and glEnd()
-///
-/// @return void
-///
-void drawSquare(float x, float y, float sidelength, bool beginEnd = true) {
-    drawRectangle(x, y, sidelength, sidelength, beginEnd);
-}
-
-///
 /// Render a line between two points (ax, ay) and (bx, by) with a given width
 ///
 /// @param float ax: X-axis value for point A
@@ -108,7 +68,7 @@ void renderRay(float ax, float ay, float bx, float by, int line_width) {
 ///
 /// @return void
 ///
-void drawPlayer() {
+void renderPlayerPos() {
     toColour(YELLOW);
     glPointSize(8);
 
@@ -127,7 +87,7 @@ void drawPlayer() {
 ///
 /// @return void
 ///
-void drawMap2D() {
+void renderMap2D() {
     int x, y;
     for (y = 0; y < gameMap.map_height; y++) {
         for (x = 0; x < gameMap.map_width; x++) {
@@ -433,12 +393,11 @@ void display() {
     drawCeiling();
     drawFloor();
     if (minimapCfg.enable) {
-        drawMap2D();
-        drawPlayer();
+        renderMap2D();
+        renderPlayerPos();
     }
     renderRays2Dto3D();
     glutSwapBuffers();
-    // printPlayerLocation();
 }
 
 ///
@@ -506,7 +465,7 @@ void init(Colour background_colour) {
         250,
         cos(player.angle) * 5,
         sin(player.angle) * 5,
-        M_PI
+        0
     );
 }
 

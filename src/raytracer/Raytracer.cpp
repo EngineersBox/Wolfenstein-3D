@@ -453,31 +453,13 @@ void init(Colour background_colour) {
         mapScreenW >>= 1;
     }
     debugContext = GLDebugContext(&loggingCfg);
+
     texLoader = TextureLoader();
     textures = *texLoader.loadTextures();
-
-    debugContext.glDebugMessageCallback(
-        DEBUG_SOURCE_APPLICATION,
-        DEBUG_TYPE_OTHER,
-        DEBUG_SEVERITY_INFO,
-        string("Loaded " + to_string(textures.size()) + " textures")
-    );
+    debugContext.logAppInfo(string("Loaded " + to_string(textures.size()) + " textures"));
 
     gameMap.readMapFromFile(MAPS_DIR + "map1.txt");
-
-    debugContext.glDebugMessageCallback(
-        DEBUG_SOURCE_APPLICATION,
-        DEBUG_TYPE_OTHER,
-        DEBUG_SEVERITY_INFO,
-        string("Loaded map: " + MAPS_DIR + "map1.txt")
-    );
-
-    debugContext.glDebugMessageCallback(
-        DEBUG_SOURCE_APPLICATION,
-        DEBUG_TYPE_OTHER,
-        DEBUG_SEVERITY_INFO,
-        "FIRST"
-    );
+    debugContext.logAppInfo(string("Loaded map: " + MAPS_DIR + "map1.txt"));
 
     gameMap.wall_width = mapScreenW / gameMap.map_width;
     gameMap.wall_height = mapScreenH / gameMap.map_height;
@@ -493,6 +475,7 @@ void init(Colour background_colour) {
         sin(player.angle) * 5,
         0
     );
+    debugContext.logAppInfo("Initialised player object");
 }
 
 ///
@@ -510,10 +493,12 @@ int main(int argc, char *argv[]) {
     glutCreateWindow("Ray Tracer");
 
     init(bg_colour);
+    debugContext.logAppInfo("COMPLETED INIT PHASE");
 
     glutDisplayFunc(display);
     glutKeyboardFunc(buttons);
     glutPostRedisplay();
+    debugContext.logAppInfo("Initialised OpenGL/GLUT display and buttons");
     glutMainLoop();
 
     return 0;

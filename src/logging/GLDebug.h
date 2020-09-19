@@ -79,6 +79,7 @@ class GLDebugContext {
         GLDebugContext(LoggingCfg* l_cfg);
         ~GLDebugContext();
         void glDebugMessageCallback(GL_DEBUG_SOURCE source, GL_DEBUG_TYPE type, GL_DEBUG_SEVERITY severity, const string& message);
+        void logAppInfo(const string& message);
 };
 
 GLDebugContext::GLDebugContext(){};
@@ -131,3 +132,12 @@ void GLDebugContext::glDebugMessageCallback(GL_DEBUG_SOURCE source, GL_DEBUG_TYP
 
     fclose(debugLog);
 };
+
+void GLDebugContext::logAppInfo(const string& message) {
+    glDebugMessageCallback(
+        DEBUG_SOURCE_APPLICATION,
+        DEBUG_TYPE_OTHER,
+        DEBUG_SEVERITY_INFO,
+        message
+    );
+}

@@ -38,6 +38,8 @@ MinimapCfg minimapCfg;
 LoggingCfg loggingCfg;
 RenderCfg renderCfg;
 
+GLDebugContext debugContext;
+
 GameMap gameMap = GameMap();
 
 ///
@@ -450,9 +452,33 @@ void init(Colour background_colour) {
     if (minimapCfg.enable) {
         mapScreenW >>= 1;
     }
+    debugContext = GLDebugContext(&loggingCfg);
     texLoader = TextureLoader();
     textures = *texLoader.loadTextures();
+
+    debugContext.glDebugMessageCallback(
+        DEBUG_SOURCE_APPLICATION,
+        DEBUG_TYPE_OTHER,
+        DEBUG_SEVERITY_INFO,
+        string("Loaded " + to_string(textures.size()) + " textures")
+    );
+
     gameMap.readMapFromFile(MAPS_DIR + "map1.txt");
+
+    debugContext.glDebugMessageCallback(
+        DEBUG_SOURCE_APPLICATION,
+        DEBUG_TYPE_OTHER,
+        DEBUG_SEVERITY_INFO,
+        string("Loaded map: " + MAPS_DIR + "map1.txt")
+    );
+
+    debugContext.glDebugMessageCallback(
+        DEBUG_SOURCE_APPLICATION,
+        DEBUG_TYPE_OTHER,
+        DEBUG_SEVERITY_INFO,
+        "FIRST"
+    );
+
     gameMap.wall_width = mapScreenW / gameMap.map_width;
     gameMap.wall_height = mapScreenH / gameMap.map_height;
 

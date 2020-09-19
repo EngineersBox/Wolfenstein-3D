@@ -22,6 +22,7 @@
 #include "../texturing/TextureColours.h"
 #include "../texturing/TextureLoader.h"
 #include "../texturing/texture.h"
+#include "../logging/GLDebug.h"
 
 #define _USE_MATH_DEFINES
 

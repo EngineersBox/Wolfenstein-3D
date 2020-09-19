@@ -6,7 +6,7 @@
 * *Change rendering to BMP columns* (WIP)
 * ~~Add config files and reader~~
 * Implement logging:
-  * OpenGL + GLUT ([OpenGL debug wiki](https://www.khronos.org/opengl/wiki/Debug_Output))
+  * ~~OpenGL + GLUT ([OpenGL debug wiki](https://www.khronos.org/opengl/wiki/Debug_Output))~~
   * Player position
   * Texture processing
   * Map processing

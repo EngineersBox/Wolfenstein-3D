@@ -140,8 +140,7 @@ inline void HashTable<V>::findNextNonNull(HMEntry<V>* prev, HMEntry<V>* entry, c
 template <typename V>
 void HashTable<V>::insert(const string& key, V* value) {
     unsigned long hashValue = hashFunc(key);
-    HMEntry<V>* prev = NULL;
-    HMEntry<V>* entry = entries[hashValue];
+    HMEntry<V>* prev = NULL, entry = entries[hashValue];
 
     findNextNonNull(prev, entry, key);
 
@@ -163,8 +162,7 @@ void HashTable<V>::insert(const string& key, V* value) {
 template <typename V>
 void HashTable<V>::remove(const string& key) {
     unsigned long hashValue = hashFunc(key);
-    HMEntry<V>* prev = NULL;
-    HMEntry<V>* entry = entries[hashValue];
+    HMEntry<V>* prev = NULL, entry = entries[hashValue];
 
     findNextNonNull(prev, entry, key);
 
@@ -187,7 +185,6 @@ size_t HashTable<V>::size() {
 
 template <typename V>
 unsigned long HashTable<V>::hashFunc(const string& key) {
-    // Hashing using rolling polynomial method
     unsigned long hashVal = 0;
     for (int i = key.length() - 1; i != -1; i--) {
         hashVal = (hashVal * PRIME_MOD) + key[i];

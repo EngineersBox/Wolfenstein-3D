@@ -6,12 +6,12 @@
 #include "../texturing/TextureColours.h"
 #include "../texturing/texture.h"
 
+using namespace std;
+
 #define IS_LEFT(a) ((7 * M_PI) / 4) < a&& a <= (M_PI / 4)
 #define IS_DOWN(a) (M_PI / 4) < a&& a <= ((3 * M_PI) / 4)
 #define IS_RIGHT(a) ((3 * M_PI) / 4) < a&& a <= ((5 * M_PI) / 4)
 #define IS_UP(a) ((5 * M_PI) / 4) < a&& a <= ((7 * M_PI) / 4)
-
-using namespace std;
 
 enum NormalDir {
     LEFT,
@@ -20,32 +20,18 @@ enum NormalDir {
     DOWN
 };
 
-string nd2str(NormalDir nd) {
-    switch(nd) {
-        case NormalDir::LEFT:
-            return "LEFT";
-            break;
-        case NormalDir::RIGHT:
-            return "RIGHT";
-            break;
-        case NormalDir::UP:
-            return "UP";
-            break;
-        case NormalDir::DOWN:
-            return "DOWN";
-            break;
-        default:
-            return "LEFT";
-            break;
-    }
-}
+static const string NormalDirLUT[] = {
+    "LEFT",
+    "RIGHT",
+    "UP",
+    "DOWN"
+};
 
 class Wall {
     double posX;
     double posY;
     Colour texColour;
     string texture_name;
-
     public:
         Wall(double x, double y, Colour colour, string texture);
         Wall(double x, double y, Colour colour);

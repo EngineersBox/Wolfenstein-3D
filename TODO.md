@@ -9,6 +9,6 @@
   * ~~OpenGL + GLUT ([OpenGL debug wiki](https://www.khronos.org/opengl/wiki/Debug_Output))~~
   * Player position
   * Texture processing
-  * Map processing
+  * ~~Map processing~~
 * ~~Change renderer to query wall texture~~
-* Fix HashTabe (change to hashmap K,V pairs) and fix Texture
+* ~~Fix HashTabe (change to hashmap K,V pairs) and fix Texture~~

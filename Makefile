@@ -2,6 +2,7 @@ CXX_VERSION := 11
 CXX := -clang++ -std=c++$(CXX_VERSION)
 CXXFLAGS := -framework OpenGL -framework GLUT -stdlib=libc++
 OUT_DIR := out
+LOGS_DIR := logs
 TARGET := run
 SRC := $(wildcard src/raytracer/*.cpp)
 OBJECTS := $(SRC:%.cpp)
@@ -17,6 +18,16 @@ clean:
 	@echo ">> Removing previous builds"
 	@echo "--------------------------------"
 	-@rm -rvf $(OUT_DIR)/*
+	@echo "--------------------------------\n"
+
+clean_logs:
+	@echo ">> Removing logs"
+	@echo "--------------------------------"
+ifeq (,$(wildcard $(LOGS_DIR)/*))
+	@echo "No files to remove"
+else
+	-@rm -rvf $(LOGS_DIR)/*
+endif
 	@echo "--------------------------------\n"
 
 destroy:

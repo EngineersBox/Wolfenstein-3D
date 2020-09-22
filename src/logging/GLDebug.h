@@ -32,6 +32,18 @@ enum GL_DEBUG_TYPE : uint16_t {
     DEBUG_TYPE_OTHER = 0x007
 };
 
+static const string GL_DEBUG_TYPE_LUT[] = {
+    "DEBUG_TYPE_ERROR",
+    "DEBUG_TYPE_UNDEFINED_BEHAVIOR",
+    "DEBUG_TYPE_PERFORMANCE",
+    "DEBUG_TYPE_MARKER",
+    "DEBUG_TYPE_PUSH_GROUP",
+    "DEBUG_TYPE_POP_GOUP",
+    "DEBUG_TYPE_OTHER"
+};
+
+#define GL_DEBUG_TYPE_STRING(gl_type) GL_DEBUG_TYPE_LUT[gl_type]
+
 enum GL_DEBUG_SOURCE : uint16_t {
     DEBUG_SOURCE_API = 0x010,
     DEBUG_SOURCE_OS_X_SYSTEM = 0x020,
@@ -41,12 +53,32 @@ enum GL_DEBUG_SOURCE : uint16_t {
     DEBUG_SOURCE_OTHER = 0x060
 };
 
+static const string GL_DEBUG_SOURCE_LUT[] = {
+    "DEBUG_SOURCE_API",
+    "DEBUG_SOURCE_OS_X_SYSTEM",
+    "DEBUG_SOURCE_SHADER_COMPILER",
+    "DEBUG_SOURCE_THIRD_PARTY",
+    "DEBUG_SOURCE_APPLICATION",
+    "DEBUG_SOURCE_OTHER"
+};
+
+#define GL_DEBUG_SOURCE_STRING(gl_source) GL_DEBUG_SOURCE_LUT[(gl_source >> 4) - 1]
+
 enum GL_DEBUG_SEVERITY : uint16_t {
     DEBUG_SEVERITY_HIGH = 0x100,
     DEBUG_SEVERITY_MEDIUM = 0x200,
     DEBUG_SEVERITY_LOW = 0x300,
     DEBUG_SEVERITY_INFO = 0x400
 };
+
+static const string GL_DEBUG_SEVERITY_LUT[] = {
+    "DEBUG_SEVERITY_HIGH",
+    "DEBUG_SEVERITY_MEDIUM",
+    "DEBUG_SEVERITY_LOW",
+    "DEBUG_SEVERITY_INFO"
+};
+
+#define GL_DEBUG_SEVERITY_STRING(gl_severity) GL_DEBUG_SEVERITY_LUT[(gl_severity >> 8) - 1]
 
 struct DEBUG_NAME_FORMAT {
     string prefix;
@@ -113,23 +145,24 @@ void GLDebugContext::glDebugMessageCallback(GL_DEBUG_SOURCE source, GL_DEBUG_TYP
     string currentTime = getCurrentTime(string(timeFormat.substr(0, pos_) + timeFormat.substr(pos_, timeFormat.size() - 1)).c_str());
 
     if (l_cfg->gl_debug) {
-        fprintf(stderr, "[%s] {%x|%x|%x ~ %x}: %s type = 0x%s, severity = 0x%s, message = %s\n",
+        FILE* out_loc = type == DEBUG_TYPE_ERROR || type == DEBUG_TYPE_UNDEFINED_BEHAVIOR ? stderr : stdout;
+        fprintf(out_loc, "[%s] {%x|%x|%x ~ %x}%s %s :: %s\n",
             currentTime.c_str(),
             type, source, severity,
             type | source | severity,
-            (type == DEBUG_TYPE_ERROR ? "** GL ERROR **" : ""),
-            toHex(type).c_str(), toHex(severity).c_str(), message.c_str()
+            (type == DEBUG_TYPE_ERROR ? " ** GL ERROR **" : ""),
+            GL_DEBUG_SOURCE_STRING(source).c_str(), message.c_str()
         );
     }
 
     FILE *debugLog;
     debugLog = fopen(filename.c_str(), "a");
 
-    fprintf(debugLog, "[%s] {%x|%x|%x ~ %x}: %s type = 0x%s, severity = 0x%s, message = %s\n",
+    fprintf(debugLog, "[%s] {%s|%s|%s ~ %x}:%s type = 0x%s, severity = 0x%s, message = %s\n",
         currentTime.c_str(),
-        type, source, severity,
+        toHex(type).c_str(), toHex(source).c_str(), toHex(severity).c_str(),
         type | source | severity,
-        (type == DEBUG_TYPE_ERROR ? "** GL ERROR **" : ""),
+        (type == DEBUG_TYPE_ERROR ? " ** GL ERROR **" : ""),
         toHex(type).c_str(), toHex(severity).c_str(), message.c_str()
     );
 

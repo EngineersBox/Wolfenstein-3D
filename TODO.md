@@ -11,3 +11,4 @@
   * Texture processing
   * Map processing
 * ~~Change renderer to query wall texture~~
+* Fix HashTabe (change to hashmap K,V pairs) and fix Texture

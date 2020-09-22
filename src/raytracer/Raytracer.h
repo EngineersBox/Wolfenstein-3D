@@ -23,6 +23,7 @@
 #include "../texturing/TextureLoader.h"
 #include "../texturing/texture.h"
 #include "../logging/GLDebug.h"
+#include "../hashing/HashTable.h"
 
 #define _USE_MATH_DEFINES
 

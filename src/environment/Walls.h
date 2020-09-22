@@ -58,7 +58,7 @@ class Wall {
         void setY(double);
         Colour getColour();
         void setColour(Colour);
-        string getTexture();
+        string getTextureId();
         NormalDir getNormDir(float x, float y, int wall_width, int wall_height);
 };
 
@@ -148,7 +148,7 @@ void Wall::setColour(Colour newColour) {
     texColour = newColour;
 }
 
-string Wall::getTexture() {
+string Wall::getTextureId() {
     return texture_name;
 }
 

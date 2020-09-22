@@ -20,7 +20,7 @@ int screenH = 512;
 Colour bg_colour = {0.3, 0.3, 0.3, 0.0};
 
 TextureLoader texLoader;
-map<string, Texture> textures;
+HashTable<Texture> textures;
 vector<Colour> emptyCol(screenH);
 
 // Player
@@ -323,6 +323,8 @@ void renderRays2Dto3D() {
     int r{0}, mx{0}, my{0}, mp{0};
     float dof, rx{0}, ry{0}, ra, x_off{0}, y_off{0}, distT{0};
     vector<Colour> prevCol = emptyCol;
+    Texture* wall_texture;
+    string prev_tex_name;
 
     ra = validateAngle(player.angle - (DR * (playerCfg.fov / 2)));
 
@@ -357,7 +359,11 @@ void renderRays2Dto3D() {
         int wallSize = (isLR ? mapScreenW : mapScreenH) / (isLR ? gameMap.map_width : gameMap.map_height);
         float wallOffset = ((wallIntersectPoint - (radToCoord(wallIntersectPoint))) % wallSize) / (float) wallSize;
 
-        vector<Colour> bmpColStrip = shouldRender ? textures.at(hitWall.getTexture()).texture.getCol(wallOffset) : prevCol;
+        if (shouldRender && (wall_texture == nullptr || wall_texture->name != prev_tex_name)) {
+            wall_texture = textures.get(hitWall.getTextureId());
+            prev_tex_name = wall_texture->name;
+        }
+        vector<Colour> bmpColStrip = shouldRender ? wall_texture->texture.getCol(wallOffset) : prevCol;
         Colour shader = isLR ? Colour{0.9, 0.9, 0.9, 1.0} : Colour{0.7, 0.7, 0.7, 1.0};
 
         prevCol = bmpColStrip;
@@ -455,7 +461,7 @@ void init(Colour background_colour) {
     debugContext = GLDebugContext(&loggingCfg);
 
     texLoader = TextureLoader();
-    textures = *texLoader.loadTextures();
+    texLoader.loadTextures(textures);
     debugContext.logAppInfo(string("Loaded " + to_string(textures.size()) + " textures"));
 
     gameMap.readMapFromFile(MAPS_DIR + "map1.txt");

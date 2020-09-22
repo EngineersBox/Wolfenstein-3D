@@ -7,15 +7,12 @@
 
 using namespace std;
 
-#define PRIME_MOD 1e9 - 9
-#define PRIME_BASE 1
-
 class Texture {
     public:
         Texture();
         Texture(string filename, string name);
         ~Texture();
-        long long hashCode();
+        string stringRep();
 
         string name;
         string filename;
@@ -36,19 +33,12 @@ Texture::Texture(string filename, string name) {
 
 Texture::~Texture() {}
 
-long long Texture::hashCode() {
-    // Hashing using rolling polynomial method
+string Texture::stringRep() {
     string texString = name;
     texString.append(to_string(width));
     texString.append(to_string(height));
     for (uint8_t elem : texture.data) {
         texString.append(to_string(elem));
     }
-
-    long long hashVal = 0;
-    for (int i = 0; i < texString.length(); i++) {
-        hashVal = (hashVal * PRIME_BASE) + texString[i];
-        hashVal %= (int)PRIME_MOD;
-    }
-    return hashVal;
-}
+    return texString;
+};

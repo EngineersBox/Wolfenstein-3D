@@ -9,6 +9,7 @@
 #include <vector>
 
 #include "texture.h"
+#include "../hashing/HashTable.h"
 #include "../raytracer/Raytracer.h"
 
 #define MAX_TEXTURE_AMT 20
@@ -19,8 +20,7 @@ class TextureLoader {
         TextureLoader(std::vector<std::string>* filenames);
         ~TextureLoader();
 
-        std::map<std::string, Texture>* loadTextures();
-
+        void loadTextures(HashTable<Texture>& textures);
         std::vector<std::string>* filenames;
     private:
         std::vector<std::string>* getTextureFileNames();
@@ -70,17 +70,16 @@ std::vector<std::string>* TextureLoader::getTextureFileNames() {
     return new std::vector<std::string>(files);
 };
 
-std::map<std::string, Texture>* TextureLoader::loadTextures() {
+void TextureLoader::loadTextures(HashTable<Texture> &textures) {
     int textureCount = this->filenames->size();
-    std::map<std::string, Texture> textures;
     for (int i = 0; i < textureCount; i++) {
         const std::string& fname = this->filenames->at(i);
         if (!verifyFileExistance(fname)) {
             continue;
         }
-        textures.insert(std::pair<string, Texture>(stripExt(fname, ".bmp"), Texture("resources/textures/" + fname, fname)));
+        string stripped_fname = fname.substr(0, fname.find_first_of("."));
+        textures.insert(stripped_fname, new Texture("resources/textures/" + fname, stripped_fname));
     }
-    return new std::map<std::string, Texture>(textures);
 }
 
 bool TextureLoader::verifyFileExistance(const std::string& filename) {

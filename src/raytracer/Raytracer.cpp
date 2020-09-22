@@ -94,7 +94,7 @@ void renderMap2D() {
     for (y = 0; y < gameMap.map_height; y++) {
         for (x = 0; x < gameMap.map_width; x++) {
             // Change to colour coresponding to map location
-            toColour(gameMap.getAt(x, y).getColour());
+            toColour(gameMap.getAt(x, y).texColour);
             drawRectangle(x * gameMap.wall_width, y * gameMap.wall_height, gameMap.wall_width, gameMap.wall_height);
         }
     }
@@ -165,7 +165,7 @@ void checkHorizontal(int &mx, int &my, int &mp, float &dof,
         my = radToCoord(ry);
         mp = my * gameMap.map_width + mx;
 
-        if (mp > 0 && mp < gameMap.map_width * gameMap.map_height && gameMap.getAt(mx, my).getColour() != NONE) {
+        if (mp > 0 && mp < gameMap.map_width * gameMap.map_height && gameMap.getAt(mx, my).texColour != NONE) {
             dof = playerCfg.dof;
             hx = rx;
             hy = ry;
@@ -228,7 +228,7 @@ void checkVertical(int &mx, int &my, int &mp, float &dof,
         my = radToCoord(ry);
         mp = my * gameMap.map_width + mx;
 
-        if (mp > 0 && mp < gameMap.map_width * gameMap.map_height && gameMap.getAt(mx, my).getColour() != NONE) {
+        if (mp > 0 && mp < gameMap.map_width * gameMap.map_height && gameMap.getAt(mx, my).texColour != NONE) {
             dof = playerCfg.dof;
             vx = rx;
             vy = ry;
@@ -360,7 +360,7 @@ void renderRays2Dto3D() {
         float wallOffset = ((wallIntersectPoint - (radToCoord(wallIntersectPoint))) % wallSize) / (float) wallSize;
 
         if (shouldRender && (wall_texture == nullptr || wall_texture->name != prev_tex_name)) {
-            wall_texture = textures.get(hitWall.getTextureId());
+            wall_texture = textures.get(hitWall.texture_name);
             prev_tex_name = wall_texture->name;
         }
         vector<Colour> bmpColStrip = shouldRender ? wall_texture->texture.getCol(wallOffset) : prevCol;

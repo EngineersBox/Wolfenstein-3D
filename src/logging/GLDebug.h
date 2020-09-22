@@ -104,7 +104,7 @@ class GLDebugContext {
         DEBUG_NAME_FORMAT format;
         string getCurrentTime(const char* date_format = "%d-%m-%Y_%H:%M:%S");
         bool checkFileExists(const string& filename);
-        string toHex(int value);
+        string toHex(int value) noexcept;
     public:
         GLDebugContext();
         GLDebugContext(LoggingCfg* l_cfg, const DEBUG_LOG_FORMAT format = DEBUG_LOG_FORMAT::DEFAULT, string optional_prefix = "");
@@ -193,7 +193,7 @@ bool GLDebugContext::checkFileExists(const string& filename) {
     return stat(filename.c_str(), &st) == 0;
 };
 
-string GLDebugContext::toHex(int value) {
+string GLDebugContext::toHex(int value) noexcept {
     stringstream sstream;
     sstream << hex << value;
     return sstream.str();

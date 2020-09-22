@@ -22,13 +22,6 @@ class HMEntry {
         HMEntry(const string& key, V* value);
         ~HMEntry();
 
-        const string& getKey() const;
-        V* getValue() const;
-        HMEntry *getNext() const;
-
-        void setValue(V* value);
-        void setNext(HMEntry *next);
-    private:
         const string key;
         V* value;
         HMEntry *next;
@@ -45,61 +38,37 @@ template<typename V>
 HMEntry<V>::~HMEntry(){};
 
 template <typename V>
-const string& HMEntry<V>::getKey() const {
-    return this->key;
-};
-
-template<typename V>
-V* HMEntry<V>::getValue() const {
-    return this->value;
-};
-
-template<typename V>
-void HMEntry<V>::setValue(V* value) {
-    this->value = value;
-};
-
-template<typename V>
-HMEntry<V>* HMEntry<V>::getNext() const {
-    return this->next;
-};
-
-template<typename V>
-void HMEntry<V>::setNext(HMEntry<V>* next) {
-    this->next = next;
-};
-
-template <typename V>
 class HashTable {
    public:
         HashTable();
-        HashTable(int size);
+        explicit HashTable(int size);
         ~HashTable();
 
         V* get(const string& key);
         void insert(const string& key, V* value);
         void remove(const string& key);
 
-        size_t size();
+        size_t size() noexcept;
    private:
         size_t element_count;
-        int table_size = HASH_TABLE_DEFAULT_SIZE;
+        int table_size;
         HMEntry<V> **entries;
 
         inline void findNextNonNull(HMEntry<V>* prev, HMEntry<V>* entry, const string& key);
-        unsigned long hashFunc(const string& key);
+        unsigned long hashFunc(const string& key) const;
 };
 
 template <typename V>
-HashTable<V>::HashTable() {
-    this->entries = new HMEntry<V>*[table_size]();
-}
-
-template <typename V>
 HashTable<V>::HashTable(int size) {
+    if (size > HASH_TABLE_MAX_SIZE) {
+        throw HashTableCapacity(HASH_TABLE_MAX_SIZE, "HashTable size cannot exceed max size limit.");
+    }
     this->table_size = size;
     this->entries = new HMEntry<V>*[size]();
-}
+};
+
+template <typename V>
+HashTable<V>::HashTable() : HashTable<V>(HASH_TABLE_DEFAULT_SIZE){};
 
 template <typename V>
 HashTable<V>::~HashTable() {
@@ -107,13 +76,13 @@ HashTable<V>::~HashTable() {
         HMEntry<V>* entry = entries[i];
         while (entry != NULL) {
             HMEntry<V>* prev = entry;
-            entry = entry->getNext();
+            entry = entry->next;
             delete prev;
         }
         entries[i] = NULL;
     }
     delete[] entries;
-}
+};
 
 template <typename V>
 V* HashTable<V>::get(const string& key) {
@@ -121,21 +90,21 @@ V* HashTable<V>::get(const string& key) {
     HMEntry<V>* entry = entries[hashValue];
 
     while (entry != NULL) {
-        if (entry->getKey().c_str() == key) {
-            return entry->getValue();
+        if (entry->key == key) {
+            return entry->value;
         }
-        entry = entry->getNext();
+        entry = entry->next;
     }
-    return nullptr;
-}
+    return NULL;
+};
 
 template <typename V>
 inline void HashTable<V>::findNextNonNull(HMEntry<V>* prev, HMEntry<V>* entry, const string& key) {
-    while (entry != NULL && entry->getKey() != key) {
+    while (entry != NULL && entry->key != key) {
         prev = entry;
-        entry = entry->getNext();
+        entry = entry->next;
     }
-}
+};
 
 template <typename V>
 void HashTable<V>::insert(const string& key, V* value) {
@@ -146,7 +115,7 @@ void HashTable<V>::insert(const string& key, V* value) {
     findNextNonNull(prev, entry, key);
 
     if (entry != NULL) {
-        entry->setValue(value);
+        entry->value = value;
         this->element_count++;
         return;
     }
@@ -155,10 +124,10 @@ void HashTable<V>::insert(const string& key, V* value) {
     if (prev == NULL) {
         entries[hashValue] = entry;
     } else {
-        prev->setNext(entry);
+        prev->next = entry;
     }
     this->element_count++;
-}
+};
 
 template <typename V>
 void HashTable<V>::remove(const string& key) {
@@ -172,21 +141,21 @@ void HashTable<V>::remove(const string& key) {
         return;
     }
     if (prev == NULL) {
-        entries[hashValue] = entry->getNext();
+        entries[hashValue] = entry->next;
     } else {
-        prev->setNext(entry->getNext());
+        prev->next = entry->next;
     }
     delete entry;
     this->element_count--;
-}
+};
 
 template <typename V>
-size_t HashTable<V>::size() {
+size_t HashTable<V>::size() noexcept {
     return this->element_count;
 };
 
 template <typename V>
-unsigned long HashTable<V>::hashFunc(const string& key) {
+unsigned long HashTable<V>::hashFunc(const string& key) const {
     // Hashing using rolling polynomial method
     unsigned long hashVal = 0;
     for (int i = key.length() - 1; i != -1; i--) {

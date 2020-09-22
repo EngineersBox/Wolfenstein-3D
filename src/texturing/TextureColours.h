@@ -7,7 +7,7 @@
 #include <functional>
 
 using namespace std;
-template <class R, class G, class B, class A>
+template<typename R, typename G, typename B, typename A>
 using CTuple = tuple<R, G, B, A>;
 using Colour = CTuple<GLdouble, GLdouble, GLdouble, GLdouble>;
 
@@ -41,7 +41,7 @@ constexpr int ALPHA_IDX = 3;
 ///
 /// @return void
 ///
-void toColour(Colour texColour) {
+inline void toColour(Colour texColour) {
     glColor4d(
         GET_RED(texColour),
         GET_GREEN(texColour),
@@ -57,7 +57,7 @@ void toColour(Colour texColour) {
 ///
 /// @return void
 ///
-void toClearColour(Colour texColour) {
+inline void toClearColour(Colour texColour) {
     glClearColor(
         GET_RED(texColour) / 255,
         GET_GREEN(texColour) / 255,
@@ -141,7 +141,7 @@ constexpr T PW_div(T a, T b) {
 ///
 /// @return Colour<GLdouble, GLdouble, GLdouble, GLdouble>
 ///
-template <class T>
+template <typename T>
 Colour colourMask(Colour base, Colour mask, PWOperator<T> lin_operator) {
     return {
         lin_operator(GET_RED(base), GET_RED(mask)),

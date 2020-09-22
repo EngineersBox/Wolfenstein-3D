@@ -28,24 +28,17 @@ static const string NormalDirLUT[] = {
 };
 
 class Wall {
-    double posX;
-    double posY;
-    Colour texColour;
-    string texture_name;
     public:
         Wall(double x, double y, Colour colour, string texture);
         Wall(double x, double y, Colour colour);
         Wall(double x, double y, string texture);
         Wall();
         ~Wall();
-        double getX();
-        void setX(double);
-        double getY();
-        void setY(double);
-        Colour getColour();
-        void setColour(Colour);
-        string getTextureId();
         NormalDir getNormDir(float x, float y, int wall_width, int wall_height);
+        double posX;
+        double posY;
+        Colour texColour;
+        string texture_name;
 };
 
 ///
@@ -59,84 +52,19 @@ class Wall {
 /// @returns Wall
 ///
 Wall::Wall(double x, double y, Colour colour, string texture) {
-    posX = x;
-    posY = y;
-    texColour = colour;
-    texture_name = texture;
-    // cout << "TEX LOADED: " << texture << endl;
+    this->posX = x;
+    this->posY = y;
+    this->texColour = colour;
+    this->texture_name = texture;
 }
 
-Wall::Wall() : Wall(0, 0, NONE, "") {}
+Wall::Wall() : Wall(0, 0, NONE, "") {};
 
-Wall::Wall(double x, double y, string texture) : Wall(x, y, NONE, texture) {}
+Wall::Wall(double x, double y, string texture) : Wall(x, y, NONE, texture) {};
 
-Wall::Wall(double x, double y, Colour colour) : Wall(x, y, colour, "") {}
+Wall::Wall(double x, double y, Colour colour) : Wall(x, y, colour, "") {};
 
-Wall::~Wall() {}
-
-///
-/// Get the x value
-///
-/// @return double
-///
-double Wall::getX() {
-    return posX;
-}
-
-///
-/// Set the x value
-///
-/// @param double newX: Set the X-axis location
-///
-/// @return void
-///
-void Wall::setX(double newX) {
-    posX = newX;
-}
-
-///
-/// Get the y value
-///
-/// @return double
-///
-double Wall::getY() {
-    return posY;
-}
-
-///
-/// Set the y value
-///
-/// @param double newY: Set the Y-axis location
-///
-/// @return void
-///
-void Wall::setY(double newY) {
-    posY = newY;
-}
-
-///
-/// Get the colour value
-///
-/// @return Colour
-///
-Colour Wall::getColour() {
-    return texColour;
-}
-
-///
-/// Set the colour value
-///
-/// @param Colour newColour: Set the colour for the wall
-///
-/// @return void
-///
-void Wall::setColour(Colour newColour) {
-    texColour = newColour;
-}
-
-string Wall::getTextureId() {
-    return texture_name;
-}
+Wall::~Wall() {};
 
 NormalDir Wall::getNormDir(float x, float y, int wall_width, int wall_height) {
     float centreX = (posX * wall_width) + (wall_width << 1);
@@ -157,4 +85,4 @@ NormalDir Wall::getNormDir(float x, float y, int wall_width, int wall_height) {
     } else {
         return NormalDir::LEFT;
     }
-}
+};

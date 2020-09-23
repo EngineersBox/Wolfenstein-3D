@@ -48,7 +48,7 @@ class HashTable {
         void insert(const string& key, V* value);
         void remove(const string& key);
 
-        size_t size() noexcept;
+        size_t size() const noexcept;
    private:
         size_t element_count;
         int table_size;
@@ -150,7 +150,7 @@ void HashTable<V>::remove(const string& key) {
 };
 
 template <typename V>
-size_t HashTable<V>::size() noexcept {
+size_t HashTable<V>::size() const noexcept {
     return this->element_count;
 };
 

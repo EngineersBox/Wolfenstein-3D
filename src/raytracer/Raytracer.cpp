@@ -8,6 +8,16 @@
 #define SRC_DIR string("src/")
 
 #define radToCoord(r) (int)(r) >> 6
+#define IMUL_2(x) x << 1
+#define IDIV_2(x) x >> 1
+#define IMUL_4(x) x << 2
+#define IDIV_4(x) x >> 2
+#define IMUL_8(x) x << 3
+#define IDIV_8(x) x >> 3
+#define IIMUL_16(x) x << 4
+#define IDIV_16(x) x >> 4
+#define IMUL_32(x) x << 5
+#define IDIV_32(x) x >> 5;
 
 #define CEILING_COLOUR LIGHT_GREY
 #define FLOOR_COLOUR DARK_GREY
@@ -165,7 +175,7 @@ void checkHorizontal(int &mx, int &my, int &mp, float &dof,
         my = radToCoord(ry);
         mp = my * gameMap.map_width + mx;
 
-        if (mp > 0 && mp < gameMap.map_width * gameMap.map_height && gameMap.getAt(mx, my).texColour != NONE) {
+        if (mp > 0 && mp < gameMap.size && gameMap.getAt(mx, my).texColour != NONE) {
             dof = playerCfg.dof;
             hx = rx;
             hy = ry;
@@ -228,7 +238,7 @@ void checkVertical(int &mx, int &my, int &mp, float &dof,
         my = radToCoord(ry);
         mp = my * gameMap.map_width + mx;
 
-        if (mp > 0 && mp < gameMap.map_width * gameMap.map_height && gameMap.getAt(mx, my).texColour != NONE) {
+        if (mp > 0 && mp < gameMap.size && gameMap.getAt(mx, my).texColour != NONE) {
             dof = playerCfg.dof;
             vx = rx;
             vy = ry;
@@ -264,22 +274,28 @@ void draw3DWalls(int &r, float &ra, float &distT, vector<Colour> *colourStrip, C
     float ca = validateAngle(player.angle - ra);
     distT *= cos(ca);
 
-    int mapS = gameMap.map_height * gameMap.map_width;
-    float lineH = (mapS * mapScreenH) / distT;
+    float lineH = (gameMap.size * mapScreenH) / distT;
+    float lineInViewPercentage = 1;
     if (lineH > mapScreenH) {
-        lineH = (float)mapScreenH;
+        lineInViewPercentage = 1 - ((lineH - ((float) mapScreenH)) / lineH);
+        lineH = (float) mapScreenH;
     }
 
     float line_off = (mapScreenH >> 1) - (lineH / 2);
+    bool isInViewFully = line_off == 0;
     float screen_off = minimapCfg.enable ? (float)mapScreenW : 0;
 
     int cStripSize = colourStrip->size();
-    int pixelOffset = 0;
-    int pixelStepSize = cStripSize / lineH;
+    int cOffset = 0;
+    if (lineInViewPercentage < 1) {
+        cStripSize = cStripSize * lineInViewPercentage;
+        cOffset = (colourStrip->size() - cStripSize) >> 1;
+    }
+    float pixelOffset = 0;
+    float pixelStepSize = cStripSize / lineH;
     glEnable(GL_SCISSOR_TEST);
     for (int yPos = line_off; yPos < line_off + lineH; yPos++) {
-        pixelOffset = min(pixelOffset, cStripSize - 1);
-        Colour c = colourStrip->at(pixelOffset);
+        Colour c = colourStrip->at(cOffset + min((int)floor(pixelOffset), cStripSize - 1));
         glScissor(r * (mapScreenW / playerCfg.fov) * 2 + screen_off, yPos, (mapScreenW / playerCfg.fov) * 2.1, mapScreenH / playerCfg.fov);
         toClearColour(
             colourMask<GLdouble>(
@@ -363,7 +379,7 @@ void renderRays2Dto3D() {
             wall_texture = textures.get(hitWall.texture_name);
             prev_tex_name = wall_texture->name;
         }
-        vector<Colour> bmpColStrip = shouldRender ? wall_texture->texture.getCol(wallOffset) : prevCol;
+        vector<Colour> bmpColStrip = shouldRender ? wall_texture->texture.getCol(1.0 - wallOffset) : prevCol;
         Colour shader = isLR ? Colour{0.9, 0.9, 0.9, 1.0} : Colour{0.7, 0.7, 0.7, 1.0};
 
         prevCol = bmpColStrip;

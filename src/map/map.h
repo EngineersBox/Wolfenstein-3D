@@ -28,6 +28,7 @@ class GameMap {
         
         int map_width;
         int map_height;
+        int size;
         int wall_width;
         int wall_height;
         vector<Wall> _walls;
@@ -38,6 +39,7 @@ GameMap::GameMap(vector<Wall> walls, int width, int height, GLDebugContext* debu
     this->map_width = height;
     this->_walls = walls;
     this->debugContext = debugContext;
+    this->size = width * height;
 }
 
 GameMap::GameMap(GLDebugContext* debugContext) : GameMap(vector<Wall>(0), 0, 0, debugContext){};
@@ -52,6 +54,7 @@ void GameMap::fromArray(Wall walls[], int width, int height) {
     for (int i = 0; i < width * height; i++) {
         this->_walls.at(i) = walls[i];
     }
+    this->size = width * height;
 }
 
 vector<string> splitString(string s, int substring_count, string delimiter) {
@@ -99,6 +102,7 @@ void GameMap::readMapFromFile(string filename) {
             this->_walls.at((y * this->map_width) + x) = Wall(x, y, cToken == "NONE" ? NONE : WHITE, cToken);
         }
     }
+    this->size = this->map_width * this->map_height;
 }
 
 Wall GameMap::getAt(int x, int y) {

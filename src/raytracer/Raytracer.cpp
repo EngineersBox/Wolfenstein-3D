@@ -2,25 +2,13 @@
 
 #include "Raytracer.h"
 
-#define RES_DIR string("resources/")
-#define MAPS_DIR RES_DIR + "maps/"
-#define TEX_DIR RES_DIR + "textures/"
-#define SRC_DIR string("src/")
-
 #define radToCoord(r) (int)(r) >> 6
-#define IMUL_2(x) x << 1
-#define IDIV_2(x) x >> 1
-#define IMUL_4(x) x << 2
-#define IDIV_4(x) x >> 2
-#define IMUL_8(x) x << 3
-#define IDIV_8(x) x >> 3
-#define IIMUL_16(x) x << 4
-#define IDIV_16(x) x >> 4
-#define IMUL_32(x) x << 5
-#define IDIV_32(x) x >> 5;
 
 #define CEILING_COLOUR LIGHT_GREY
 #define FLOOR_COLOUR DARK_GREY
+
+#define SCREEN_WIDTH glutGet(GLUT_WINDOW_WIDTH)
+#define SCREEN_HEIGHT glutGet(GLUT_WINDOW_HEIGHT)
 
 using namespace std;
 
@@ -44,6 +32,7 @@ int mapScreenH = screenH;
 ConfigInit cfgInit;
 
 GameMap gameMap = GameMap();
+vector<Ray> rays(0);
 
 ///
 /// Render a line between two points (ax, ay) and (bx, by) with a given width
@@ -93,12 +82,16 @@ void renderPlayerPos() {
 /// @return void
 ///
 void renderMap2D() {
+    int xSize = 20;
+    int ySize = 20;
+    int xOffset = minimapCfg.isLeft() ? SCREEN_WIDTH - (gameMap.map_width * xSize) : 0;
+    int yOffset = minimapCfg.isTop() ? 0 : SCREEN_HEIGHT - (gameMap.map_height * ySize);
     int x, y;
     for (y = 0; y < gameMap.map_height; y++) {
         for (x = 0; x < gameMap.map_width; x++) {
             // Change to colour coresponding to map location
             toColour(gameMap.getAt(x, y).texColour);
-            drawRectangle(x * gameMap.wall_width, y * gameMap.wall_height, gameMap.wall_width, gameMap.wall_height);
+            drawRectangle(xOffset + x * xSize, yOffset + y * ySize, xSize, ySize);
         }
     }
 }
@@ -265,17 +258,19 @@ inline float validateAngle(float angle) {
 void draw3DWalls(int &r, float &ra, float &distT, const vector<Colour> *colourStrip, const Colour polygonShader, PWOperator<GLdouble> shaderOperator) {
     // Draw 3D walls
     // float ca = validateAngle(player.angle - ra);
+    const int SH = SCREEN_HEIGHT;
+    const int SW = SCREEN_WIDTH;
     distT *= cos(validateAngle(player.angle - ra));
 
-    float lineH = (gameMap.size * mapScreenH) / distT;
+    float lineH = (gameMap.size * SH) / distT;
     float lineInViewPercentage = 1;
-    if (lineH > mapScreenH) {
-        lineInViewPercentage = 1 - ((lineH - ((float) mapScreenH)) / lineH);
-        lineH = (float) mapScreenH;
+    if (lineH > SH) {
+        lineInViewPercentage = 1 - ((lineH - ((float) SH)) / lineH);
+        lineH = (float) SH;
     }
 
-    const float line_off = (mapScreenH >> 1) - (lineH / 2);
-    const float screen_off = minimapCfg.enable ? (float)mapScreenW : 0;
+    const float line_off = (SH / 2) - (lineH / 2);
+    const float screen_off = (SW / playerCfg.fov ) * r;
 
     int cStripSize = colourStrip->size();
     int cOffset = 0;
@@ -288,14 +283,12 @@ void draw3DWalls(int &r, float &ra, float &distT, const vector<Colour> *colourSt
     glEnable(GL_SCISSOR_TEST);
     for (int yPos = line_off; yPos < line_off + lineH; yPos++) {
         Colour c = colourStrip->at(cOffset + min((int)floor(pixelOffset), cStripSize - 1));
-        glScissor(r * (mapScreenW / playerCfg.fov) * 2 + screen_off, yPos, (mapScreenW / playerCfg.fov) * 2.1, mapScreenH / playerCfg.fov);
+        glScissor(screen_off * 2, yPos * 2, (SW / playerCfg.fov) * 2.1, (SH / lineH) * 2);
         toClearColour(
             colourMask<GLdouble>(
                 c,
                 polygonShader,
-                shaderOperator
-            )
-        );
+                shaderOperator));
         glClear(GL_COLOR_BUFFER_BIT);
         pixelOffset += pixelStepSize;
     }
@@ -327,7 +320,7 @@ inline Wall validateSideRender(float &rx, float &ry, float &disH, float &hx, flo
 ///
 /// @return void
 ///
-void renderRays2Dto3D() {
+void renderRays2Dto3D(vector<Ray>& rays) {
     int r{0}, mx{0}, my{0}, mp{0};
     float dof, rx{0}, ry{0}, ra, x_off{0}, y_off{0}, distT{0};
     vector<Colour> prevCol = emptyCol;
@@ -357,7 +350,7 @@ void renderRays2Dto3D() {
         Wall hitWall = validateSideRender(rx, ry, disH, hx, hy, disV, vx, vy, distT, shouldRender);
         
         if (minimapCfg.enable && minimapCfg.render_rays) {
-            renderRay(player.x, player.y, rx, ry, 1);
+            rays.at(r) = {player.x, player.y, rx, ry, 1};
         }
 
         const NormalDir nDir = hitWall.getNormDir(rx, ry, gameMap.wall_width, gameMap.wall_height);
@@ -388,7 +381,7 @@ void renderRays2Dto3D() {
 ///
 inline void drawCeiling() {
     toColour(CEILING_COLOUR);
-    drawRectangle(0, 0, screenW, screenH >> 1, true);
+    drawRectangle(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT >> 1, true);
 }
 
 ///
@@ -396,7 +389,24 @@ inline void drawCeiling() {
 ///
 inline void drawFloor() {
     toColour(FLOOR_COLOUR);
-    drawRectangle(0, screenH >> 1, screenW, screenH, true);
+    drawRectangle(0, SCREEN_HEIGHT >> 1, SCREEN_WIDTH, SCREEN_HEIGHT, true);
+}
+
+inline void renderMapRays(vector<Ray>& rays) {
+    for (Ray ray : rays) {
+        renderRay(ray.ax, ray.ay, ray.bx, ray.by, ray.line_width);
+    }
+}
+
+void reshape(int x, int y) {
+    if (minimapCfg.enable) {
+        renderMap2D();
+        renderPlayerPos();
+        if (minimapCfg.render_rays) {
+            renderMapRays(rays);
+        }
+    }
+    glutSwapBuffers();
 }
 
 ///
@@ -408,11 +418,16 @@ void display() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     drawCeiling();
     drawFloor();
+
+    vector<Ray> rays(playerCfg.fov);
+    renderRays2Dto3D(rays);
     if (minimapCfg.enable) {
         renderMap2D();
         renderPlayerPos();
+        if (minimapCfg.render_rays) {
+            renderMapRays(rays);
+        }
     }
-    renderRays2Dto3D();
     glutSwapBuffers();
 }
 
@@ -464,7 +479,7 @@ void buttons(unsigned char key, int x, int y) {
 void init(Colour background_colour) {
     cfgInit.initAll(playerCfg, minimapCfg, loggingCfg, renderCfg);
     if (minimapCfg.enable) {
-        mapScreenW >>= 1;
+        mapScreenW = IDIV_2(mapScreenW);
     }
     debugContext = GLDebugContext(&loggingCfg);
 
@@ -474,6 +489,8 @@ void init(Colour background_colour) {
 
     gameMap.readMapFromFile(MAPS_DIR + "map1.txt");
     debugContext.logAppInfo(string("Loaded map: " + MAPS_DIR + "map1.txt"));
+
+    rays = vector<Ray>(playerCfg.fov);
 
     gameMap.wall_width = mapScreenW / gameMap.map_width;
     gameMap.wall_height = mapScreenH / gameMap.map_height;
@@ -510,6 +527,7 @@ int main(int argc, char *argv[]) {
     debugContext.logAppInfo("COMPLETED INIT PHASE");
 
     glutDisplayFunc(display);
+    glutReshapeFunc(reshape);
     glutKeyboardFunc(buttons);
     glutPostRedisplay();
     debugContext.logAppInfo("Initialised OpenGL/GLUT display and buttons");

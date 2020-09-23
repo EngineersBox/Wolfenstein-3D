@@ -3,6 +3,7 @@
 #include <GLUT/glut.h>
 #include <OpenGL/gl.h>
 #include <string>
+#include "../raytracer/Globals.h"
 #include "BMPreader.h"
 
 using namespace std;

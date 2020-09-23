@@ -10,7 +10,7 @@
 
 #include "texture.h"
 #include "../hashing/HashTable.h"
-#include "../raytracer/Raytracer.h"
+#include "../raytracer/Globals.h"
 
 #define MAX_TEXTURE_AMOUNT 20
 

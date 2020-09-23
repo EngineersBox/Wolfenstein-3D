@@ -5,7 +5,6 @@
 #include <stdio.h>
 #include <sys/stat.h>
 #include <sys/types.h>
-
 #include <ctime>
 #include <fstream>
 #include <iostream>
@@ -17,11 +16,10 @@
 #include "../exceptions/debug/ExceededDebugMessageSize.h"
 #include "../raytracer/Globals.h"
 
+using namespace std;
+
 #define GL_MAX_DEBUG_MSG_LENGTH 2048
 #define LOGS_DIR string("logs/")
-using Buffer = const char;
-
-using namespace std;
 
 enum GL_DEBUG_TYPE : uint16_t {
     DEBUG_TYPE_ERROR = 0x001,

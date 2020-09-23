@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 #include "INIReader.h"
 #include "../exceptions/config/INIReadError.h"
 #include "mappers/MinimapCfg.h"
@@ -9,7 +11,8 @@
 
 using namespace std;
 
-const string CFG_DIR = "resources/configs/";
+#define RES_DIR string("resources/")
+#define CFG_DIR RES_DIR + "configs/"
 #define DEFAULT_CONFIG CFG_DIR + "config.ini"
 
 #define PLAYER_SECTION "player"
@@ -61,7 +64,7 @@ MinimapCfg ConfigInit::initMinimapConfig() {
     return MinimapCfg(
         reader.GetBoolean(MINIMAP_SECTION, "enable", false),
         reader.GetBoolean(MINIMAP_SECTION, "render_rays", true),
-        parseMinimapPos(reader.Get(MINIMAP_SECTION, "pos", "TOP_LEFT"))
+        parseMinimapPos(reader.Get(MINIMAP_SECTION, "pos", "TOP_RIGHT"))
     );
 };
 

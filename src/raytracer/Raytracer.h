@@ -6,7 +6,6 @@
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
-
 #include <algorithm>
 #include <iostream>
 #include <limits>
@@ -17,13 +16,13 @@
 #include "../configuration/ConfigInit.h"
 #include "../drawing/DrawingUtils.h"
 #include "../environment/Walls.h"
+#include "../hashing/HashTable.h"
 #include "../map/map.h"
 #include "../player/Player.h"
 #include "../texturing/TextureColours.h"
 #include "../texturing/TextureLoader.h"
 #include "../texturing/texture.h"
-#include "../logging/GLDebug.h"
-#include "../hashing/HashTable.h"
+#include "Ray.h"
 #include "Globals.h"
 
 #define _USE_MATH_DEFINES

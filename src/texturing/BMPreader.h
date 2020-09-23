@@ -121,14 +121,14 @@ struct BMP {
                 throw BMPOriginPositionError(bmp_info_header.height);
             }
 
-            data.resize(bmp_info_header.width * bmp_info_header.height * bmp_info_header.bit_count / 8);
+            data.resize(bmp_info_header.width * bmp_info_header.height * IDIV_8(bmp_info_header.bit_count));
 
             // Here we check if we need to take into account row padding
             if (bmp_info_header.width % 4 == 0) {
                 inp.read((char *)data.data(), data.size());
                 file_header.file_size += static_cast<uint32_t>(data.size());
             } else {
-                row_stride = bmp_info_header.width * bmp_info_header.bit_count / 8;
+                row_stride = bmp_info_header.width * IDIV_8(bmp_info_header.bit_count);
                 uint32_t new_stride = makeStrideAligned(4);
                 vector<uint8_t> padding_row(new_stride - row_stride);
 
@@ -156,7 +156,7 @@ struct BMP {
 
             bmp_info_header.bit_count = 32;
             bmp_info_header.compression = 3;
-            row_stride = width * 4;
+            row_stride = IMUL_4(width);
             data.resize(row_stride * height);
             file_header.file_size = file_header.offset_data + data.size();
         } else {
@@ -176,7 +176,7 @@ struct BMP {
     vector<Colour> getCol(float percentageDist) {
         u_int32_t col = bmp_info_header.width * percentageDist;
         vector<Colour> colData(bmp_info_header.height);
-        uint32_t channels = bmp_info_header.bit_count / 8;
+        uint32_t channels = IDIV_8(bmp_info_header.bit_count);
         for (u_int32_t i = 0; i < bmp_info_header.height; i++) {
             // uint32_t R, G, B, A = 1;
             // B = data[channels * (i * bmp_info_header.width + col) + 0];
@@ -196,7 +196,7 @@ struct BMP {
             throw ImagePixelError(x, y);
         }
         uint32_t R, G, B, A = 1;
-        uint32_t channels = bmp_info_header.bit_count / 8;
+        uint32_t channels = IDIV_8(bmp_info_header.bit_count);
         B = data[channels * (y * bmp_info_header.width + x) + 0];
         G = data[channels * (y * bmp_info_header.width + x) + 1];
         R = data[channels * (y * bmp_info_header.width + x) + 2];
@@ -212,7 +212,7 @@ struct BMP {
             throw ImagePixelError(x, y);
         }
 
-        uint32_t channels = bmp_info_header.bit_count / 8;
+        uint32_t channels = IDIV_8(bmp_info_header.bit_count);
         data[channels * (y * bmp_info_header.width + x) + 0] = B;
         data[channels * (y * bmp_info_header.width + x) + 1] = G;
         data[channels * (y * bmp_info_header.width + x) + 2] = R;

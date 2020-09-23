@@ -1,12 +1,11 @@
 #pragma once
 
 #include <string>
-#include <type_traits>
 #include <vector>
 
 #include "../exceptions/hashing/BucketIndexOccupied.h"
 #include "../exceptions/hashing/HashTableCapacity.h"
-#include "../exceptions/hashing/NullClassWithInheritance.h"
+#include "../raytracer/Globals.h"
 
 using namespace std;
 
@@ -52,7 +51,7 @@ class HashTable {
    private:
         size_t element_count;
         int table_size;
-        HMEntry<V> **entries;
+        HMEntry<V> **buckets;
 
         inline void findNextNonNull(HMEntry<V>* prev, HMEntry<V>* entry, const string& key);
         unsigned long hashFunc(const string& key) const;
@@ -64,30 +63,33 @@ HashTable<V>::HashTable(int size) {
         throw HashTableCapacity(HASH_TABLE_MAX_SIZE, "HashTable size cannot exceed max size limit.");
     }
     this->table_size = size;
-    this->entries = new HMEntry<V>*[size]();
+    this->buckets = new HMEntry<V>*[size]();
 };
 
 template <typename V>
-HashTable<V>::HashTable() : HashTable<V>(HASH_TABLE_DEFAULT_SIZE){};
+HashTable<V>::HashTable() {
+    this->table_size = HASH_TABLE_DEFAULT_SIZE;
+    this->buckets = new HMEntry<V>*[HASH_TABLE_DEFAULT_SIZE]();
+};
 
 template <typename V>
 HashTable<V>::~HashTable() {
     for (int i = table_size - 1; i != -1; i--) {
-        HMEntry<V>* entry = entries[i];
+        HMEntry<V>* entry = buckets[i];
         while (entry != NULL) {
             HMEntry<V>* prev = entry;
             entry = entry->next;
             delete prev;
         }
-        entries[i] = NULL;
+        buckets[i] = NULL;
     }
-    delete[] entries;
+    delete[] buckets;
 };
 
 template <typename V>
 V* HashTable<V>::get(const string& key) {
     unsigned long hashValue = hashFunc(key);
-    HMEntry<V>* entry = entries[hashValue];
+    HMEntry<V>* entry = buckets[hashValue];
 
     while (entry != NULL) {
         if (entry->key == key) {
@@ -110,7 +112,7 @@ template <typename V>
 void HashTable<V>::insert(const string& key, V* value) {
     unsigned long hashValue = hashFunc(key);
     HMEntry<V>* prev = NULL;
-    HMEntry<V>* entry = entries[hashValue];
+    HMEntry<V>* entry = buckets[hashValue];
 
     findNextNonNull(prev, entry, key);
 
@@ -122,7 +124,7 @@ void HashTable<V>::insert(const string& key, V* value) {
 
     entry = new HMEntry<V>(key, value);
     if (prev == NULL) {
-        entries[hashValue] = entry;
+        buckets[hashValue] = entry;
     } else {
         prev->next = entry;
     }
@@ -133,7 +135,7 @@ template <typename V>
 void HashTable<V>::remove(const string& key) {
     unsigned long hashValue = hashFunc(key);
     HMEntry<V>* prev = NULL;
-    HMEntry<V>* entry = entries[hashValue];
+    HMEntry<V>* entry = buckets[hashValue];
 
     findNextNonNull(prev, entry, key);
 
@@ -141,7 +143,7 @@ void HashTable<V>::remove(const string& key) {
         return;
     }
     if (prev == NULL) {
-        entries[hashValue] = entry->next;
+        buckets[hashValue] = entry->next;
     } else {
         prev->next = entry->next;
     }

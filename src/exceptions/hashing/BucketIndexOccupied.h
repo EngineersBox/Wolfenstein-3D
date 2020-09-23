@@ -20,9 +20,9 @@ class BucketIndexOccupied : virtual public exception {
             string ret_val = "Element already exists at bucket index: ";
             ret_val.append(to_string(idx));
             debugContext.glDebugMessageCallback(
-                DEBUG_SOURCE_APPLICATION,
-                DEBUG_TYPE_ERROR,
-                DEBUG_SEVERITY_HIGH,
+                GL_DEBUG_SOURCE::DEBUG_SOURCE_APPLICATION,
+                GL_DEBUG_TYPE::DEBUG_TYPE_ERROR,
+                GL_DEBUG_SEVERITY::DEBUG_SEVERITY_HIGH,
                 ret_val
             );
             return ret_val.c_str();

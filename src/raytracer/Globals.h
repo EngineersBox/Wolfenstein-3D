@@ -6,9 +6,9 @@
 #include "../configuration/mappers/RenderCfg.h"
 #include "../logging/GLDebug.h"
 
-PlayerCfg playerCfg;
-MinimapCfg minimapCfg;
-LoggingCfg loggingCfg;
-RenderCfg renderCfg;
+static PlayerCfg playerCfg = PlayerCfg();
+static MinimapCfg minimapCfg = MinimapCfg();
+static LoggingCfg loggingCfg = LoggingCfg();
+static RenderCfg renderCfg = RenderCfg();
 
-GLDebugContext debugContext;
+static GLDebugContext debugContext = GLDebugContext();

@@ -15,6 +15,7 @@
 #include "../exceptions/debug/DebugLogDirCreateError.h"
 #include "../exceptions/debug/DebugLogWriteError.h"
 #include "../exceptions/debug/ExceededDebugMessageSize.h"
+#include "../raytracer/Globals.h"
 
 #define GL_MAX_DEBUG_MSG_LENGTH 2048
 #define LOGS_DIR string("logs/")

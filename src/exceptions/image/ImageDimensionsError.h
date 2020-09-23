@@ -3,6 +3,8 @@
 #include <exception>
 #include <string>
 
+#include "../../raytracer/Globals.h"
+
 using namespace std;
 
 class ImageDimensionsError : virtual public exception {
@@ -23,9 +25,9 @@ class ImageDimensionsError : virtual public exception {
                 + ", "
                 + to_string(img_height);
             debugContext.glDebugMessageCallback(
-                DEBUG_SOURCE_APPLICATION,
-                DEBUG_TYPE_ERROR,
-                DEBUG_SEVERITY_HIGH,
+                GL_DEBUG_SOURCE::DEBUG_SOURCE_APPLICATION,
+                GL_DEBUG_TYPE::DEBUG_TYPE_ERROR,
+                GL_DEBUG_SEVERITY::DEBUG_SEVERITY_HIGH,
                 ret_val
             );
             return ret_val.c_str();

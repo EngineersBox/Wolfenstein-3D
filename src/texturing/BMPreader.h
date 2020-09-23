@@ -24,6 +24,8 @@
 #include "../exceptions/image/ImagePixelError.h"
 #include "TextureColours.h"
 
+#include "../raytracer/Globals.h"
+
 using namespace std;
 
 #define BMP_FILE_TYPE 0x4D42

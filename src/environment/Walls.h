@@ -67,13 +67,13 @@ Wall::Wall(double x, double y, Colour colour) : Wall(x, y, colour, "") {};
 Wall::~Wall() {};
 
 NormalDir Wall::getNormDir(float x, float y, int wall_width, int wall_height) {
-    float centreX = (posX * wall_width) + (wall_width << 1);
-    float centreY = (posY * wall_height) + (wall_height << 1);
+    const float centreX = (posX * wall_width) + (wall_width << 1);
+    const float centreY = (posY * wall_height) + (wall_height << 1);
 
-    float dx = x - centreX;
-    float dy = y - centreY;
+    const float dx = x - centreX;
+    const float dy = y - centreY;
 
-    float angle = 1 / (tan(dy/dx));
+    const float angle = 1 / (tan(dy/dx));
     if (IS_LEFT(angle)) {
         return NormalDir::LEFT;
     } else if (IS_RIGHT(angle)) {

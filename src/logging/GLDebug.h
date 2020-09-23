@@ -96,7 +96,8 @@ static const DEBUG_NAME_FORMAT DEBUG_LOG_FORMAT_LUT[] = {
     DEBUG_NAME_FORMAT{"debug_log_", "%d-%m-%Y_%H:%M:%S"},
     DEBUG_NAME_FORMAT{"debug_log_", "%H:%M:%S"},
     DEBUG_NAME_FORMAT{"", "%d-%m-%Y_%H:%M:%S"},
-    DEBUG_NAME_FORMAT{"", "%H:%M:%S"}};
+    DEBUG_NAME_FORMAT{"", "%H:%M:%S"}
+};
 
 class GLDebugContext {
     private:

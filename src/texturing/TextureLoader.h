@@ -12,7 +12,7 @@
 #include "../hashing/HashTable.h"
 #include "../raytracer/Raytracer.h"
 
-#define MAX_TEXTURE_AMT 20
+#define MAX_TEXTURE_AMOUNT 20
 
 class TextureLoader {
     public:
@@ -25,7 +25,7 @@ class TextureLoader {
     private:
         std::vector<std::string>* getTextureFileNames();
         bool verifyFileExistance(const std::string& filename);
-        bool hasExt(const std::string& filename, const std::string& extension);
+        bool hasExt(const std::string& filename, const std::string& extension) const;
         std::string stripExt(const std::string& filename, const std::string& extension);
 };
 
@@ -39,7 +39,7 @@ TextureLoader::TextureLoader(std::vector<std::string>* filenames) {
 
 TextureLoader::~TextureLoader(){};
 
-bool TextureLoader::hasExt(const std::string& filename, const std::string& extension) {
+bool TextureLoader::hasExt(const std::string& filename, const std::string& extension) const {
     return filename.substr(filename.find(".")) == extension;
 }
 
@@ -51,11 +51,11 @@ std::string TextureLoader::stripExt(const std::string& filename, const std::stri
 }
 
 std::vector<std::string>* TextureLoader::getTextureFileNames() {
-    DIR* dirp = opendir(std::string("resources/textures").c_str());
+    DIR* dir = opendir(std::string("resources/textures").c_str());
     struct dirent* dp;
     std::vector<std::string> files;
     int texCount = 0;
-    while ((dp = readdir(dirp)) != NULL && texCount < MAX_TEXTURE_AMT) {
+    while ((dp = readdir(dir)) != NULL && texCount < MAX_TEXTURE_AMOUNT) {
         std::string cfile(dp->d_name);
         if (cfile.size() < 3 || !hasExt(cfile, ".bmp")) {
             continue;
@@ -63,9 +63,9 @@ std::vector<std::string>* TextureLoader::getTextureFileNames() {
         files.push_back(dp->d_name);
         texCount++;
     }
-    closedir(dirp);
-    if (texCount == MAX_TEXTURE_AMT) {
-        cout << "WARNING: Maximum texture import count reached [" << MAX_TEXTURE_AMT << "]" << endl;
+    closedir(dir);
+    if (texCount == MAX_TEXTURE_AMOUNT) {
+        cout << "WARNING: Maximum texture import count reached [" << MAX_TEXTURE_AMOUNT << "]" << endl;
     }
     return new std::vector<std::string>(files);
 };

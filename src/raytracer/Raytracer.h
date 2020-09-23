@@ -24,6 +24,7 @@
 #include "../texturing/texture.h"
 #include "../logging/GLDebug.h"
 #include "../hashing/HashTable.h"
+#include "Globals.h"
 
 #define _USE_MATH_DEFINES
 

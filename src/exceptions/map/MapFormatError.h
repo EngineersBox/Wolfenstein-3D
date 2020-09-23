@@ -18,6 +18,12 @@ class MapFormatError : virtual public exception {
 
         virtual const char* what() const throw() {
             string ret_val = "Map format should be 0 or 1: " + to_string(format);
+            debugContext.glDebugMessageCallback(
+                DEBUG_SOURCE_APPLICATION,
+                DEBUG_TYPE_ERROR,
+                DEBUG_SEVERITY_HIGH,
+                ret_val
+            );
             return ret_val.c_str();
         };
 };

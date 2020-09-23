@@ -43,13 +43,6 @@ int mapScreenH = screenH;
 // Configs
 ConfigInit cfgInit;
 
-PlayerCfg playerCfg;
-MinimapCfg minimapCfg;
-LoggingCfg loggingCfg;
-RenderCfg renderCfg;
-
-GLDebugContext debugContext;
-
 GameMap gameMap = GameMap();
 
 ///
@@ -63,7 +56,7 @@ GameMap gameMap = GameMap();
 ///
 /// @return void
 ///
-void renderRay(float ax, float ay, float bx, float by, int line_width) {
+inline void renderRay(float ax, float ay, float bx, float by, int line_width) {
     toColour(WHITE);
     glLineWidth((float)line_width);
 
@@ -121,7 +114,7 @@ void renderMap2D() {
 ///
 /// @return float
 ///
-float dist(float ax, float ay, float bx, float by, float ang) {
+inline float dist(float ax, float ay, float bx, float by, float ang) {
     return sqrtf((bx - ax) * (bx - ax) + (by - ay) * (by - ay));
 }
 
@@ -251,7 +244,7 @@ void checkVertical(int &mx, int &my, int &mp, float &dof,
     }
 }
 
-float validateAngle(float angle) {
+inline float validateAngle(float angle) {
     if (angle < 0) {
         angle += (float)(2 * M_PI);
     } else if (angle > 2 * M_PI) {
@@ -269,10 +262,10 @@ float validateAngle(float angle) {
 ///
 /// @return void
 ///
-void draw3DWalls(int &r, float &ra, float &distT, vector<Colour> *colourStrip, Colour polygonShader, PWOperator<GLdouble> shaderOperator) {
+void draw3DWalls(int &r, float &ra, float &distT, const vector<Colour> *colourStrip, const Colour polygonShader, PWOperator<GLdouble> shaderOperator) {
     // Draw 3D walls
-    float ca = validateAngle(player.angle - ra);
-    distT *= cos(ca);
+    // float ca = validateAngle(player.angle - ra);
+    distT *= cos(validateAngle(player.angle - ra));
 
     float lineH = (gameMap.size * mapScreenH) / distT;
     float lineInViewPercentage = 1;
@@ -281,9 +274,8 @@ void draw3DWalls(int &r, float &ra, float &distT, vector<Colour> *colourStrip, C
         lineH = (float) mapScreenH;
     }
 
-    float line_off = (mapScreenH >> 1) - (lineH / 2);
-    bool isInViewFully = line_off == 0;
-    float screen_off = minimapCfg.enable ? (float)mapScreenW : 0;
+    const float line_off = (mapScreenH >> 1) - (lineH / 2);
+    const float screen_off = minimapCfg.enable ? (float)mapScreenW : 0;
 
     int cStripSize = colourStrip->size();
     int cOffset = 0;
@@ -292,7 +284,7 @@ void draw3DWalls(int &r, float &ra, float &distT, vector<Colour> *colourStrip, C
         cOffset = (colourStrip->size() - cStripSize) >> 1;
     }
     float pixelOffset = 0;
-    float pixelStepSize = cStripSize / lineH;
+    const float pixelStepSize = cStripSize / lineH;
     glEnable(GL_SCISSOR_TEST);
     for (int yPos = line_off; yPos < line_off + lineH; yPos++) {
         Colour c = colourStrip->at(cOffset + min((int)floor(pixelOffset), cStripSize - 1));
@@ -310,7 +302,7 @@ void draw3DWalls(int &r, float &ra, float &distT, vector<Colour> *colourStrip, C
     glDisable(GL_SCISSOR_TEST);
 }
 
-Wall validateSideRender(float &rx, float &ry, float &disH, float &hx, float &hy, float &disV, float &vx, float &vy, float &distT, bool &shouldRender) {
+inline Wall validateSideRender(float &rx, float &ry, float &disH, float &hx, float &hy, float &disV, float &vx, float &vy, float &distT, bool &shouldRender) {
     Wall hitWall;
     if (disV < disH) {
         rx = vx;
@@ -368,19 +360,19 @@ void renderRays2Dto3D() {
             renderRay(player.x, player.y, rx, ry, 1);
         }
 
-        NormalDir nDir = hitWall.getNormDir(rx, ry, gameMap.wall_width, gameMap.wall_height);
-        bool isLR = nDir == NormalDir::LEFT || nDir == NormalDir::RIGHT;
+        const NormalDir nDir = hitWall.getNormDir(rx, ry, gameMap.wall_width, gameMap.wall_height);
+        const bool isLR = nDir == NormalDir::LEFT || nDir == NormalDir::RIGHT;
 
-        int wallIntersectPoint = isLR ? ry : rx;
-        int wallSize = (isLR ? mapScreenW : mapScreenH) / (isLR ? gameMap.map_width : gameMap.map_height);
-        float wallOffset = ((wallIntersectPoint - (radToCoord(wallIntersectPoint))) % wallSize) / (float) wallSize;
+        const int wallIntersectPoint = isLR ? ry : rx;
+        const int wallSize = (isLR ? mapScreenW : mapScreenH) / (isLR ? gameMap.map_width : gameMap.map_height);
+        const float wallOffset = ((wallIntersectPoint - (radToCoord(wallIntersectPoint))) % wallSize) / (float) wallSize;
 
         if (shouldRender && (wall_texture == nullptr || wall_texture->name != prev_tex_name)) {
             wall_texture = textures.get(hitWall.texture_name);
             prev_tex_name = wall_texture->name;
         }
-        vector<Colour> bmpColStrip = shouldRender ? wall_texture->texture.getCol(1.0 - wallOffset) : prevCol;
-        Colour shader = isLR ? Colour{0.9, 0.9, 0.9, 1.0} : Colour{0.7, 0.7, 0.7, 1.0};
+        const vector<Colour> bmpColStrip = shouldRender ? wall_texture->texture.getCol(1.0 - wallOffset) : prevCol;
+        const Colour shader = isLR ? Colour{0.9, 0.9, 0.9, 1.0} : Colour{0.7, 0.7, 0.7, 1.0};
 
         prevCol = bmpColStrip;
 
@@ -394,7 +386,7 @@ void renderRays2Dto3D() {
 ///
 /// Render ceiling quad
 ///
-void drawCeiling() {
+inline void drawCeiling() {
     toColour(CEILING_COLOUR);
     drawRectangle(0, 0, screenW, screenH >> 1, true);
 }
@@ -402,7 +394,7 @@ void drawCeiling() {
 ///
 /// Render floor quad
 ///
-void drawFloor() {
+inline void drawFloor() {
     toColour(FLOOR_COLOUR);
     drawRectangle(0, screenH >> 1, screenW, screenH, true);
 }

@@ -18,6 +18,12 @@ class BPPSizeError : virtual public exception {
 
         virtual const char* what() const throw() {
             string ret_val = "BMP must use 24 or 32 bits per pixel: " + to_string(bit_count);
+            debugContext.glDebugMessageCallback(
+                DEBUG_SOURCE_APPLICATION,
+                DEBUG_TYPE_ERROR,
+                DEBUG_SEVERITY_HIGH,
+                ret_val
+            );
             return ret_val.c_str();
         };
 };

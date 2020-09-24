@@ -37,6 +37,13 @@ struct BMPFileHeader {
     uint16_t reserved1{0};       // Reserved, always 0
     uint16_t reserved2{0};       // Reserved, always 0
     uint32_t offset_data{0};     // Start position of pixel data (bytes from the beginning of the file)
+    bool operator==(BMPFileHeader& other) {
+        return (this->file_type == other.file_type)
+            && (this->file_size == other.file_size)
+            && (this->reserved1 == other.reserved1)
+            && (this->reserved2 == other.reserved2)
+            && (this->offset_data == other.offset_data);
+    }
 };
 
 struct BMPInfoHeader {
@@ -53,6 +60,18 @@ struct BMPInfoHeader {
     int32_t y_pixels_per_meter{0};
     uint32_t colors_used{0};       // No. color indexes in the color table. Use 0 for the max number of colors allowed by bit_count
     uint32_t colors_important{0};  // No. of colors used for displaying the bitmap. If 0 all colors are required
+    bool operator==(BMPInfoHeader& other) {
+        return (this->size == other.size)
+            && (this->width == other.width)
+            && (this->height == other.height)
+            && (this->planes == other.planes)
+            && (this->compression == other.compression)
+            && (this->size_image == other.size_image)
+            && (this->x_pixels_per_meter == other.x_pixels_per_meter)
+            && (this->y_pixels_per_meter == other.y_pixels_per_meter)
+            && (this->colors_used == other.colors_used)
+            && (this->colors_important == other.colors_important);
+    }
 };
 
 struct BMPColorHeader {
@@ -62,6 +81,14 @@ struct BMPColorHeader {
     uint32_t alpha_mask{0xff000000};        // Bit mask for the alpha channel
     uint32_t color_space_type{0x73524742};  // Default "sRGB" (0x73524742)
     uint32_t unused[16]{0};                 // Unused data for sRGB color space
+    bool operator==(BMPColorHeader& other) {
+        return (this->red_mask == other.red_mask)
+            && (this->green_mask == other.green_mask)
+            && (this->blue_mask == other.blue_mask)
+            && (this->alpha_mask == other.alpha_mask)
+            && (this->color_space_type == other.color_space_type)
+            && (this->unused == other.unused);
+    }
 };
 #pragma pack(pop)
 
@@ -72,6 +99,13 @@ struct BMP {
     vector<uint8_t> data;
 
     BMP() {}
+
+    bool operator==(BMP& other) {
+        return (this->file_header == other.file_header)
+            && (this->bmp_info_header == other.bmp_info_header)
+            && (this->bmp_color_header == other.bmp_color_header)
+            && (this->data == other.data);
+    }
 
     BMP(const char *fname) {
         read(fname);

@@ -81,11 +81,11 @@ void renderPlayerPos() {
 ///
 /// @return void
 ///
-void renderMap2D() {
+void renderMap2D(int sw = SCREEN_WIDTH, int sh = SCREEN_HEIGHT) {
     int xSize = 20;
     int ySize = 20;
-    int xOffset = minimapCfg.isLeft() ? SCREEN_WIDTH - (gameMap.map_width * xSize) : 0;
-    int yOffset = minimapCfg.isTop() ? 0 : SCREEN_HEIGHT - (gameMap.map_height * ySize);
+    int xOffset = minimapCfg.isLeft() ? sw - (gameMap.map_width * xSize) : 0;
+    int yOffset = minimapCfg.isTop() ? 0 : sh - (gameMap.map_height * ySize);
     int x, y;
     for (y = 0; y < gameMap.map_height; y++) {
         for (x = 0; x < gameMap.map_width; x++) {
@@ -387,17 +387,17 @@ void renderRays2Dto3D(vector<Ray>& rays) {
 ///
 /// Render ceiling quad
 ///
-inline void drawCeiling() {
+inline void drawCeiling(int width = SCREEN_WIDTH, int height = SCREEN_HEIGHT) {
     toColour(CEILING_COLOUR);
-    drawRectangle(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT >> 1, true);
+    drawRectangle(0, 0, width, IDIV_2(height), true);
 }
 
 ///
 /// Render floor quad
 ///
-inline void drawFloor() {
+inline void drawFloor(int width = SCREEN_WIDTH, int height = SCREEN_HEIGHT) {
     toColour(FLOOR_COLOUR);
-    drawRectangle(0, SCREEN_HEIGHT >> 1, SCREEN_WIDTH, SCREEN_HEIGHT, true);
+    drawRectangle(0, IDIV_2(height), width, height, true);
 }
 
 inline void renderMapRays(vector<Ray>& rays) {
@@ -406,15 +406,16 @@ inline void renderMapRays(vector<Ray>& rays) {
     }
 }
 
-void reshape(int x, int y) {
+static void reshape(int width, int height) {
+    drawCeiling(width, height);
+    drawFloor(width, height);
     if (minimapCfg.enable) {
-        renderMap2D();
+        renderMap2D(width, height);
         renderPlayerPos();
         if (minimapCfg.render_rays) {
             renderMapRays(rays);
         }
     }
-    glutSwapBuffers();
 }
 
 ///
@@ -422,7 +423,7 @@ void reshape(int x, int y) {
 ///
 /// @return void
 ///
-void display() {
+static void display(void) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     drawCeiling();
     drawFloor();
@@ -448,7 +449,7 @@ void display() {
 ///
 /// @return void
 ///
-void buttons(unsigned char key, int x, int y) {
+static void keyPress(unsigned char key, int x, int y) {
     if (key == 'a') {
         // Turn right
         player.angle -= 0.1f;
@@ -517,6 +518,10 @@ void init(Colour background_colour) {
     debugContext.logAppInfo("Initialised player object");
 }
 
+inline static void idle(void) {
+    glutPostRedisplay();
+}
+
 ///
 /// Main execution
 ///
@@ -527,7 +532,7 @@ void init(Colour background_colour) {
 ///
 int main(int argc, char *argv[]) {
     glutInit(&argc, argv);
-    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
+    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
     glutInitWindowSize(screenW, screenH);
     glutCreateWindow("Ray Tracer");
 
@@ -536,7 +541,8 @@ int main(int argc, char *argv[]) {
 
     glutDisplayFunc(display);
     glutReshapeFunc(reshape);
-    glutKeyboardFunc(buttons);
+    glutKeyboardFunc(keyPress);
+    glutIdleFunc(idle);
     glutPostRedisplay();
     debugContext.logAppInfo("Initialised OpenGL/GLUT display and buttons");
     glutMainLoop();

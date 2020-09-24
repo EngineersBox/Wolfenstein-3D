@@ -20,10 +20,10 @@ void drawRectangle(float x, float y, float xSideLength, float ySideLength, bool 
         glBegin(GL_QUADS);
     }
 
-    glVertex2f(x + 1, y + 1);                              // Top right
-    glVertex2f(x + 1, y + ySideLength - 1);                // Top left
-    glVertex2f(x + xSideLength - 1, y + ySideLength - 1);  // Bottom left
-    glVertex2f(x + xSideLength - 1, y + 1);                // Bottom right
+    glVertex2f(x, y);                              // Top right
+    glVertex2f(x, y + ySideLength);                // Top left
+    glVertex2f(x + xSideLength, y + ySideLength);  // Bottom left
+    glVertex2f(x + xSideLength, y);                // Bottom right
 
     if (beginEnd) {
         glEnd();

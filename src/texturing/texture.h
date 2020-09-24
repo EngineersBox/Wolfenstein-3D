@@ -14,6 +14,9 @@ class Texture {
         Texture(string filename, string name);
         ~Texture();
 
+        bool operator==(Texture& other);
+        bool operator!=(Texture& other);
+
         string name;
         string filename;
         BMP texture;
@@ -32,3 +35,11 @@ Texture::Texture(string filename, string name) {
 };
 
 Texture::~Texture() {};
+
+bool Texture::operator==(Texture& other) {
+    return (this->name == other.name)
+        && (this->filename == other.filename)
+        && (this->width == other.width)
+        && (this->height == other.height)
+        && (this->texture == other.texture);
+}

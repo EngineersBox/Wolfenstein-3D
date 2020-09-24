@@ -284,7 +284,6 @@ void draw3DWalls(int &r, float &ra, float &distT, vector<Colour> *colourStrip, c
     const float x_width = (SW / playerCfg.fov) * 2.1;
     const float y_height = (SH / playerCfg.fov) * 2;
     const int cStripLast = cStripSize - 1;
-    glEnable(GL_SCISSOR_TEST);
     for (int yPos = line_off; yPos < line_off + lineH; yPos++) {
         Colour c = colourStrip->at(cOffset + min((int)floor(pixelOffset), cStripLast));
         glScissor(screen_off * 2, yPos * 2, x_width, y_height);
@@ -296,7 +295,6 @@ void draw3DWalls(int &r, float &ra, float &distT, vector<Colour> *colourStrip, c
         glClear(GL_COLOR_BUFFER_BIT);
         pixelOffset += pixelStepSize;
     }
-    glDisable(GL_SCISSOR_TEST);
 }
 
 inline Wall validateSideRender(float &rx, float &ry, float &disH, float &hx, float &hy, float &disV, float &vx, float &vy, float &distT, bool &shouldRender) {
@@ -336,7 +334,7 @@ inline void updatePrevious(const bool isLR, float ry, float rx, WallFace& prev_w
 /// @return void
 ///
 void renderRays2Dto3D(vector<Ray>& rays) {
-    int r{0}, mx{0}, my{0}, mp{0};
+    int mx{0}, my{0}, mp{0};
     float dof, rx{0}, ry{0}, ra, x_off{0}, y_off{0}, distT{0}, prev_wall_offset, disH, hx, hy, disV, vx, vy;
     vector<Colour> prevCol = emptyCol;
     Wall prev_wall, hitWall;
@@ -351,7 +349,8 @@ void renderRays2Dto3D(vector<Ray>& rays) {
 
     ra = validateAngle(player.angle - (DR * (playerCfg.fov / 2)));
 
-    for (r = 0; r < playerCfg.fov; r++) {
+    glEnable(GL_SCISSOR_TEST);
+    for (int r = 0; r < playerCfg.fov; r++) {
         // Check horizontal lines
         dof = 0;
         disH = numeric_limits<float>::max();
@@ -409,6 +408,7 @@ void renderRays2Dto3D(vector<Ray>& rays) {
         ra += DR;
         ra = validateAngle(ra);
     }
+    glDisable(GL_SCISSOR_TEST);
 }
 
 ///

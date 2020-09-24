@@ -318,7 +318,7 @@ inline Wall validateSideRender(float &rx, float &ry, float &disH, float &hx, flo
     }
 }
 
-inline void updatePrevious(const bool isLR, float ry, float rx, WallFace prev_wall_face, Texture &wall_texture, vector<Colour> &bmpColStrip, vector<Colour> &prevCol, Wall &prev_wall, Wall hitWall, NormalDir &prev_dir, NormalDir nDir) {
+inline void updatePrevious(const bool isLR, float ry, float rx, WallFace& prev_wall_face, Texture &wall_texture, vector<Colour> &bmpColStrip, vector<Colour> &prevCol, Wall &prev_wall, Wall hitWall, NormalDir &prev_dir, NormalDir nDir) {
     const int wallIntersectPoint = isLR ? ry : rx;
     const int wallSize = (isLR ? mapScreenW : mapScreenH) / (isLR ? gameMap.map_width : gameMap.map_height);
     const float wallOffset = ((wallIntersectPoint - (radToCoord(wallIntersectPoint))) % wallSize) / (float)wallSize;
@@ -402,7 +402,6 @@ void renderRays2Dto3D(vector<Ray>& rays) {
             }
         }
         const Colour shader = isLR ? lr_shader : ud_shader;
-        prevCol = bmpColStrip;
 
         draw3DWalls(r, ra, distT, &bmpColStrip, shader, PW_mul<GLdouble>);
 

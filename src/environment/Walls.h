@@ -34,6 +34,8 @@ class Wall {
         Wall(double x, double y, string texture);
         Wall();
         ~Wall();
+        bool operator==(Wall& other);
+        bool operator!=(Wall& other);
         NormalDir getNormDir(float x, float y, int wall_width, int wall_height);
         double posX;
         double posY;
@@ -65,6 +67,20 @@ Wall::Wall(double x, double y, string texture) : Wall(x, y, NONE, texture) {};
 Wall::Wall(double x, double y, Colour colour) : Wall(x, y, colour, "") {};
 
 Wall::~Wall() {};
+
+bool Wall::operator==(Wall& other) {
+    return (this->posX == other.posX)
+        && (this->posY == other.posY)
+        && (this->texColour == other.texColour)
+        && (this->texture_name == other.texture_name);
+}
+
+bool Wall::operator!=(Wall& other) {
+    return (this->posX != other.posX)
+        && (this->posY != other.posY)
+        && (this->texColour != other.texColour)
+        && (this->texture_name != other.texture_name);
+}
 
 NormalDir Wall::getNormDir(float x, float y, int wall_width, int wall_height) {
     const float centreX = (posX * wall_width) + (wall_width << 1);

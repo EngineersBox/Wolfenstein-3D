@@ -255,7 +255,7 @@ inline float validateAngle(float angle) {
 ///
 /// @return void
 ///
-void draw3DWalls(int &r, float &ra, float &distT, const vector<Colour> *colourStrip, const Colour polygonShader, PWOperator<GLdouble> shaderOperator) {
+void draw3DWalls(int &r, float &ra, float &distT, vector<Colour> *colourStrip, const Colour polygonShader, PWOperator<GLdouble> shaderOperator) {
     // Draw 3D walls
     // float ca = validateAngle(player.angle - ra);
     const int SH = SCREEN_HEIGHT;
@@ -296,23 +296,22 @@ void draw3DWalls(int &r, float &ra, float &distT, const vector<Colour> *colourSt
 }
 
 inline Wall validateSideRender(float &rx, float &ry, float &disH, float &hx, float &hy, float &disV, float &vx, float &vy, float &distT, bool &shouldRender) {
-    Wall hitWall;
     if (disV < disH) {
         rx = vx;
         ry = vy;
         distT = disV;
-        hitWall = gameMap.getAt(radToCoord(rx), radToCoord(ry));
+        return gameMap.getAt(radToCoord(rx), radToCoord(ry));
     } else if (disH < disV) {
         rx = hx;
         ry = hy;
         distT = disH;
-        hitWall = gameMap.getAt(radToCoord(rx), radToCoord(ry));
+        return gameMap.getAt(radToCoord(rx), radToCoord(ry));
     } else {
         rx = 0;
         ry = 0;
         shouldRender = false;
+        return Wall();
     }
-    return hitWall;
 }
 
 ///
@@ -324,6 +323,8 @@ void renderRays2Dto3D(vector<Ray>& rays) {
     int r{0}, mx{0}, my{0}, mp{0};
     float dof, rx{0}, ry{0}, ra, x_off{0}, y_off{0}, distT{0};
     vector<Colour> prevCol = emptyCol;
+    float prev_wall_offset;
+    Wall prev_wall;
     Texture* wall_texture;
     string prev_tex_name;
 
@@ -364,7 +365,14 @@ void renderRays2Dto3D(vector<Ray>& rays) {
             wall_texture = textures.get(hitWall.texture_name);
             prev_tex_name = wall_texture->name;
         }
-        const vector<Colour> bmpColStrip = shouldRender ? wall_texture->texture.getCol(1.0 - wallOffset) : prevCol;
+        vector<Colour> bmpColStrip;
+        if (!shouldRender || (hitWall == prev_wall && wallOffset == prev_wall_offset)) {
+            bmpColStrip = prevCol;
+        } else {
+            prev_wall = hitWall;
+            prev_wall_offset = wallOffset;
+            bmpColStrip = wall_texture->texture.getCol(1.0 - wallOffset);
+        }
         const Colour shader = isLR ? Colour{0.9, 0.9, 0.9, 1.0} : Colour{0.7, 0.7, 0.7, 1.0};
 
         prevCol = bmpColStrip;

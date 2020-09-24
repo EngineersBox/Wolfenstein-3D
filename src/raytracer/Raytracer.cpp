@@ -337,9 +337,8 @@ inline void updatePrevious(const bool isLR, float ry, float rx, WallFace& prev_w
 ///
 void renderRays2Dto3D(vector<Ray>& rays) {
     int r{0}, mx{0}, my{0}, mp{0};
-    float dof, rx{0}, ry{0}, ra, x_off{0}, y_off{0}, distT{0};
+    float dof, rx{0}, ry{0}, ra, x_off{0}, y_off{0}, distT{0}, prev_wall_offset, disH, hx, hy, disV, vx, vy;
     vector<Colour> prevCol = emptyCol;
-    float prev_wall_offset, disH, hx, hy, disV, vx, vy;
     Wall prev_wall, hitWall;
     NormalDir prev_dir, nDir;
     WallFace prev_wall_face;

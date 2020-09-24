@@ -369,12 +369,12 @@ void renderRays2Dto3D(vector<Ray>& rays) {
         if (!shouldRender || (hitWall == prev_wall && wallOffset == prev_wall_offset)) {
             bmpColStrip = prevCol;
         } else {
-            prev_wall = hitWall;
-            prev_wall_offset = wallOffset;
             bmpColStrip = wall_texture->texture.getCol(1.0 - wallOffset);
         }
         const Colour shader = isLR ? Colour{0.9, 0.9, 0.9, 1.0} : Colour{0.7, 0.7, 0.7, 1.0};
 
+        prev_wall = hitWall;
+        prev_wall_offset = wallOffset;
         prevCol = bmpColStrip;
 
         draw3DWalls(r, ra, distT, &bmpColStrip, shader, PW_mul<GLdouble>);

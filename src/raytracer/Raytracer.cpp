@@ -339,7 +339,6 @@ void renderRays2Dto3D(vector<Ray>& rays) {
     int r{0}, mx{0}, my{0}, mp{0};
     float dof, rx{0}, ry{0}, ra, x_off{0}, y_off{0}, distT{0};
     vector<Colour> prevCol = emptyCol;
-    vector<Colour> bmpColStrip;
     float prev_wall_offset, disH, hx, hy, disV, vx, vy;
     Wall prev_wall, hitWall;
     NormalDir prev_dir, nDir;
@@ -348,7 +347,7 @@ void renderRays2Dto3D(vector<Ray>& rays) {
     string prev_tex_name;
     Colour lr_shader = {0.9, 0.9, 0.9, 1.0};
     Colour ud_shader = {0.7, 0.7, 0.7, 1.0};
-    bool isLR, shouldRender;
+    bool shouldRender, isLR;
     Colour shader;
 
     ra = validateAngle(player.angle - (DR * (playerCfg.fov / 2)));
@@ -378,6 +377,7 @@ void renderRays2Dto3D(vector<Ray>& rays) {
 
         nDir = hitWall.getNormDir(rx, ry, gameMap.wall_width, gameMap.wall_height);
         isLR = nDir == NormalDir::LEFT || nDir == NormalDir::RIGHT;
+        vector<Colour> bmpColStrip;
         if (shouldRender) {
             if (hitWall == prev_wall) {
                 if (nDir == prev_dir) {

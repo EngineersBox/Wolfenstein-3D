@@ -10,6 +10,8 @@
 #define SCREEN_WIDTH glutGet(GLUT_WINDOW_WIDTH)
 #define SCREEN_HEIGHT glutGet(GLUT_WINDOW_HEIGHT)
 
+#define FUNC_ADDR(f) string("0x") + to_string((unsigned long int) (&f))
+
 using namespace std;
 
 // Screen
@@ -129,7 +131,7 @@ inline float dist(float ax, float ay, float bx, float by, float ang) {
 ///
 /// @return void
 ///
-void checkHorizontal(int &mx, int &my, int &mp, float &dof,
+static void checkHorizontal(int &mx, int &my, int &mp, float &dof,
                      float &rx, float &ry, float &ra, float &x_off, float &y_off,
                      float &hx, float &hy, float &disH) {
     float aTan = -1 / tan(ra);
@@ -169,7 +171,7 @@ void checkHorizontal(int &mx, int &my, int &mp, float &dof,
         } else {
             rx += x_off;
             ry += y_off;
-            dof += 1;
+            dof++;
         }
     }
 }
@@ -192,7 +194,7 @@ void checkHorizontal(int &mx, int &my, int &mp, float &dof,
 ///
 /// @return void
 ///
-void checkVertical(int &mx, int &my, int &mp, float &dof,
+static void checkVertical(int &mx, int &my, int &mp, float &dof,
                    float &rx, float &ry, float &ra, float &x_off, float &y_off,
                    float &vx, float &vy, float &disV) {
     float nTan = -tan(ra);
@@ -232,16 +234,16 @@ void checkVertical(int &mx, int &my, int &mp, float &dof,
         } else {
             rx += x_off;
             ry += y_off;
-            dof += 1;
+            dof++;
         }
     }
 }
 
 inline float validateAngle(float angle) {
     if (angle < 0) {
-        angle += (float)(2 * M_PI);
+        return angle + (float)(2 * M_PI);
     } else if (angle > 2 * M_PI) {
-        angle -= (float)(2 * M_PI);
+        return angle - (float)(2 * M_PI);
     }
     return angle;
 }
@@ -257,7 +259,6 @@ inline float validateAngle(float angle) {
 ///
 void draw3DWalls(int &r, float &ra, float &distT, vector<Colour> *colourStrip, const Colour polygonShader, PWOperator<GLdouble> shaderOperator) {
     // Draw 3D walls
-    // float ca = validateAngle(player.angle - ra);
     const int SH = SCREEN_HEIGHT;
     const int SW = SCREEN_WIDTH;
     distT *= cos(validateAngle(player.angle - ra));
@@ -280,10 +281,13 @@ void draw3DWalls(int &r, float &ra, float &distT, vector<Colour> *colourStrip, c
     }
     float pixelOffset = 0;
     const float pixelStepSize = cStripSize / lineH;
+    const float x_width = (SW / playerCfg.fov) * 2.1;
+    const float y_height = (SH / playerCfg.fov) * 2;
+    const int cStripLast = cStripSize - 1;
     glEnable(GL_SCISSOR_TEST);
     for (int yPos = line_off; yPos < line_off + lineH; yPos++) {
-        Colour c = colourStrip->at(cOffset + min((int)floor(pixelOffset), cStripSize - 1));
-        glScissor(screen_off * 2, yPos * 2, (SW / playerCfg.fov) * 2.1, (SH / lineH) * 2);
+        Colour c = colourStrip->at(cOffset + min((int)floor(pixelOffset), cStripLast));
+        glScissor(screen_off * 2, yPos * 2, x_width, y_height);
         toClearColour(
             colourMask<GLdouble>(
                 c,
@@ -328,6 +332,9 @@ void renderRays2Dto3D(vector<Ray>& rays) {
     Texture* wall_texture;
     string prev_tex_name;
 
+    Colour lr_shader = {0.9, 0.9, 0.9, 1.0};
+    Colour ud_shader = {0.7, 0.7, 0.7, 1.0};
+
     ra = validateAngle(player.angle - (DR * (playerCfg.fov / 2)));
 
     for (r = 0; r < playerCfg.fov; r++) {
@@ -371,7 +378,7 @@ void renderRays2Dto3D(vector<Ray>& rays) {
         } else {
             bmpColStrip = wall_texture->texture.getCol(1.0 - wallOffset);
         }
-        const Colour shader = isLR ? Colour{0.9, 0.9, 0.9, 1.0} : Colour{0.7, 0.7, 0.7, 1.0};
+        const Colour shader = isLR ? lr_shader : ud_shader;
 
         prev_wall = hitWall;
         prev_wall_offset = wallOffset;
@@ -491,6 +498,7 @@ void init(Colour background_colour) {
         mapScreenW = IDIV_2(mapScreenW);
     }
     debugContext = GLDebugContext(&loggingCfg);
+    debugContext.logAppInfo("Loaded debug context");
 
     texLoader = TextureLoader();
     texLoader.loadTextures(textures);
@@ -537,14 +545,18 @@ int main(int argc, char *argv[]) {
     glutCreateWindow("Ray Tracer");
 
     init(bg_colour);
-    debugContext.logAppInfo("COMPLETED INIT PHASE");
+    debugContext.logAppInfo("---- COMPLETED APPLICATION INIT PHASE ----");
 
     glutDisplayFunc(display);
+    debugContext.logAppInfo("Initialised glutDisplayFunc at: " + FUNC_ADDR(display));
     glutReshapeFunc(reshape);
+    debugContext.logAppInfo("Initialised glutReshapeFunc at: " + FUNC_ADDR(reshape));
     glutKeyboardFunc(keyPress);
+    debugContext.logAppInfo("Initialised glutKeyboardFunc at: " + FUNC_ADDR(keyPress));
     glutIdleFunc(idle);
+    debugContext.logAppInfo("Initialised glutIdleFunc at: " + FUNC_ADDR(idle));
     glutPostRedisplay();
-    debugContext.logAppInfo("Initialised OpenGL/GLUT display and buttons");
+    debugContext.logAppInfo("---- COMPLETED OpenGL/GLUT INIT PHASE ----");
     glutMainLoop();
 
     return 0;

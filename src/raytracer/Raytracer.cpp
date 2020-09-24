@@ -339,43 +339,45 @@ void renderRays2Dto3D(vector<Ray>& rays) {
     int r{0}, mx{0}, my{0}, mp{0};
     float dof, rx{0}, ry{0}, ra, x_off{0}, y_off{0}, distT{0};
     vector<Colour> prevCol = emptyCol;
-    float prev_wall_offset;
-    Wall prev_wall;
-    NormalDir prev_dir;
+    vector<Colour> bmpColStrip;
+    float prev_wall_offset, disH, hx, hy, disV, vx, vy;
+    Wall prev_wall, hitWall;
+    NormalDir prev_dir, nDir;
     WallFace prev_wall_face;
     Texture wall_texture;
     string prev_tex_name;
     Colour lr_shader = {0.9, 0.9, 0.9, 1.0};
     Colour ud_shader = {0.7, 0.7, 0.7, 1.0};
+    bool isLR, shouldRender;
+    Colour shader;
 
     ra = validateAngle(player.angle - (DR * (playerCfg.fov / 2)));
 
     for (r = 0; r < playerCfg.fov; r++) {
         // Check horizontal lines
         dof = 0;
-        float disH = numeric_limits<float>::max();
-        float hx = player.x;
-        float hy = player.y;
+        disH = numeric_limits<float>::max();
+        hx = player.x;
+        hy = player.y;
 
         checkHorizontal(mx, my, mp, dof, rx, ry, ra, x_off, y_off, hx, hy, disH);
 
         // Check vertical lines
         dof = 0;
-        float disV = numeric_limits<float>::max();
-        float vx = player.x;
-        float vy = player.y;
+        disV = numeric_limits<float>::max();
+        vx = player.x;
+        vy = player.y;
 
         checkVertical(mx, my, mp, dof, rx, ry, ra, x_off, y_off, vx, vy, disV);
 
-        bool shouldRender = true;
-        Wall hitWall = validateSideRender(rx, ry, disH, hx, hy, disV, vx, vy, distT, shouldRender);
+        shouldRender = true;
+        hitWall = validateSideRender(rx, ry, disH, hx, hy, disV, vx, vy, distT, shouldRender);
         if (minimapCfg.enable && minimapCfg.render_rays) {
             rays.at(r) = {player.x, player.y, rx, ry, 1};
         }
 
-        const NormalDir nDir = hitWall.getNormDir(rx, ry, gameMap.wall_width, gameMap.wall_height);
-        const bool isLR = nDir == NormalDir::LEFT || nDir == NormalDir::RIGHT;
-        vector<Colour> bmpColStrip;
+        nDir = hitWall.getNormDir(rx, ry, gameMap.wall_width, gameMap.wall_height);
+        isLR = nDir == NormalDir::LEFT || nDir == NormalDir::RIGHT;
         if (shouldRender) {
             if (hitWall == prev_wall) {
                 if (nDir == prev_dir) {
@@ -401,7 +403,7 @@ void renderRays2Dto3D(vector<Ray>& rays) {
                     bmpColStrip, prevCol, prev_wall, prev_wall, prev_dir, prev_dir);
             }
         }
-        const Colour shader = isLR ? lr_shader : ud_shader;
+        shader = isLR ? lr_shader : ud_shader;
 
         draw3DWalls(r, ra, distT, &bmpColStrip, shader, PW_mul<GLdouble>);
 

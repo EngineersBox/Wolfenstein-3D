@@ -2,7 +2,7 @@
 
 #include <string>
 
-#include "INIReader.h"
+#include "../io/INIReader.h"
 #include "../exceptions/config/INIReadError.h"
 #include "mappers/MinimapCfg.h"
 #include "mappers/LoggingCfg.h"

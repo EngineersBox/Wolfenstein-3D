@@ -15,6 +15,7 @@
 
 #include "../configuration/ConfigInit.h"
 #include "../drawing/DrawingUtils.h"
+#include "../environment/WallFace.h"
 #include "../environment/Walls.h"
 #include "../hashing/HashTable.h"
 #include "../map/map.h"

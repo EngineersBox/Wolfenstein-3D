@@ -18,16 +18,16 @@ using namespace std;
 template <typename V>
 class HMEntry {
     public:
-        HMEntry(const string& key, V* value);
+        HMEntry(const string& key, V value);
         ~HMEntry();
 
         const string key;
-        V* value;
+        V value;
         HMEntry *next;
 };
 
 template <typename V>
-HMEntry<V>::HMEntry(const string& key, V* value):
+HMEntry<V>::HMEntry(const string& key, V value):
     key(key),
     value(value),
     next(NULL)
@@ -43,8 +43,8 @@ class HashTable {
         explicit HashTable(int size);
         ~HashTable();
 
-        V* get(const string& key);
-        void insert(const string& key, V* value);
+        void get(const string& key, V& value);
+        void insert(const string& key, V value);
         void remove(const string& key);
 
         size_t size() const noexcept;
@@ -87,17 +87,17 @@ HashTable<V>::~HashTable() {
 };
 
 template <typename V>
-V* HashTable<V>::get(const string& key) {
+void HashTable<V>::get(const string& key, V& value) {
     unsigned long hashValue = hashFunc(key);
     HMEntry<V>* entry = buckets[hashValue];
 
     while (entry != NULL) {
         if (entry->key == key) {
-            return entry->value;
+            value = entry->value;
+            return;
         }
         entry = entry->next;
     }
-    return NULL;
 };
 
 template <typename V>
@@ -109,7 +109,7 @@ inline void HashTable<V>::findNextNonNull(HMEntry<V>* prev, HMEntry<V>* entry, c
 };
 
 template <typename V>
-void HashTable<V>::insert(const string& key, V* value) {
+void HashTable<V>::insert(const string& key, V value) {
     unsigned long hashValue = hashFunc(key);
     HMEntry<V>* prev = NULL;
     HMEntry<V>* entry = buckets[hashValue];

@@ -92,7 +92,7 @@ void renderMap2D(int sw = SCREEN_WIDTH, int sh = SCREEN_HEIGHT) {
     for (y = 0; y < gameMap.map_height; y++) {
         for (x = 0; x < gameMap.map_width; x++) {
             // Change to colour coresponding to map location
-            toColour(gameMap.getAt(x, y).texColour);
+            toColour(gameMap.getAt(x, y).wf_left.f_colour);
             drawRectangle(xOffset + x * xSize, yOffset + y * ySize, xSize, ySize);
         }
     }
@@ -163,7 +163,7 @@ static void checkHorizontal(int &mx, int &my, int &mp, float &dof,
         my = radToCoord(ry);
         mp = my * gameMap.map_width + mx;
 
-        if (mp > 0 && mp < gameMap.size && gameMap.getAt(mx, my).texColour != NONE) {
+        if (mp > 0 && mp < gameMap.size && gameMap.getAt(mx, my).wf_left.f_colour != NONE) {
             dof = playerCfg.dof;
             hx = rx;
             hy = ry;
@@ -226,7 +226,7 @@ static void checkVertical(int &mx, int &my, int &mp, float &dof,
         my = radToCoord(ry);
         mp = my * gameMap.map_width + mx;
 
-        if (mp > 0 && mp < gameMap.size && gameMap.getAt(mx, my).texColour != NONE) {
+        if (mp > 0 && mp < gameMap.size && gameMap.getAt(mx, my).wf_left.f_colour != NONE) {
             dof = playerCfg.dof;
             vx = rx;
             vy = ry;
@@ -318,6 +318,18 @@ inline Wall validateSideRender(float &rx, float &ry, float &disH, float &hx, flo
     }
 }
 
+inline void updatePrevious(const bool isLR, float ry, float rx, WallFace prev_wall_face, Texture &wall_texture, vector<Colour> &bmpColStrip, vector<Colour> &prevCol, Wall &prev_wall, Wall hitWall, NormalDir &prev_dir, NormalDir nDir) {
+    const int wallIntersectPoint = isLR ? ry : rx;
+    const int wallSize = (isLR ? mapScreenW : mapScreenH) / (isLR ? gameMap.map_width : gameMap.map_height);
+    const float wallOffset = ((wallIntersectPoint - (radToCoord(wallIntersectPoint))) % wallSize) / (float)wallSize;
+    prev_wall_face = hitWall.getFace(nDir);
+    textures.get(prev_wall_face.f_texture, wall_texture);
+    bmpColStrip = wall_texture.texture.getCol(1.0 - wallOffset);
+    prevCol = bmpColStrip;
+    prev_wall = hitWall;
+    prev_dir = nDir;
+}
+
 ///
 /// Cast rays from the player and render walls
 ///
@@ -329,9 +341,10 @@ void renderRays2Dto3D(vector<Ray>& rays) {
     vector<Colour> prevCol = emptyCol;
     float prev_wall_offset;
     Wall prev_wall;
-    Texture* wall_texture;
+    NormalDir prev_dir;
+    WallFace prev_wall_face;
+    Texture wall_texture;
     string prev_tex_name;
-
     Colour lr_shader = {0.9, 0.9, 0.9, 1.0};
     Colour ud_shader = {0.7, 0.7, 0.7, 1.0};
 
@@ -356,32 +369,39 @@ void renderRays2Dto3D(vector<Ray>& rays) {
 
         bool shouldRender = true;
         Wall hitWall = validateSideRender(rx, ry, disH, hx, hy, disV, vx, vy, distT, shouldRender);
-        
         if (minimapCfg.enable && minimapCfg.render_rays) {
             rays.at(r) = {player.x, player.y, rx, ry, 1};
         }
 
         const NormalDir nDir = hitWall.getNormDir(rx, ry, gameMap.wall_width, gameMap.wall_height);
         const bool isLR = nDir == NormalDir::LEFT || nDir == NormalDir::RIGHT;
-
-        const int wallIntersectPoint = isLR ? ry : rx;
-        const int wallSize = (isLR ? mapScreenW : mapScreenH) / (isLR ? gameMap.map_width : gameMap.map_height);
-        const float wallOffset = ((wallIntersectPoint - (radToCoord(wallIntersectPoint))) % wallSize) / (float) wallSize;
-
-        if (shouldRender && (wall_texture == nullptr || wall_texture->name != prev_tex_name)) {
-            wall_texture = textures.get(hitWall.texture_name);
-            prev_tex_name = wall_texture->name;
-        }
         vector<Colour> bmpColStrip;
-        if (!shouldRender || (hitWall == prev_wall && wallOffset == prev_wall_offset)) {
-            bmpColStrip = prevCol;
+        if (shouldRender) {
+            if (hitWall == prev_wall) {
+                if (nDir == prev_dir) {
+                    if (bmpColStrip == prevCol) {
+                        bmpColStrip = prevCol;
+                    } else {
+                        updatePrevious(isLR, ry, rx, prev_wall_face, wall_texture,
+                            bmpColStrip, prevCol, prev_wall, prev_wall, prev_dir, prev_dir);
+                    }
+                } else {
+                    updatePrevious(isLR, ry, rx, prev_wall_face, wall_texture,
+                        bmpColStrip, prevCol, prev_wall, prev_wall, prev_dir, nDir);
+                }
+            } else {
+                updatePrevious(isLR, ry, rx, prev_wall_face, wall_texture,
+                    bmpColStrip, prevCol, prev_wall, hitWall, prev_dir, nDir);
+            }
         } else {
-            bmpColStrip = wall_texture->texture.getCol(1.0 - wallOffset);
+            if (bmpColStrip == prevCol) {
+                bmpColStrip = prevCol;
+            } else {
+                updatePrevious(isLR, ry, rx, prev_wall_face, wall_texture,
+                    bmpColStrip, prevCol, prev_wall, prev_wall, prev_dir, prev_dir);
+            }
         }
         const Colour shader = isLR ? lr_shader : ud_shader;
-
-        prev_wall = hitWall;
-        prev_wall_offset = wallOffset;
         prevCol = bmpColStrip;
 
         draw3DWalls(r, ra, distT, &bmpColStrip, shader, PW_mul<GLdouble>);
@@ -504,8 +524,9 @@ void init(Colour background_colour) {
     texLoader.loadTextures(textures);
     debugContext.logAppInfo(string("Loaded " + to_string(textures.size()) + " textures"));
 
-    gameMap.readMapFromFile(MAPS_DIR + "map1.txt");
-    debugContext.logAppInfo(string("Loaded map: " + MAPS_DIR + "map1.txt"));
+    string map_filename = MAPS_DIR + "map1.json";
+    gameMap.readMapFromJSON(map_filename);
+    debugContext.logAppInfo(string("Loaded map: " + map_filename));
 
     rays = vector<Ray>(playerCfg.fov);
 

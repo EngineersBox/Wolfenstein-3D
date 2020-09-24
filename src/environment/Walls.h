@@ -5,6 +5,7 @@
 
 #include "../texturing/TextureColours.h"
 #include "../texturing/texture.h"
+#include "WallFace.h"
 
 using namespace std;
 
@@ -28,45 +29,64 @@ static const string NormalDirLUT[] = {
 };
 
 class Wall {
-    public:
-        Wall(double x, double y, Colour colour, string texture);
-        Wall(double x, double y, Colour colour);
-        Wall(double x, double y, string texture);
-        Wall();
-        ~Wall();
-        bool operator==(Wall& other);
-        bool operator!=(Wall& other);
-        NormalDir getNormDir(float x, float y, int wall_width, int wall_height);
-        double posX;
-        double posY;
-        Colour texColour;
-        string texture_name;
+   public:
+    Wall(int x, int y, Colour colour, string texture);
+    Wall(int x, int y, Colour colour);
+    Wall(int x, int y, string texture);
+    Wall(int x, int y, Colour colour, WallFace wf_left, WallFace wf_right, WallFace wf_up, WallFace wf_down);
+    Wall();
+    ~Wall();
+    bool operator==(Wall& other);
+    bool operator!=(Wall& other);
+    NormalDir getNormDir(float x, float y, int wall_width, int wall_height);
+    WallFace getFace(NormalDir normDir);
+    WallFace getFace(float x, float y, int wall_width, int wall_height);
+
+    int posX;
+    int posY;
+    Colour texColour;
+    string texture_name;
+
+    WallFace wf_left;
+    WallFace wf_right;
+    WallFace wf_up;
+    WallFace wf_down;
 };
 
 ///
 /// Wall object that stores a location and colour
 ///
-/// @param double x: X-axis location
-/// @param double y: Y-axis location
+/// @param int x: X-axis location
+/// @param int y: Y-axis location
 /// @param Colour colour: A colour to set as the wall
 /// @param string texture: Name of texture for the wall
 ///
 /// @returns Wall
 ///
-Wall::Wall(double x, double y, Colour colour, string texture) {
+Wall::Wall(int x, int y, Colour colour, string texture) {
     this->posX = x;
     this->posY = y;
     this->texColour = colour;
     this->texture_name = texture;
 }
 
+Wall::Wall(int x, int y, Colour colour, WallFace wf_left, WallFace wf_right, WallFace wf_up, WallFace wf_down) {
+    this->posX = x;
+    this->posY = y;
+    this->texColour = colour;
+    this->wf_left = wf_left;
+    this->wf_right = wf_right;
+    this->wf_up = wf_up;
+    this->wf_down = wf_down;
+};
+
 Wall::Wall() : Wall(0, 0, NONE, "") {};
 
-Wall::Wall(double x, double y, string texture) : Wall(x, y, NONE, texture) {};
+Wall::Wall(int x, int y, string texture) : Wall(x, y, NONE, texture) {};
 
-Wall::Wall(double x, double y, Colour colour) : Wall(x, y, colour, "") {};
+Wall::Wall(int x, int y, Colour colour) : Wall(x, y, colour, "") {};
 
-Wall::~Wall() {};
+Wall::~Wall(){};
 
 bool Wall::operator==(Wall& other) {
     return (this->posX == other.posX)
@@ -101,4 +121,28 @@ NormalDir Wall::getNormDir(float x, float y, int wall_width, int wall_height) {
     } else {
         return NormalDir::LEFT;
     }
+};
+
+WallFace Wall::getFace(NormalDir normDir) {
+    switch(normDir) {
+        case NormalDir::LEFT:
+            // cout << this->wf_left.f_texture << endl;
+            return this->wf_left;
+            break;
+        case NormalDir::RIGHT:
+            return this->wf_right;
+            break;
+        case NormalDir::UP:
+            return this->wf_up;
+            break;
+        case NormalDir::DOWN:
+            return this->wf_down;
+            break;
+        default:
+            return this->wf_left;
+    }
+};
+
+WallFace Wall::getFace(float x, float y, int wall_width, int wall_height) {
+    return getFace(getNormDir(x, y, wall_width, wall_height));
 };

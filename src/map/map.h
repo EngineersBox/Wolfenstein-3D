@@ -8,21 +8,22 @@
 #include "../environment/Walls.h"
 #include "../exceptions/map/MapFormatError.h"
 #include "../logging/GLDebug.h"
+#include "../io/JSONParser.h"
+#include "../raytracer/Globals.h"
 
 using namespace std;
 #define MAP_DELIM ";"
 
 class GameMap {
     private:
-        GLDebugContext* debugContext;
     public:
-        GameMap(vector<Wall> walls, int width, int height, GLDebugContext* debugContext);
-        GameMap(GLDebugContext* debugContext);
+        GameMap(vector<Wall> walls, int width, int height);
         GameMap();
         ~GameMap();
 
         void fromArray(Wall walls[], int width, int height);
         void readMapFromFile(string filename);
+        void readMapFromJSON(string filename);
         Wall getAt(int x, int y);
         Wall getAtPure(int loc);
         
@@ -34,17 +35,14 @@ class GameMap {
         vector<Wall> _walls;
 };
 
-GameMap::GameMap(vector<Wall> walls, int width, int height, GLDebugContext* debugContext) {
+GameMap::GameMap(vector<Wall> walls, int width, int height) {
     this->map_width = width;
     this->map_width = height;
     this->_walls = walls;
-    this->debugContext = debugContext;
     this->size = width * height;
 }
 
-GameMap::GameMap(GLDebugContext* debugContext) : GameMap(vector<Wall>(0), 0, 0, debugContext){};
-
-GameMap::GameMap() : GameMap(vector<Wall>(0), 0, 0, nullptr) {}
+GameMap::GameMap(): GameMap(vector<Wall>(0), 0, 0){};
 
 GameMap::~GameMap(){}
 
@@ -76,8 +74,8 @@ void GameMap::readMapFromFile(string filename) {
     inFile >> this->map_width >> this->map_height >> mapFormat;
     if (mapFormat != 0 && mapFormat != 1) {
         MapFormatError err(mapFormat);
-        if (this->debugContext->l_cfg->map_skip_invalid) {
-            this->debugContext->glDebugMessageCallback(
+        if (debugContext.l_cfg->map_skip_invalid) {
+            debugContext.glDebugMessageCallback(
                 DEBUG_SOURCE_API,
                 DEBUG_TYPE_ERROR,
                 DEBUG_SEVERITY_LOW,
@@ -103,12 +101,66 @@ void GameMap::readMapFromFile(string filename) {
         }
     }
     this->size = this->map_width * this->map_height;
-}
+    inFile.close();
+};
+
+void GameMap::readMapFromJSON(string filename) {
+    RSJresource jsonres;
+    filebuf fileBuffer;
+    if (fileBuffer.open(filename.c_str(), ios::in)) {
+        istream is(&fileBuffer);
+        jsonres = RSJresource(is);
+        fileBuffer.close();
+    } else {
+        debugContext.glDebugMessageCallback(
+            GL_DEBUG_SOURCE::DEBUG_SOURCE_OS_X_SYSTEM,
+            GL_DEBUG_TYPE::DEBUG_TYPE_ERROR,
+            GL_DEBUG_SEVERITY::DEBUG_SEVERITY_HIGH,
+            "Unable to load map file: " + filename
+        );
+    }
+    debugContext.logAppInfo("Loaded map file: " + string(filename));
+    debugContext.logAppInfo("---- STARTED MAP PROCESSING [" + filename +"] ----");
+    this->map_width = jsonres["Params"]["Width"].as<int>();
+    this->map_height = jsonres["Params"]["Height"].as<int>();
+    this->size = this->map_height * this->map_width;
+    RSJarray wallarr = jsonres["Walls"].as_array();
+    for (RSJresource wallObj : wallarr) {
+        int x = wallObj["x"].as<int>();
+        int y = wallObj["y"].as<int>();
+        RSJobject left = wallObj["Left"].as<RSJobject>();
+        RSJobject right = wallObj["Right"].as<RSJobject>();
+        RSJobject up = wallObj["Up"].as<RSJobject>();
+        RSJobject down = wallObj["Down"].as<RSJobject>();
+        this->_walls.push_back(Wall(
+                x, y,
+                toTexColour(left["Colour"].as<string>()),
+                WallFace(
+                    toTexColour(left["Colour"].as<string>()),
+                    left["Texture"].as<string>()
+                ),
+                WallFace(
+                    toTexColour(right["Colour"].as<string>()),
+                    right["Texture"].as<string>()
+                ),
+                WallFace(
+                    toTexColour(up["Colour"].as<string>()),
+                    up["Texture"].as<string>()
+                ),
+                WallFace(
+                    toTexColour(down["Colour"].as<string>()),
+                    down["Texture"].as<string>()
+                )
+            )
+        );
+    }
+    debugContext.logAppInfo("---- FINISHED MAP PROCESSING [" + filename + "] ----");
+};
 
 Wall GameMap::getAt(int x, int y) {
     return this->_walls.at((y * this->map_width) + x);
-}
+};
 
 Wall GameMap::getAtPure(int loc) {
     return this->_walls.at(loc);
-}
+};

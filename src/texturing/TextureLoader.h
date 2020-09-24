@@ -78,7 +78,7 @@ void TextureLoader::loadTextures(HashTable<Texture> &textures) {
             continue;
         }
         string stripped_fname = fname.substr(0, fname.find_first_of("."));
-        textures.insert(stripped_fname, new Texture("resources/textures/" + fname, stripped_fname));
+        textures.insert(stripped_fname, Texture("resources/textures/" + fname, stripped_fname));
     }
 }
 

@@ -50,7 +50,7 @@ add_custom_command(
 	COMMAND echo \">> Running new build...\"
 	COMMAND echo \"--------------------------------\\n\"
 	COMMAND ./out/${PROJECT_NAME}
-	COMMAND echo ">> Stopped running"
+	COMMAND echo \">> Stopped running\"
 	COMMAND echo \"--------------------------------\\n\"
 )
 

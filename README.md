@@ -43,7 +43,7 @@ A map is described by a JSON object contain information about the map parameters
 
 Map files are stored in `resources/maps/`. Below is the JSON type data and structure of the file:
 
-```JavaScript
+```JSON
 {
     "Params": {
         "Name": "<string>",

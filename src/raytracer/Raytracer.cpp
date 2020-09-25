@@ -135,7 +135,7 @@ inline float dist(float ax, float ay, float bx, float by, float ang) {
 ///
 /// @return void
 ///
-static void checkHorizontal(int &mx, int &my, int &mp, float &dof,
+static inline void checkHorizontal(int &mx, int &my, int &mp, float &dof,
                      float &rx, float &ry, float &ra, float &x_off, float &y_off,
                      float &hx, float &hy, float &disH) {
     float aTan = -1 / tan(ra);
@@ -198,7 +198,7 @@ static void checkHorizontal(int &mx, int &my, int &mp, float &dof,
 ///
 /// @return void
 ///
-static void checkVertical(int &mx, int &my, int &mp, float &dof,
+static inline void checkVertical(int &mx, int &my, int &mp, float &dof,
                    float &rx, float &ry, float &ra, float &x_off, float &y_off,
                    float &vx, float &vy, float &disV) {
     float nTan = -tan(ra);

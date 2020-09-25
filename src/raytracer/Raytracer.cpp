@@ -287,7 +287,7 @@ void draw3DWalls(int &r, float &ra, float &distT, vector<Colour> *colourStrip, c
     for (int yPos = line_off; yPos < line_off + lineH; yPos++) {
         Colour c;
         try {
-            c = colourStrip->at(cOffset + min((int)floor(pixelOffset), cStripLast));
+            c = colourStrip->at(max(0, cOffset + min((int)floor(pixelOffset), cStripLast)));
         } catch (const out_of_range& e) {
             throw PixelColumnInvalidIndex(cOffset + min((int)floor(pixelOffset), cStripLast));
         }
@@ -321,12 +321,14 @@ inline Wall validateSideRender(float &rx, float &ry, float &disH, float &hx, flo
     }
 }
 
-inline void updatePrevious(const bool isLR, float ry, float rx, WallFace& prev_wall_face, Texture &wall_texture, vector<Colour> &bmpColStrip, vector<Colour> &prevCol, Wall &prev_wall, Wall hitWall, NormalDir &prev_dir, NormalDir nDir) {
+inline void updatePrevious(const bool isLR, float ry, float rx, WallFace& prev_wall_face, bool updateTexture, Texture &wall_texture, vector<Colour> &bmpColStrip, vector<Colour> &prevCol, Wall &prev_wall, Wall hitWall, NormalDir &prev_dir, NormalDir nDir) {
     const int wallIntersectPoint = isLR ? ry : rx;
     const int wallSize = (isLR ? mapScreenW : mapScreenH) / (isLR ? gameMap.map_width : gameMap.map_height);
     const float wallOffset = ((wallIntersectPoint - (radToCoord(wallIntersectPoint))) % wallSize) / (float)wallSize;
     prev_wall_face = hitWall.getFace(nDir);
-    textures.get(prev_wall_face.f_texture, wall_texture);
+    if (updateTexture) {
+        textures.get(prev_wall_face.f_texture, wall_texture);
+    }
     bmpColStrip = wall_texture.texture.getCol(1.0 - wallOffset);
     prevCol = bmpColStrip;
     prev_wall = hitWall;
@@ -392,25 +394,30 @@ void renderRays2Dto3D(vector<Ray>& rays) {
         if (shouldRender) {
             if (hitWall == prev_wall) {
                 if (nDir == prev_dir) {
-                    if (bmpColStrip == prevCol) {
-                        bmpColStrip = prevCol;
+                    if (wall_texture.name != prev_wall.getFace(nDir).f_texture) {
+                        if (bmpColStrip == prevCol) {
+                            bmpColStrip = prevCol;
+                        } else {
+                            updatePrevious(isLR, ry, rx, prev_wall_face, true, wall_texture,
+                                bmpColStrip, prevCol, prev_wall, prev_wall, prev_dir, prev_dir);
+                        }
                     } else {
-                        updatePrevious(isLR, ry, rx, prev_wall_face, wall_texture,
-                            bmpColStrip, prevCol, prev_wall, prev_wall, prev_dir, prev_dir);
+                        updatePrevious(isLR, ry, rx, prev_wall_face, false, wall_texture,
+                            bmpColStrip, prevCol, prev_wall, prev_wall, prev_dir, nDir);
                     }
                 } else {
-                    updatePrevious(isLR, ry, rx, prev_wall_face, wall_texture,
+                    updatePrevious(isLR, ry, rx, prev_wall_face, true, wall_texture,
                         bmpColStrip, prevCol, prev_wall, prev_wall, prev_dir, nDir);
                 }
             } else {
-                updatePrevious(isLR, ry, rx, prev_wall_face, wall_texture,
+                updatePrevious(isLR, ry, rx, prev_wall_face, true, wall_texture,
                     bmpColStrip, prevCol, prev_wall, hitWall, prev_dir, nDir);
             }
         } else {
             if (bmpColStrip == prevCol) {
                 bmpColStrip = prevCol;
             } else {
-                updatePrevious(isLR, ry, rx, prev_wall_face, wall_texture,
+                updatePrevious(isLR, ry, rx, prev_wall_face, true, wall_texture,
                     bmpColStrip, prevCol, prev_wall, prev_wall, prev_dir, prev_dir);
             }
         }
@@ -537,9 +544,7 @@ void init(Colour background_colour) {
     texLoader.loadTextures(textures);
     debugContext.logAppInfo(string("Loaded " + to_string(textures.size()) + " textures"));
 
-    string map_filename = MAPS_DIR + "map1.json";
-    gameMap.readMapFromJSON(map_filename);
-    debugContext.logAppInfo(string("Loaded map: " + map_filename));
+    gameMap.readMapFromJSON(MAPS_DIR + "map1.json");
 
     rays = vector<Ray>(playerCfg.fov);
 
@@ -591,6 +596,7 @@ int main(int argc, char *argv[]) {
     debugContext.logAppInfo("Initialised glutIdleFunc at: " + FUNC_ADDR(idle));
     glutPostRedisplay();
     debugContext.logAppInfo("---- COMPLETED OpenGL/GLUT INIT PHASE ----");
+    debugContext.logAppInfo("Starting glutMainLoop() ...");
     glutMainLoop();
 
     return 0;

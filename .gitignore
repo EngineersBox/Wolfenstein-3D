@@ -11,3 +11,5 @@ logs/*
 
 CMakeFiles
 CMakeFiles/*
+
+Makefile

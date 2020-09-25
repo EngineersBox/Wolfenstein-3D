@@ -9,11 +9,6 @@
 
 using namespace std;
 
-#define IS_LEFT(a) ((7 * M_PI) / 4) < a&& a <= (M_PI / 4)
-#define IS_DOWN(a) (M_PI / 4) < a&& a <= ((3 * M_PI) / 4)
-#define IS_RIGHT(a) ((3 * M_PI) / 4) < a&& a <= ((5 * M_PI) / 4)
-#define IS_UP(a) ((5 * M_PI) / 4) < a&& a <= ((7 * M_PI) / 4)
-
 enum NormalDir {
     LEFT,
     RIGHT,
@@ -38,9 +33,9 @@ class Wall {
     ~Wall();
     bool operator==(Wall& other);
     bool operator!=(Wall& other);
-    NormalDir getNormDir(float x, float y, int wall_width, int wall_height);
+    NormalDir getNormDir(int x, int y);
     WallFace getFace(NormalDir normDir);
-    WallFace getFace(float x, float y, int wall_width, int wall_height);
+    WallFace getFace(int x, int y);
 
     int posX;
     int posY;
@@ -93,40 +88,33 @@ bool Wall::operator==(Wall& other) {
         && (this->posY == other.posY)
         && (this->texColour == other.texColour)
         && (this->texture_name == other.texture_name);
-}
+};
 
 bool Wall::operator!=(Wall& other) {
     return (this->posX != other.posX)
         && (this->posY != other.posY)
         && (this->texColour != other.texColour)
         && (this->texture_name != other.texture_name);
-}
+};
 
-NormalDir Wall::getNormDir(float x, float y, int wall_width, int wall_height) {
-    const float centreX = (posX * wall_width) + (wall_width << 1);
-    const float centreY = (posY * wall_height) + (wall_height << 1);
-
-    const float dx = x - centreX;
-    const float dy = y - centreY;
-
-    const float angle = 1 / (tan(dy/dx));
-    if (IS_LEFT(angle)) {
-        return NormalDir::LEFT;
-    } else if (IS_RIGHT(angle)) {
-        return NormalDir::RIGHT;
-    } else if (IS_DOWN(angle)) {
+NormalDir Wall::getNormDir(int x, int y) {
+    // cout << to_string(x) << " " << to_string(y) << endl;
+    // cout << to_string(posX) << " " << to_string(posY) << endl;
+    if ((x == posX || x == posX + 1) && y == posY) {
         return NormalDir::DOWN;
-    } else if (IS_UP(angle)) {
+    } else if ((x == posX || x == posX + 1) && y == posY + 1) {
         return NormalDir::UP;
-    } else {
+    } else if ((y == posY || y == posY + 1) && x == posX) {
         return NormalDir::LEFT;
+    } else if ((y == posY || y == posY + 1) && x == posX + 1) {
+        return NormalDir::RIGHT;
     }
+    return NormalDir::LEFT;
 };
 
 WallFace Wall::getFace(NormalDir normDir) {
     switch(normDir) {
         case NormalDir::LEFT:
-            // cout << this->wf_left.f_texture << endl;
             return this->wf_left;
             break;
         case NormalDir::RIGHT:
@@ -143,6 +131,6 @@ WallFace Wall::getFace(NormalDir normDir) {
     }
 };
 
-WallFace Wall::getFace(float x, float y, int wall_width, int wall_height) {
-    return getFace(getNormDir(x, y, wall_width, wall_height));
+WallFace Wall::getFace(int x, int y) {
+    return getFace(getNormDir(x, y));
 };

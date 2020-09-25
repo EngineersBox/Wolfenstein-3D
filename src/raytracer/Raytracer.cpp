@@ -285,7 +285,12 @@ void draw3DWalls(int &r, float &ra, float &distT, vector<Colour> *colourStrip, c
     const float y_height = (SH / playerCfg.fov) * 2;
     const int cStripLast = cStripSize - 1;
     for (int yPos = line_off; yPos < line_off + lineH; yPos++) {
-        Colour c = colourStrip->at(cOffset + min((int)floor(pixelOffset), cStripLast));
+        Colour c;
+        try {
+            c = colourStrip->at(cOffset + min((int)floor(pixelOffset), cStripLast));
+        } catch (const out_of_range& e) {
+            throw PixelColumnInvalidIndex(cOffset + min((int)floor(pixelOffset), cStripLast));
+        }
         glScissor(screen_off * 2, yPos * 2, x_width, y_height);
         toClearColour(
             colourMask<GLdouble>(
@@ -326,6 +331,12 @@ inline void updatePrevious(const bool isLR, float ry, float rx, WallFace& prev_w
     prevCol = bmpColStrip;
     prev_wall = hitWall;
     prev_dir = nDir;
+}
+
+inline int convertCoord(float coord) {
+    int int_coord = coord;
+    int converted = radToCoord(coord);
+    return converted + (int_coord + 0.5 <= coord);
 }
 
 ///
@@ -373,8 +384,10 @@ void renderRays2Dto3D(vector<Ray>& rays) {
             rays.at(r) = {player.x, player.y, rx, ry, 1};
         }
 
-        nDir = hitWall.getNormDir(rx, ry, gameMap.wall_width, gameMap.wall_height);
+        nDir = hitWall.getNormDir(convertCoord(rx), convertCoord(ry));
+        // cout << NormalDirLUT[nDir] << endl;
         isLR = nDir == NormalDir::LEFT || nDir == NormalDir::RIGHT;
+
         vector<Colour> bmpColStrip;
         if (shouldRender) {
             if (hitWall == prev_wall) {

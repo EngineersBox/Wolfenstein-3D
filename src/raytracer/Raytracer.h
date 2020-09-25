@@ -12,6 +12,7 @@
 #include <map>
 #include <string>
 #include <tuple>
+#include <exception>
 
 #include "../configuration/ConfigInit.h"
 #include "../drawing/DrawingUtils.h"
@@ -23,6 +24,7 @@
 #include "../texturing/TextureColours.h"
 #include "../texturing/TextureLoader.h"
 #include "../texturing/texture.h"
+#include "../exceptions/image/PixelColumnInvalidIndex.h"
 #include "Ray.h"
 #include "Globals.h"
 

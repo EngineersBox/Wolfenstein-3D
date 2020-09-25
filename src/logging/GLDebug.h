@@ -127,6 +127,9 @@ GLDebugContext::GLDebugContext(LoggingCfg* l_cfg, const DEBUG_LOG_FORMAT format,
     ofstream logFile(this->filename);
     if (logFile.is_open()) {
         logFile << "#### START OF LOG ####\n";
+        if (!this->l_cfg->gl_debug) {
+            logFile << "[gl_debug = false] logging to file disabled.";
+        }
         logFile.close();
     } else {
         throw DebugLogWriteError(this->filename);

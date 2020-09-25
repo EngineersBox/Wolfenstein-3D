@@ -7,6 +7,9 @@
 #define CEILING_COLOUR LIGHT_GREY
 #define FLOOR_COLOUR DARK_GREY
 
+#define DIST_SHADING_MULTIPLIER 0.01
+#define DIST_SHADING_THRESHOLD 1.6666666666666667
+
 #define SCREEN_WIDTH glutGet(GLUT_WINDOW_WIDTH)
 #define SCREEN_HEIGHT glutGet(GLUT_WINDOW_HEIGHT)
 
@@ -47,7 +50,7 @@ vector<Ray> rays(0);
 ///
 /// @return void
 ///
-inline void renderRay(float ax, float ay, float bx, float by, int line_width) {
+inline static void renderRay(float ax, float ay, float bx, float by, int line_width) {
     toColour(WHITE);
     glLineWidth((float)line_width);
 
@@ -64,7 +67,7 @@ inline void renderRay(float ax, float ay, float bx, float by, int line_width) {
 ///
 /// @return void
 ///
-void renderPlayerPos() {
+inline static void renderPlayerPos() {
     toColour(YELLOW);
     glPointSize(8);
 
@@ -83,7 +86,7 @@ void renderPlayerPos() {
 ///
 /// @return void
 ///
-void renderMap2D(int sw = SCREEN_WIDTH, int sh = SCREEN_HEIGHT) {
+static void renderMap2D(int sw = SCREEN_WIDTH, int sh = SCREEN_HEIGHT) {
     int xSize = 20;
     int ySize = 20;
     int xOffset = minimapCfg.isLeft() ? sw - (gameMap.map_width * xSize) : 0;
@@ -257,16 +260,20 @@ inline float validateAngle(float angle) {
 ///
 /// @return void
 ///
-void draw3DWalls(int &r, float &ra, float &distT, vector<Colour> *colourStrip, const Colour polygonShader, PWOperator<GLdouble> shaderOperator, bool distanceShading) {
+void draw3DWalls(int &r, float &ra, float &distT, vector<Colour> *colourStrip, const Colour directionalShader, PWOperator<GLdouble> shaderOperator, bool distanceShading) {
     // Draw 3D walls
     const int SH = SCREEN_HEIGHT;
     const int SW = SCREEN_WIDTH;
     distT *= cos(validateAngle(player.angle - ra));
 
-    double dist_rgb = distanceShading ? min(1 / (distT * 0.01), 1.6666666666666667) : 1;
-    Colour distance_shader = {dist_rgb, dist_rgb, dist_rgb, 1};
+    Colour distance_shader;
+    if (distanceShading) {
+        double dist_rgb = min(1 / (distT * DIST_SHADING_MULTIPLIER), DIST_SHADING_THRESHOLD);
+        distance_shader = {dist_rgb, dist_rgb, dist_rgb, 1};
+    }
     float lineH = (gameMap.size * SH) / distT;
     float lineInViewPercentage = 1;
+
     if (lineH > SH) {
         lineInViewPercentage = 1 - ((lineH - ((float) SH)) / lineH);
         lineH = (float) SH;
@@ -296,7 +303,7 @@ void draw3DWalls(int &r, float &ra, float &distT, vector<Colour> *colourStrip, c
         glScissor(screen_off * 2, yPos * 2, x_width, y_height);
         Colour appliedDirectionalShader = colourMask<GLdouble>(
             c,
-            polygonShader,
+            directionalShader,
             shaderOperator
         );
         toClearColour(

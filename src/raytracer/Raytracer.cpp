@@ -263,7 +263,7 @@ void draw3DWalls(int &r, float &ra, float &distT, vector<Colour> *colourStrip, c
     const int SW = SCREEN_WIDTH;
     distT *= cos(validateAngle(player.angle - ra));
 
-    double dist_rgb = 1 / distT;
+    double dist_rgb = distanceShading ? min(1 / (distT * 0.01), 1.6666666666666667) : 1;
     Colour distance_shader = {dist_rgb, dist_rgb, dist_rgb, 1};
     float lineH = (gameMap.size * SH) / distT;
     float lineInViewPercentage = 1;
@@ -294,15 +294,19 @@ void draw3DWalls(int &r, float &ra, float &distT, vector<Colour> *colourStrip, c
             throw PixelColumnInvalidIndex(cOffset + min((int)floor(pixelOffset), cStripLast));
         }
         glScissor(screen_off * 2, yPos * 2, x_width, y_height);
-        toClearColour(
-            colourMask(
-                colourMask<GLdouble>(
-                c,
-                polygonShader,
-                shaderOperator),
-            distance_shader,
+        Colour appliedDirectionalShader = colourMask<GLdouble>(
+            c,
+            polygonShader,
             shaderOperator
+        );
+        toClearColour(
+            distanceShading ?
+            colourMask(
+                appliedDirectionalShader,
+                distance_shader,
+                shaderOperator
             )
+            : appliedDirectionalShader
         );
         glClear(GL_COLOR_BUFFER_BIT);
         pixelOffset += pixelStepSize;

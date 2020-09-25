@@ -542,13 +542,9 @@ static void keyPress(unsigned char key, int x, int y) {
         player.dy = sin(player.angle) * 5;
     } else if (key == 'w') {
         // Move forward
-        // player.x += player.dx;
-        // player.y += player.dy;
         checkPlayerCollision(player.x + player.dx, player.y + player.dy);
     } else if (key == 's') {
         // Move backward
-        // player.x -= player.dx;
-        // player.y -= player.dy;
         checkPlayerCollision(player.x - player.dx, player.y - player.dy);
     }
     glutPostRedisplay();

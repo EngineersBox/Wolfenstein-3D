@@ -3,19 +3,13 @@ name: C/C++ CI
 on:
   push:
     branches: [ master ]
-  pull_request:
-    branches: [ master ]
 
 jobs:
   build:
-    runs-on: [ubuntu-latest, macOS-latest]
+    runs-on: [ubuntu-latest, macos-latest]
     steps:
+      - uses: actions/checkout@v1
       - name: make clean
         run: make clean
       - name: make compile
         run: make compile
-  clean-logs:
-    runs-on: ubuntu-latest
-    steps:
-      - name: make clean_logs
-        run: make clean_logs

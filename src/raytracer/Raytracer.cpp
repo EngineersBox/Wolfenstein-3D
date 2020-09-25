@@ -299,7 +299,7 @@ void draw3DWalls(int &r, float &ra, float &distT, vector<Colour> *colourStrip, c
         try {
             c = colourStrip->at(max(0, cOffset + min((int)floor(pixelOffset), cStripLast)));
         } catch (const out_of_range& e) {
-            throw PixelColumnInvalidIndex(cOffset + min((int)floor(pixelOffset), cStripLast));
+            throw PixelColumnInvalidIndex(max(0, cOffset + min((int)floor(pixelOffset), cStripLast)));
         }
         glScissor(screen_off * 2, yPos * 2, x_width, y_height);
         Colour appliedDirectionalShader = colourMask<GLdouble>(
@@ -506,6 +506,14 @@ static void display(void) {
     glutSwapBuffers();
 }
 
+inline void checkPlayerCollision(float newx, float newy) {
+    if (gameMap.getAt(radToCoord(newx), radToCoord(newy)).wf_left.f_colour != NONE) {
+        return;
+    }
+    player.x = newx;
+    player.y = newy;
+}
+
 ///
 /// Register key presses for movement and apply position changes accordingly
 ///
@@ -534,12 +542,14 @@ static void keyPress(unsigned char key, int x, int y) {
         player.dy = sin(player.angle) * 5;
     } else if (key == 'w') {
         // Move forward
-        player.x += player.dx;
-        player.y += player.dy;
+        // player.x += player.dx;
+        // player.y += player.dy;
+        checkPlayerCollision(player.x + player.dx, player.y + player.dy);
     } else if (key == 's') {
         // Move backward
-        player.x -= player.dx;
-        player.y -= player.dy;
+        // player.x -= player.dx;
+        // player.y -= player.dy;
+        checkPlayerCollision(player.x - player.dx, player.y - player.dy);
     }
     glutPostRedisplay();
 }

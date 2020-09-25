@@ -9,6 +9,7 @@
 #include <vector>
 
 #include "texture.h"
+#include "../exceptions/textureLoader/ExceededMaxTextureImport.h"
 #include "../hashing/HashTable.h"
 #include "../raytracer/Globals.h"
 
@@ -65,7 +66,7 @@ std::vector<std::string>* TextureLoader::getTextureFileNames() {
     }
     closedir(dir);
     if (texCount == MAX_TEXTURE_AMOUNT) {
-        cout << "WARNING: Maximum texture import count reached [" << MAX_TEXTURE_AMOUNT << "]" << endl;
+        throw ExceededMaxTextureImport(MAX_TEXTURE_AMOUNT);
     }
     return new std::vector<std::string>(files);
 };
@@ -85,7 +86,12 @@ void TextureLoader::loadTextures(HashTable<Texture> &textures) {
 bool TextureLoader::verifyFileExistance(const std::string& filename) {
     struct stat buffer;
     if (stat(std::string("resources/textures/" + filename).c_str(), &buffer) != 0) {
-        cout << "TextureLoader: [" + filename + "] File does not exist, skipping." << endl;
+        debugContext.glDebugMessageCallback(
+            GL_DEBUG_SOURCE::DEBUG_SOURCE_OS_X_SYSTEM,
+            GL_DEBUG_TYPE::DEBUG_TYPE_ERROR,
+            GL_DEBUG_SEVERITY::DEBUG_SEVERITY_LOW,
+            "[" + filename + "] File does not exist, skipping."
+        );
         return false;
     }
     return true;

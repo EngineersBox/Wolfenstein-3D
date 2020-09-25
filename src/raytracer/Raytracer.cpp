@@ -257,12 +257,14 @@ inline float validateAngle(float angle) {
 ///
 /// @return void
 ///
-void draw3DWalls(int &r, float &ra, float &distT, vector<Colour> *colourStrip, const Colour polygonShader, PWOperator<GLdouble> shaderOperator) {
+void draw3DWalls(int &r, float &ra, float &distT, vector<Colour> *colourStrip, const Colour polygonShader, PWOperator<GLdouble> shaderOperator, bool distanceShading) {
     // Draw 3D walls
     const int SH = SCREEN_HEIGHT;
     const int SW = SCREEN_WIDTH;
     distT *= cos(validateAngle(player.angle - ra));
 
+    double dist_rgb = 1 / distT;
+    Colour distance_shader = {dist_rgb, dist_rgb, dist_rgb, 1};
     float lineH = (gameMap.size * SH) / distT;
     float lineInViewPercentage = 1;
     if (lineH > SH) {
@@ -293,10 +295,15 @@ void draw3DWalls(int &r, float &ra, float &distT, vector<Colour> *colourStrip, c
         }
         glScissor(screen_off * 2, yPos * 2, x_width, y_height);
         toClearColour(
-            colourMask<GLdouble>(
+            colourMask(
+                colourMask<GLdouble>(
                 c,
                 polygonShader,
-                shaderOperator));
+                shaderOperator),
+            distance_shader,
+            shaderOperator
+            )
+        );
         glClear(GL_COLOR_BUFFER_BIT);
         pixelOffset += pixelStepSize;
     }
@@ -423,7 +430,7 @@ void renderRays2Dto3D(vector<Ray>& rays) {
         }
         shader = isLR ? lr_shader : ud_shader;
 
-        draw3DWalls(r, ra, distT, &bmpColStrip, shader, PW_mul<GLdouble>);
+        draw3DWalls(r, ra, distT, &bmpColStrip, shader, PW_mul<GLdouble>, true);
 
         ra += DR;
         ra = validateAngle(ra);

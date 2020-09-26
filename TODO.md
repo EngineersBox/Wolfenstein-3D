@@ -15,3 +15,7 @@
 * Create test cases for HashTable, A* and BSP Tree (Convex hull)
 * ~~Change map file to JSON and map reader to parse JSON~~
 * ~~Add collision detection with walls~~
+* Implement A* search algorithm
+* ~~Add start + end locations in map definitions~~
+* Implement BSP search tree based on first and last rays
+* Change raycasting to query against walls from results of BSP rather than raymarching

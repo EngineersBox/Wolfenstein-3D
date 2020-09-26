@@ -2,7 +2,15 @@
     "Params": {
         "Name": "map1",
         "Width": 8,
-        "Height": 8
+        "Height": 8,
+        "Start": {
+            "x": 1,
+            "y": 1
+        },
+        "End": {
+            "x": 7,
+            "y": 7
+        }
     },
     "Walls": [
         

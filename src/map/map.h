@@ -32,6 +32,10 @@ class GameMap {
         int size;
         int wall_width;
         int wall_height;
+
+        Coords start;
+        Coords end;
+
         vector<Wall> _walls;
 };
 
@@ -125,6 +129,8 @@ void GameMap::readMapFromJSON(string filename) {
     this->map_height = jsonres["Params"]["Height"].as<int>();
     debugContext.logAppInfo("Loading map with dimensions: W = " + to_string(this->map_width) + ", H = " + to_string(this->map_height));
     this->size = this->map_height * this->map_width;
+    this->start = Coords(jsonres["Params"]["Start"]["x"].as<int>(),jsonres["Params"]["Start"]["y"].as<int>());
+    this->end = Coords(jsonres["Params"]["End"]["x"].as<int>(),jsonres["Params"]["End"]["y"].as<int>());
     RSJarray wallarr = jsonres["Walls"].as_array();
     for (RSJresource wallObj : wallarr) {
         int x = wallObj["x"].as<int>();

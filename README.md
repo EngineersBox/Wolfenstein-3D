@@ -48,7 +48,15 @@ Map files are stored in `resources/maps/`. Below is the JSON type data and struc
     "Params": {
         "Name": "<string>",
         "Width": "<int>",
-        "Height": "<int>"
+        "Height": "<int>",
+        "Start": {
+            "x": "<int>",
+            "y": "<int>"
+        },
+        "End": {
+            "x": "<int>",
+            "y": "<int>"
+        }
     },
     "Walls": [
         {

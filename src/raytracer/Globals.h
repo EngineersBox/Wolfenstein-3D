@@ -32,6 +32,8 @@
 // ../../../~
 #define DEFAULT_CONFIG CFG_DIR + "config.ini"
 
+typedef pair<int, int> Coords;
+
 static PlayerCfg playerCfg = PlayerCfg();
 static MinimapCfg minimapCfg = MinimapCfg();
 static LoggingCfg loggingCfg = LoggingCfg();

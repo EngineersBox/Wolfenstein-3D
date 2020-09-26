@@ -27,13 +27,14 @@
 #include "../exceptions/debug/DebugLogWriteError.h"
 #include "../exceptions/debug/ExceededDebugMessageSize.h"
 #include "../raytracer/Globals.h"
+#include "TerminalColours.h"
 
 using namespace std;
 
 #define GL_MAX_DEBUG_MSG_LENGTH 2048
 #define LOGS_DIR string("logs/")
 
-enum GL_DEBUG_TYPE : uint16_t {
+enum GL_DEBUG_TYPE : u_int16_t {
     DEBUG_TYPE_ERROR = 0x001,
     DEBUG_TYPE_UNDEFINED_BEHAVIOR = 0x002,
     DEBUG_TYPE_PERFORMANCE = 0x003,
@@ -55,7 +56,7 @@ static const string GL_DEBUG_TYPE_LUT[] = {
 
 #define GL_DEBUG_TYPE_STRING(gl_type) GL_DEBUG_TYPE_LUT[gl_type]
 
-enum GL_DEBUG_SOURCE : uint16_t {
+enum GL_DEBUG_SOURCE : u_int16_t {
     DEBUG_SOURCE_API = 0x010,
     DEBUG_SOURCE_OS_X_SYSTEM = 0x020,
     DEBUG_SOURCE_SHADER_COMPILER = 0x030,
@@ -75,7 +76,7 @@ static const string GL_DEBUG_SOURCE_LUT[] = {
 
 #define GL_DEBUG_SOURCE_STRING(gl_source) GL_DEBUG_SOURCE_LUT[(gl_source >> 4) - 1]
 
-enum GL_DEBUG_SEVERITY : uint16_t {
+enum GL_DEBUG_SEVERITY : u_int16_t {
     DEBUG_SEVERITY_HIGH = 0x100,
     DEBUG_SEVERITY_MEDIUM = 0x200,
     DEBUG_SEVERITY_LOW = 0x300,
@@ -161,13 +162,12 @@ void GLDebugContext::glDebugMessageCallback(GL_DEBUG_SOURCE source, GL_DEBUG_TYP
 
     if (l_cfg->gl_debug) {
         FILE* out_loc = type == DEBUG_TYPE_ERROR || type == DEBUG_TYPE_UNDEFINED_BEHAVIOR ? stderr : stdout;
-        fprintf(out_loc, "[%s] {%x|%x|%x ~ %x}%s %s :: %s\n",
-            currentTime.c_str(),
-            type, source, severity,
-            type | source | severity,
-            (type == DEBUG_TYPE_ERROR ? " ** GL ERROR **" : ""),
-            GL_DEBUG_SOURCE_STRING(source).c_str(), message.c_str()
-        );
+        fprintf(out_loc, "[%s] {%s|%s|%s ~ %s}%s %s :: %s\n",
+                string(BGRN + currentTime + RST).c_str(),
+                string(CYN + toHex(type) + RST).c_str(), string(CYN + toHex(source) + RST).c_str(), string(CYN + toHex(severity) + RST).c_str(),
+                string(CYN + toHex(type | source | severity) + RST).c_str(),
+                (type == DEBUG_TYPE_ERROR ? string(BRED + string(" **") + (source == DEBUG_SOURCE_API ? " GL" : "") + " ERROR **" + RST).c_str() : ""),
+                string(YEL + GL_DEBUG_SOURCE_STRING(source) + RST).c_str(), message.c_str());
     }
 
     FILE *debugLog;

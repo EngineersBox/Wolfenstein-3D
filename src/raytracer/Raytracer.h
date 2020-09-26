@@ -4,7 +4,7 @@
     #include <windows.h>
     #include <GL/glut.h>
 #elif _WIN32
-   #include <windows.h>
+    #include <windows.h>
     #include <GL/glut.h>
 #elif __APPLE__
     #include <GLUT/glut.h>

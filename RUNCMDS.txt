@@ -1,0 +1,8 @@
+MAC OS X:
+clang++ -std=c++11 src/raytracer/Raytracer.cpp -framework OpenGL -framework GLUT -stdlib=libc++ -o out/run
+
+LINUX:
+g++ -std=c++11 src/raytracer/Raytracer.cpp -lm -lGL -lGLU -lglut -o out/run
+
+WINDOWS:
+g++ -std=c++11 src/raytracer/Raytracer.cpp -lopengl32 -lfreeglut -lglu32 -o out/run

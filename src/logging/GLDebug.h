@@ -1,7 +1,19 @@
 #pragma once
 
-#include <GLUT/glut.h>
-#include <OpenGL/gl.h>
+#if _WIN64
+    #include <windows.h>
+    #include <GL/glut.h>
+#elif _WIN32
+   #include <windows.h>
+    #include <GL/glut.h>
+#elif __APPLE__
+    #include <GLUT/glut.h>
+    #include <OpenGL/GL.h>
+    #include <OpenGL/GLU.h>
+#elif __linux__
+    #include <GL/glut.h>
+#endif
+
 #include <stdio.h>
 #include <sys/stat.h>
 #include <sys/types.h>

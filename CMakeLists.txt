@@ -25,21 +25,33 @@ add_custom_target(destroy ALL)
 add_custom_target(run ALL)
 add_custom_command(
     TARGET clean_out
-    COMMAND echo \">> Removing previous builds\"
+	COMMAND ${CMAKE_COMMAND} -E cmake_echo_color --cyan --bold --no-newline \"\>\> \"
+	COMMAND ${CMAKE_COMMAND} -E cmake_echo_color --green \"Removing previous builds\"
 	COMMAND echo \"--------------------------------\"
 	COMMAND rm -rvf out/*
 	COMMAND echo \"--------------------------------\\n\"
 )
 add_custom_command(
     TARGET clean_logs
-    COMMAND echo \">> Removing logs\"
+    COMMAND ${CMAKE_COMMAND} -E cmake_echo_color --cyan --bold --no-newline \"\>\> \"
+	COMMAND ${CMAKE_COMMAND} -E cmake_echo_color --green --no-newline \"Removing logs in \"
+	COMMAND ${CMAKE_COMMAND} -E cmake_echo_color --white --no-newline \"[\"
+	COMMAND ${CMAKE_COMMAND} -E cmake_echo_color --red --bold --no-newline \"log/*\"
+	COMMAND ${CMAKE_COMMAND} -E cmake_echo_color --white \"]\"
 	COMMAND echo \"--------------------------------\"
+	COMMAND [ `ls -A logs/ | wc -m` == "0" ] && cmake -E cmake_echo_color --red --bold "No logs to remove" || rm -rvf logs/*
     COMMAND rm -rvf logs/*
+	COMMAND ${CMAKE_COMMAND} -E cmake_echo_color --white --no-newline \"\"
     COMMAND echo \"--------------------------------\\n\"
 )
 add_custom_command(
     TARGET destroy
-    COMMAND echo \">> Removing out directory\"
+	COMMAND ${CMAKE_COMMAND} -E cmake_echo_color --cyan --bold --no-newline \"\>\> \"
+	COMMAND ${CMAKE_COMMAND} -E cmake_echo_color --green --no-newline \"Removing \"
+	COMMAND ${CMAKE_COMMAND} -E cmake_echo_color --white --no-newline \"[\"
+	COMMAND ${CMAKE_COMMAND} -E cmake_echo_color --red --bold --no-newline \"out\"
+	COMMAND ${CMAKE_COMMAND} -E cmake_echo_color --white --no-newline \"] \"
+	COMMAND ${CMAKE_COMMAND} -E cmake_echo_color --green \"directory\"
 	COMMAND echo \"--------------------------------\"
 	COMMAND rm -rvf out
 	COMMAND echo \"--------------------------------\\n\"
@@ -47,11 +59,17 @@ add_custom_command(
 
 add_custom_command(
     TARGET run
-	COMMAND echo \">> Running new build...\"
-	COMMAND echo \"--------------------------------\\n\"
+	COMMAND ${CMAKE_COMMAND} -E cmake_echo_color --cyan --bold --no-newline \"\>\> \"
+	COMMAND ${CMAKE_COMMAND} -E cmake_echo_color --green --no-newline \"Running new build \"
+	COMMAND ${CMAKE_COMMAND} -E cmake_echo_color --white --no-newline \"[\"
+	COMMAND ${CMAKE_COMMAND} -E cmake_echo_color --red --bold --no-newline \"out/${PROJECT_NAME}\"
+	COMMAND ${CMAKE_COMMAND} -E cmake_echo_color --white \"]\"
+	COMMAND echo \"--------------------------------\"
 	COMMAND ./out/${PROJECT_NAME}
-	COMMAND echo \">> Stopped running\"
-	COMMAND echo \"--------------------------------\\n\"
+	COMMAND echo \"--------------------------------\"
+	COMMAND ${CMAKE_COMMAND} -E cmake_echo_color --cyan --bold --no-newline \"\>\> \"
+	COMMAND ${CMAKE_COMMAND} -E cmake_echo_color --green \"Stopped running\"
+	COMMAND echo \"\\n\"
 )
 
 # SET THE EXECUTABLE TO THE SOURCE AND LINK LIBRARIES

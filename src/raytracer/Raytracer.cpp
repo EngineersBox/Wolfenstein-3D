@@ -574,7 +574,7 @@ void init(Colour background_colour) {
     rays = vector<Ray>(playerCfg.fov);
 
     gameMap.wall_width = mapScreenW / gameMap.map_width;
-    gameMap.wall_height = mapScreenH / gameMap.map_height;g
+    gameMap.wall_height = mapScreenH / gameMap.map_height;
 
     fill(emptyCol.begin(), emptyCol.end(), background_colour);
 

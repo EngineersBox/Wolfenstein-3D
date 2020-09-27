@@ -25,7 +25,7 @@ using CTuple = tuple<R, G, B, A>;
 using Colour = CTuple<GLdouble, GLdouble, GLdouble, GLdouble>;
 
 // ---- DEFAULT COLOURS ---
-Colour RED = {1.0, 0.0, 0.0, 1.0};
+Colour C_RED = {1.0, 0.0, 0.0, 1.0};
 Colour YELLOW = {1.0, 1.0, 0.0, 1.0};
 Colour GREEN = {0.0, 1.0, 0.0, 1.0};
 Colour BLUE = {0.0, 0.0, 1.0, 1.0};
@@ -81,7 +81,7 @@ inline void toClearColour(Colour texColour) {
 
 Colour toTexColour(string colour) {
     if (colour == "RED") {
-        return RED;
+        return C_RED;
     } else if (colour == "YELLOW") {
         return YELLOW;
     } else if (colour == "GREEN") {

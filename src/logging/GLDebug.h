@@ -163,11 +163,11 @@ void GLDebugContext::glDebugMessageCallback(GL_DEBUG_SOURCE source, GL_DEBUG_TYP
     if (l_cfg->gl_debug) {
         FILE* out_loc = type == DEBUG_TYPE_ERROR || type == DEBUG_TYPE_UNDEFINED_BEHAVIOR ? stderr : stdout;
         fprintf(out_loc, "[%s] {%s|%s|%s ~ %s}%s %s :: %s\n",
-                string(BGRN + currentTime + RST).c_str(),
-                string(CYN + toHex(type) + RST).c_str(), string(CYN + toHex(source) + RST).c_str(), string(CYN + toHex(severity) + RST).c_str(),
-                string(CYN + toHex(type | source | severity) + RST).c_str(),
-                (type == DEBUG_TYPE_ERROR ? string(BRED + string(" **") + (source == DEBUG_SOURCE_API ? " GL" : "") + " ERROR **" + RST).c_str() : ""),
-                string(YEL + GL_DEBUG_SOURCE_STRING(source) + RST).c_str(), message.c_str());
+                string(A_BGRN + currentTime + RST).c_str(),
+                string(A_CYN + toHex(type) + RST).c_str(), string(A_CYN + toHex(source) + RST).c_str(), string(A_CYN + toHex(severity) + RST).c_str(),
+                string(A_CYN + toHex(type | source | severity) + RST).c_str(),
+                (type == DEBUG_TYPE_ERROR ? string(A_BRED + string(" **") + (source == DEBUG_SOURCE_API ? " GL" : "") + " ERROR **" + RST).c_str() : ""),
+                string(A_YEL + GL_DEBUG_SOURCE_STRING(source) + RST).c_str(), message.c_str());
     }
 
     FILE *debugLog;

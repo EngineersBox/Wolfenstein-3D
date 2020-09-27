@@ -38,6 +38,7 @@
 #include "../exceptions/image/PixelColumnInvalidIndex.h"
 #include "Ray.h"
 #include "Globals.h"
+#include "../pathfinding/AStar.h"
 
 #define _USE_MATH_DEFINES
 

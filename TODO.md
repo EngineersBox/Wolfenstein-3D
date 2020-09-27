@@ -1,7 +1,7 @@
 # TODO
 
 * Create generic method for both `checkVertical()` and `checkHorizontal()` called `checkDir()`
-* Break `renderRays2Dto3D()` method up into smaller methods and generify where possible
+* ~~Break `renderRays2Dto3D()` method up into smaller methods and generify where possible~~
 * ~~Create texture hashing by string using polynomial rolling~~
 * *Change rendering to BMP columns* (WIP)
 * ~~Add config files and reader~~
@@ -15,7 +15,7 @@
 * Create test cases for HashTable, A* and BSP Tree (Convex hull)
 * ~~Change map file to JSON and map reader to parse JSON~~
 * ~~Add collision detection with walls~~
-* Implement A* search algorithm
+* ~~Implement A* search algorithm~~
 * ~~Add start + end locations in map definitions~~
 * Implement BSP search tree based on first and last rays
 * Change raycasting to query against walls from results of BSP rather than raymarching

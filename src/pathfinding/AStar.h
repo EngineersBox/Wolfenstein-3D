@@ -83,6 +83,10 @@ inline int AStar::heuristic(GraphNode next, GraphNode goal) {
     return abs(next.x - goal.x) + abs(next.y - goal.y);
 };
 
+// FIXME: Should not traverse between walls:
+// _|_|_
+// _|#|/
+// _|/|#
 vector<Coords>* AStar::find(Coords start_loc, Coords end_loc) {
     GraphNode start(start_loc);
     GraphNode goal(end_loc);

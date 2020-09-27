@@ -1,5 +1,8 @@
 # BSPMinimalRendering
 
+![GitHub Workflow Status](https://img.shields.io/github/workflow/status/EngineersBox/BSPMinimalRendering/CMake?style=for-the-badge)
+![TODO Status](https://img.shields.io/badge/TODO-outstanding-yellow?style=for-the-badge&logo=appveyor)
+
 Finding the minimal amount of polygons to render based with A* and BSP trees.
 
 ## Involved Algorithms

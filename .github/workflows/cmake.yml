@@ -16,21 +16,15 @@ jobs:
 
     steps:
     - uses: actions/checkout@v1
-    
-    - name: eval_test
-      shell: bash
-      working-directory: ${{runner.workspace}}
-      run: ls -a
 
     - name: Configure CMake
       shell: bash
-      working-directory: ${{runner.workspace}}
+      working-directory: ${{runner.workspace}}/BSPMinimalRendering
       run: cmake .
 
     - name: Build
-      working-directory: ${{runner.workspace}}
+      working-directory: ${{runner.workspace}}/BSPMinimalRendering
       shell: bash
-      # Execute the build.  You can specify a specific target with "--target <NAME>"
       run: make BSP
 
 #     - name: Test

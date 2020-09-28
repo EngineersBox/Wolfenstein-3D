@@ -9,6 +9,12 @@ enum MinimapPos {
     BOTTOM_RIGHT
 };
 
+enum MinimapSize: int {
+    SMALL = 30,
+    MEDIUM = 20,
+    LARGE = 10
+};
+
 MinimapPos parseMinimapPos(const string& pos_str) {
     if (pos_str == "TOP_LEFT") {
         return MinimapPos::TOP_LEFT;
@@ -22,10 +28,21 @@ MinimapPos parseMinimapPos(const string& pos_str) {
     return MinimapPos::TOP_LEFT;
 }
 
+MinimapSize parseMinimapSize(const string& pos_str) {
+    if (pos_str == "SMALL") {
+        return MinimapSize::SMALL;
+    } else if (pos_str == "MEDIUM") {
+        return MinimapSize::MEDIUM;
+    } else if (pos_str == "LARGE") {
+        return MinimapSize::LARGE;
+    }
+    return MinimapSize::MEDIUM;
+}
+
 class MinimapCfg {
     public:
         MinimapCfg();
-        MinimapCfg(bool enable, bool render_rays, MinimapPos pos);
+        MinimapCfg(bool enable, bool render_rays, MinimapPos pos, MinimapSize size);
         ~MinimapCfg();
 
         inline bool isTop();
@@ -34,14 +51,16 @@ class MinimapCfg {
         bool enable;
         bool render_rays;
         MinimapPos pos;
+        MinimapSize size;
 };
 
 MinimapCfg::MinimapCfg() {};
 
-MinimapCfg::MinimapCfg(bool enable, bool render_rays, MinimapPos pos) {
+MinimapCfg::MinimapCfg(bool enable, bool render_rays, MinimapPos pos, MinimapSize size) {
     this->enable = enable;
     this->render_rays = render_rays;
     this->pos = pos;
+    this->size = size;
 };
 
 MinimapCfg::~MinimapCfg() {};

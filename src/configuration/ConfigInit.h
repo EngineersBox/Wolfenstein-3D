@@ -64,8 +64,8 @@ MinimapCfg ConfigInit::initMinimapConfig() {
     return MinimapCfg(
         reader.GetBoolean(MINIMAP_SECTION, "enable", false),
         reader.GetBoolean(MINIMAP_SECTION, "render_rays", true),
-        parseMinimapPos(reader.Get(MINIMAP_SECTION, "pos", "TOP_RIGHT"))
-    );
+        parseMinimapPos(reader.Get(MINIMAP_SECTION, "pos", "TOP_RIGHT")),
+        parseMinimapSize(reader.Get(MINIMAP_SECTION, "size", "MEDIUM")));
 };
 
 LoggingCfg ConfigInit::initLoggingConfig() {

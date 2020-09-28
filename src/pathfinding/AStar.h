@@ -21,7 +21,7 @@ class AStar {
         AStar(GameMap map);
         ~AStar();
 
-        vector<Coords>* reconstructPath(unordered_map<GraphNode, GraphNode>& traversals, GraphNode start, GraphNode goal);
+        vector<Coords>* rebuildPath(unordered_map<GraphNode, GraphNode>& traversals, GraphNode start, GraphNode goal);
         vector<Coords>* find(Coords start_loc, Coords end_loc);
         void renderPath(vector<Coords>* path, Colour path_colour, int sw, int sh, float scalingX, float scalingY);
 
@@ -60,7 +60,7 @@ vector<GraphNode> AStar::neighbors(GraphNode node) {
     return map_neighbors;
 };
 
-vector<Coords>* AStar::reconstructPath(unordered_map<GraphNode, GraphNode>& traversals, GraphNode start, GraphNode goal) {
+vector<Coords>* AStar::rebuildPath(unordered_map<GraphNode, GraphNode>& traversals, GraphNode start, GraphNode goal) {
     vector<Coords> path;
     GraphNode current = goal;
     while (current != start) {
@@ -133,7 +133,7 @@ vector<Coords>* AStar::find(Coords start_loc, Coords end_loc) {
             }
         }
     }
-    return reconstructPath(traversals, start, goal);
+    return rebuildPath(traversals, start, goal);
 };
 
 void AStar::renderPath(vector<Coords>* path, Colour path_colour, int sw, int sh, float scalingX, float scalingY) {

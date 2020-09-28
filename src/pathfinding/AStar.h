@@ -99,6 +99,7 @@ vector<Coords>* AStar::find(Coords start_loc, Coords end_loc) {
     GraphNode start(start_loc);
     GraphNode goal(end_loc);
 
+    // By default, std::priority_queue implements<T,E,F> a min-heap when using F = std::greater<T>
     typedef pair<int, GraphNode> QueueEntry;
     priority_queue<QueueEntry, vector<QueueEntry>, greater<QueueEntry>> min_heap;
     min_heap.emplace(0, start);

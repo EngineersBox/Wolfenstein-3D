@@ -21,3 +21,4 @@
 * ~~Add start + end locations in map definitions~~
 * Implement BSP search tree based on first and last rays
 * Change raycasting to query against walls from results of BSP rather than raymarching
+* ~~Implement minmap and player position scaling~~

@@ -9,6 +9,9 @@
 #include "../map/map.h"
 #include "../raytracer/Globals.h"
 #include "GraphNode.h"
+#include "../exceptions/pathfinding/InvalidPathTargets.h"
+#include "../drawing/DrawingUtils.h"
+#include "../texturing/TextureColours.h"
 
 using namespace std;
 
@@ -20,7 +23,9 @@ class AStar {
 
         vector<Coords>* reconstructPath(unordered_map<GraphNode, GraphNode>& traversals, GraphNode start, GraphNode goal);
         vector<Coords>* find(Coords start_loc, Coords end_loc);
-    private:
+        void renderPath(vector<Coords>* path, Colour path_colour, int sw, int sh, float scalingX, float scalingY);
+
+       private:
         inline int heuristic(GraphNode next, GraphNode goal);
         inline bool inMap(GraphNode loc);
         vector<GraphNode> neighbors(GraphNode node);
@@ -88,6 +93,9 @@ inline int AStar::heuristic(GraphNode next, GraphNode goal) {
 // _|#|/
 // _|/|#
 vector<Coords>* AStar::find(Coords start_loc, Coords end_loc) {
+    if (start_loc == end_loc) {
+        throw InvalidPathTargets(start_loc, end_loc);
+    }
     GraphNode start(start_loc);
     GraphNode goal(end_loc);
 
@@ -125,4 +133,22 @@ vector<Coords>* AStar::find(Coords start_loc, Coords end_loc) {
         }
     }
     return reconstructPath(traversals, start, goal);
+};
+
+void AStar::renderPath(vector<Coords>* path, Colour path_colour, int sw, int sh, float scalingX, float scalingY) {
+    if (path->size() < 2) {
+        return;
+    }
+    int xOffset = minimapCfg.isLeft() ? sw - (map.map_width * minimapCfg.size) : 0;
+    int yOffset = minimapCfg.isTop() ? 0 : sh - (map.map_height * minimapCfg.size);
+    for (int i = 0; i < path->size() - 2; i++) {
+        renderRay(
+            xOffset + (path->at(i).first * scalingX),
+            yOffset + (path->at(i).second * scalingY),
+            xOffset + (path->at(i + 1).first * scalingX),
+            yOffset + (path->at(i + 1).second * scalingY),
+            5,
+            path_colour
+        );
+    }
 };

@@ -42,30 +42,6 @@ ConfigInit cfgInit;
 
 GameMap gameMap = GameMap();
 vector<Ray> rays(0);
-
-///
-/// Render a line between two points (ax, ay) and (bx, by) with a given width
-///
-/// @param float ax: X-axis value for point A
-/// @param float ay: Y-axis value for point A
-/// @param float bx: X-axis value for point B
-/// @param float by: Y-axis value for point B
-/// @param float line_width: Width of the ray to draw
-///
-/// @return void
-///
-inline static void renderRay(float ax, float ay, float bx, float by, int line_width, Colour ray_colour = WHITE) {
-    toColour(ray_colour);
-    glLineWidth((float)line_width);
-
-    glBegin(GL_LINES);
-
-    glVertex2f(ax, ay);
-    glVertex2f(bx, by);
-
-    glEnd();
-}
-
 ///
 /// Render the player
 ///
@@ -477,7 +453,7 @@ inline void drawFloor(int width = SCREEN_WIDTH, int height = SCREEN_HEIGHT) {
 
 inline void renderMapRays(vector<Ray>& rays) {
     for (Ray ray : rays) {
-        renderRay(ray.ax, ray.ay, ray.bx, ray.by, ray.line_width);
+        renderRay(ray.ax, ray.ay, ray.bx, ray.by, ray.line_width, WHITE);
     }
 }
 

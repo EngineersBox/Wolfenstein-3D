@@ -34,6 +34,11 @@ Player player;
 int mapScreenW = screenW; // x >> 1 == x / 2
 int mapScreenH = screenH;
 
+#define MINIMAP_SIZE_X 20
+#define MINIMAP_SIZE_Y 20
+float mapScalingX;
+float mapScalingY;
+
 // Configs
 ConfigInit cfgInit;
 
@@ -51,8 +56,8 @@ vector<Ray> rays(0);
 ///
 /// @return void
 ///
-inline static void renderRay(float ax, float ay, float bx, float by, int line_width) {
-    toColour(WHITE);
+inline static void renderRay(float ax, float ay, float bx, float by, int line_width, Colour ray_colour = WHITE) {
+    toColour(ray_colour);
     glLineWidth((float)line_width);
 
     glBegin(GL_LINES);
@@ -68,18 +73,26 @@ inline static void renderRay(float ax, float ay, float bx, float by, int line_wi
 ///
 /// @return void
 ///
-inline static void renderPlayerPos() {
-    toColour(YELLOW);
+inline static void renderPlayerPos(int sw = SCREEN_WIDTH, int sh = SCREEN_HEIGHT) {
+    int xOffset = minimapCfg.isLeft() ? sw - (gameMap.map_width * MINIMAP_SIZE_X) : 0;
+    int yOffset = minimapCfg.isTop() ? 0 : sh - (gameMap.map_height * MINIMAP_SIZE_Y);
+    
+    toColour(RED);
     glPointSize(8);
 
     // Draw player point
     glBegin(GL_POINTS);
-    glVertex2d(player.x, player.y);
+    glVertex2d(xOffset + (player.x * mapScalingX), yOffset + (player.y * mapScalingY));
 
     glEnd();
 
     // Draw direction vector
-    renderRay(player.x, player.y, player.x + player.dx * 5, player.y + player.dy * 5, 3);
+    renderRay(
+        xOffset + (player.x * mapScalingX),
+        yOffset + (player.y * mapScalingY),
+        xOffset + ((player.x + player.dx * 5) * mapScalingX),
+        yOffset + ((player.y + player.dy * 5) * mapScalingY),
+        3, RED);
 }
 
 ///
@@ -88,8 +101,8 @@ inline static void renderPlayerPos() {
 /// @return void
 ///
 static void renderMap2D(int sw = SCREEN_WIDTH, int sh = SCREEN_HEIGHT) {
-    int xSize = 20;
-    int ySize = 20;
+    int xSize = MINIMAP_SIZE_X;
+    int ySize = MINIMAP_SIZE_Y;
     int xOffset = minimapCfg.isLeft() ? sw - (gameMap.map_width * xSize) : 0;
     int yOffset = minimapCfg.isTop() ? 0 : sh - (gameMap.map_height * ySize);
     int x, y;
@@ -575,6 +588,9 @@ void init(Colour background_colour) {
 
     gameMap.wall_width = mapScreenW / gameMap.map_width;
     gameMap.wall_height = mapScreenH / gameMap.map_height;
+
+    mapScalingX = (MINIMAP_SIZE_X / (float)mapScreenW) * gameMap.map_width;
+    mapScalingY = (MINIMAP_SIZE_Y / (float)mapScreenH) * gameMap.map_height;
 
     fill(emptyCol.begin(), emptyCol.end(), background_colour);
 

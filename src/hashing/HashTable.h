@@ -164,7 +164,7 @@ unsigned long HashTable<V>::hashFunc(const string& key) const {
     }
     unsigned long hashVal = PRIME_BASE;
     for (int i = 31; i != -1; i--) {
-        hashVal = (hashVal ^ PRIME_MOD) * key[i];
+        hashVal = (hashVal * PRIME_MOD) ^ key[i];
         hashVal %= table_size;
     }
     return hashVal;

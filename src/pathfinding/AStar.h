@@ -35,6 +35,8 @@ class AStar {
         GameMap map;
 };
 
+AStar::AStar(){};
+
 AStar::AStar(GameMap map) {
     this->map = map;
 };

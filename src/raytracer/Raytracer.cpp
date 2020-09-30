@@ -26,7 +26,8 @@ Colour bg_colour = {0.3, 0.3, 0.3, 0.0};
 TextureLoader texLoader;
 HashTable<Texture> textures;
 vector<Colour> emptyCol(screenH);
-
+AStar astar;
+vector<Coords>* path = new vector<Coords>();
 // Player
 Player player;
 
@@ -488,6 +489,7 @@ static void display(void) {
             renderMapRays(rays);
         }
     }
+    astar.renderPath(path, YELLOW, SCREEN_WIDTH, SCREEN_HEIGHT, mapScalingX, mapScalingY);
     glutSwapBuffers();
 }
 
@@ -563,6 +565,9 @@ void init(Colour background_colour) {
 
     mapScalingX = (minimapCfg.size / (float)mapScreenW) * gameMap.map_width;
     mapScalingY = (minimapCfg.size / (float)mapScreenH) * gameMap.map_height;
+
+    astar = AStar(gameMap);
+    path = astar.find(gameMap.start, gameMap.end); // TEST: Ensure path rendering works
 
     fill(emptyCol.begin(), emptyCol.end(), background_colour);
 

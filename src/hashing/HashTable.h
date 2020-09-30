@@ -5,6 +5,7 @@
 
 #include "../exceptions/hashing/BucketIndexOccupied.h"
 #include "../exceptions/hashing/HashTableCapacity.h"
+#include "../exceptions/hashing/InvalidKeySize.h"
 #include "../raytracer/Globals.h"
 
 using namespace std;
@@ -12,8 +13,8 @@ using namespace std;
 #define HASH_TABLE_MAX_SIZE 1024
 #define HASH_TABLE_DEFAULT_SIZE 16
 
-#define PRIME_MOD 1e9 - 9
-#define PRIME_BASE 113
+#define PRIME_MOD 22801763489 // Closest prime to 1e9 - 9
+#define PRIME_BASE 11
 
 template <typename V>
 class HMEntry {
@@ -158,10 +159,12 @@ size_t HashTable<V>::size() const noexcept {
 
 template <typename V>
 unsigned long HashTable<V>::hashFunc(const string& key) const {
-    // Hashing using rolling polynomial method
-    unsigned long hashVal = 0;
-    for (int i = key.length() - 1; i != -1; i--) {
-        hashVal = (hashVal * PRIME_MOD) + key[i];
+    if (key.length() > 32) {
+        throw InvalidKeySize(key);
+    }
+    unsigned long hashVal = PRIME_BASE;
+    for (int i = 31; i != -1; i--) {
+        hashVal = (hashVal ^ PRIME_MOD) * key[i];
         hashVal %= table_size;
     }
     return hashVal;

@@ -11,7 +11,6 @@ class GraphNode {
         GraphNode();
         GraphNode(int x, int y);
         GraphNode(Coords loc);
-        ~GraphNode();
 
         inline bool operator==(const GraphNode& other) const;
         inline bool operator!=(const GraphNode& other) const;
@@ -42,8 +41,6 @@ GraphNode::GraphNode(int x, int y) {
     this->x = x;
     this->y = y;
 }
-
-GraphNode::~GraphNode(){};
 
 inline bool GraphNode::operator==(const GraphNode& other) const {
     return (this->x == other.x

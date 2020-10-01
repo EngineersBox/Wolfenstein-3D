@@ -1,6 +1,6 @@
 #define GL_SILENCE_DEPRECATION
 
-#include "Raytracer.h"
+#include "Raytracer.hpp"
 
 #define radToCoord(r) (int)(r) >> 6
 

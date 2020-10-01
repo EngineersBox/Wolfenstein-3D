@@ -61,7 +61,7 @@ add_custom_command(
 add_custom_command(
     TARGET clean_archives
     COMMAND ${CMAKE_COMMAND} -E cmake_echo_color --cyan --bold --no-newline \"\>\> \"
-	COMMAND ${CMAKE_COMMAND} -E cmake_echo_color --green --no-newline \"Removing logs in \"
+	COMMAND ${CMAKE_COMMAND} -E cmake_echo_color --green --no-newline \"Removing archives in \"
 	COMMAND ${CMAKE_COMMAND} -E cmake_echo_color --white --no-newline \"[\"
 	COMMAND ${CMAKE_COMMAND} -E cmake_echo_color --red --bold --no-newline \"log/*\"
 	COMMAND ${CMAKE_COMMAND} -E cmake_echo_color --white \"]\"

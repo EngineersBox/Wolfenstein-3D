@@ -355,11 +355,12 @@ void renderRays2Dto3D(vector<Ray>& rays) {
     int mx{0}, my{0}, mp{0};
     float dof, rx{0}, ry{0}, ra, x_off{0}, y_off{0}, distT{0}, prev_wall_offset, disH, hx, hy, disV, vx, vy;
     vector<Colour> prevCol = emptyCol;
-    Wall prev_wall, hitWall;
-    NormalDir prev_dir, nDir;
+    NormalDir normalDir;
+    Wall hitWall;
     WallFace prev_wall_face;
     Texture wall_texture;
     string prev_tex_name;
+    float prev_wallOffset = 0.0;
     Colour lr_shader = {0.9, 0.9, 0.9, 1.0};
     Colour ud_shader = {0.7, 0.7, 0.7, 1.0};
     bool shouldRender, isLR;
@@ -391,40 +392,21 @@ void renderRays2Dto3D(vector<Ray>& rays) {
             rays.at(r) = {player.x, player.y, rx, ry, 1};
         }
 
-        nDir = hitWall.getNormDir(convertCoord(rx), convertCoord(ry));
-        // cout << NormalDirLUT[nDir] << endl;
-        isLR = nDir == NormalDir::LEFT || nDir == NormalDir::RIGHT;
+        normalDir = hitWall.getNormDir(convertCoord(rx), convertCoord(ry));
+        isLR = normalDir == NormalDir::LEFT || normalDir == NormalDir::RIGHT;
 
         vector<Colour> bmpColStrip;
-        if (shouldRender) {
-            if (hitWall == prev_wall) {
-                if (nDir == prev_dir) {
-                    if (wall_texture.name != prev_wall.getFace(nDir).f_texture) {
-                        if (bmpColStrip == prevCol) {
-                            bmpColStrip = prevCol;
-                        } else {
-                            updatePrevious(isLR, ry, rx, prev_wall_face, true, wall_texture,
-                                bmpColStrip, prevCol, prev_wall, prev_wall, prev_dir, prev_dir);
-                        }
-                    } else {
-                        updatePrevious(isLR, ry, rx, prev_wall_face, false, wall_texture,
-                            bmpColStrip, prevCol, prev_wall, prev_wall, prev_dir, nDir);
-                    }
-                } else {
-                    updatePrevious(isLR, ry, rx, prev_wall_face, true, wall_texture,
-                        bmpColStrip, prevCol, prev_wall, prev_wall, prev_dir, nDir);
-                }
-            } else {
-                updatePrevious(isLR, ry, rx, prev_wall_face, true, wall_texture,
-                    bmpColStrip, prevCol, prev_wall, hitWall, prev_dir, nDir);
-            }
+        const int wallIntersectPoint = isLR ? ry : rx;
+        const int wallSize = (isLR ? mapScreenW : mapScreenH) / (isLR ? gameMap.map_width : gameMap.map_height);
+        const float wallOffset = ((wallIntersectPoint - (radToCoord(wallIntersectPoint))) % wallSize) / (float)wallSize;
+        
+        prev_wall_face = hitWall.getFace(normalDir);
+        textures.get(prev_wall_face.f_texture, wall_texture);
+        if (prev_tex_name != prev_wall_face.f_texture || prev_wallOffset != wallOffset) {
+            bmpColStrip = wall_texture.texture.getCol(1.0 - wallOffset);
+            prevCol = bmpColStrip;
         } else {
-            if (bmpColStrip == prevCol) {
-                bmpColStrip = prevCol;
-            } else {
-                updatePrevious(isLR, ry, rx, prev_wall_face, true, wall_texture,
-                    bmpColStrip, prevCol, prev_wall, prev_wall, prev_dir, prev_dir);
-            }
+            bmpColStrip = prevCol;
         }
         shader = isLR ? lr_shader : ud_shader;
 

@@ -196,11 +196,11 @@ void GLDebugContext::glDebugMessageCallback(GL_DEBUG_SOURCE source, GL_DEBUG_TYP
     FILE *debugLog;
     debugLog = fopen(filename.c_str(), "a");
 
-    fprintf(debugLog, "[%s] {%s|%s|%s ~ %x}:%s type = 0x%s, severity = 0x%s, message = %s\n",
+    fprintf(debugLog, "[%s] {%s|%s|%s ~ %s}%s type = 0x%s, severity = 0x%s, message = %s\n",
             currentTime.c_str(),
             toHex(type).c_str(), toHex(source).c_str(), toHex(severity).c_str(),
-            type | source | severity,
-            string(" **" + string(source == DEBUG_SOURCE_API ? " GL" : "") + " ERROR **").c_str(),
+            toHex(type | source | severity).c_str(),
+            (type == DEBUG_TYPE_ERROR ? string(" **" + string(source == DEBUG_SOURCE_API ? " GL" : "") + " ERROR **").c_str() : ""),
             toHex(type).c_str(), toHex(severity).c_str(), message.c_str());
 
     fclose(debugLog);

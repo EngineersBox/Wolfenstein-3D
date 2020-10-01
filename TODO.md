@@ -14,7 +14,16 @@
   * ~~Map processing~~
 * ~~Change renderer to query wall texture~~
 * ~~Fix HashTable (change to hashmap K,V pairs) and fix Texture~~
-* Create test cases for HashTable, A* and BSP Tree (Convex hull)
+* Implement unit tests:
+  * A*
+  * BSP
+  * BMP read
+  * INI read
+  * JSON read
+  * map load
+  * texture load
+  * hash table usage
+  * hashing collision rate
 * ~~Change map file to JSON and map reader to parse JSON~~
 * ~~Add collision detection with walls~~
 * ~~Implement A* search algorithm~~

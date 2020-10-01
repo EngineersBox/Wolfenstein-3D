@@ -56,6 +56,7 @@ class HashTable {
 
         inline void findNextNonNull(HMEntry<V>* prev, HMEntry<V>* entry, const string& key);
         unsigned long hashFunc(const string& key) const;
+        unsigned long cantorHash(const string& key) const;
 };
 
 template <typename V>

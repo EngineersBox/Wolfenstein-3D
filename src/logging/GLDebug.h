@@ -78,14 +78,16 @@ enum GL_DEBUG_SEVERITY : u_int16_t {
     DEBUG_SEVERITY_HIGH = 0x100,
     DEBUG_SEVERITY_MEDIUM = 0x200,
     DEBUG_SEVERITY_LOW = 0x300,
-    DEBUG_SEVERITY_INFO = 0x400
+    DEBUG_SEVERITY_INFO = 0x400,
+    DEBUG_SEVERITY_VERBOSE = 0x500
 };
 
 static const string GL_DEBUG_SEVERITY_LUT[] = {
     "DEBUG_SEVERITY_HIGH",
     "DEBUG_SEVERITY_MEDIUM",
     "DEBUG_SEVERITY_LOW",
-    "DEBUG_SEVERITY_INFO"
+    "DEBUG_SEVERITY_INFO",
+    "DEBUG_SEVERITY_VERBOSE"
 };
 
 #define GL_DEBUG_SEVERITY_STRING(gl_severity) GL_DEBUG_SEVERITY_LUT[(gl_severity >> 8) - 1]
@@ -122,6 +124,9 @@ class GLDebugContext {
         ~GLDebugContext();
         void glDebugMessageCallback(GL_DEBUG_SOURCE source, GL_DEBUG_TYPE type, GL_DEBUG_SEVERITY severity, const string& message);
         void logAppInfo(const string& message);
+        void logApiInfo(const string& message);
+        void logSysInfo(const string& message);
+        void logAppVerb(const string& message);
         LoggingCfg* l_cfg;
 };
 
@@ -160,11 +165,12 @@ void GLDebugContext::glDebugMessageCallback(GL_DEBUG_SOURCE source, GL_DEBUG_TYP
 
     if (l_cfg->gl_debug) {
         FILE* out_loc = type == DEBUG_TYPE_ERROR || type == DEBUG_TYPE_UNDEFINED_BEHAVIOR ? stderr : stdout;
-        fprintf(out_loc, "[%s] {%s|%s|%s ~ %s}%s %s :: %s\n",
+        fprintf(out_loc, "[%s] {%s|%s|%s ~ %s}%s %s %s :: %s\n",
                 string(A_BGRN + currentTime + RST).c_str(),
                 string(A_CYN + toHex(type) + RST).c_str(), string(A_CYN + toHex(source) + RST).c_str(), string(A_CYN + toHex(severity) + RST).c_str(),
                 string(A_CYN + toHex(type | source | severity) + RST).c_str(),
                 (type == DEBUG_TYPE_ERROR ? string(A_BRED + string(" **") + (source == DEBUG_SOURCE_API ? " GL" : "") + " ERROR **" + RST).c_str() : ""),
+                (severity == DEBUG_SEVERITY_VERBOSE ? string(A_MAG + string(" VERBOSE")).c_str() : ""),
                 string(A_YEL + GL_DEBUG_SOURCE_STRING(source) + RST).c_str(), message.c_str());
     }
 
@@ -172,12 +178,11 @@ void GLDebugContext::glDebugMessageCallback(GL_DEBUG_SOURCE source, GL_DEBUG_TYP
     debugLog = fopen(filename.c_str(), "a");
 
     fprintf(debugLog, "[%s] {%s|%s|%s ~ %x}:%s type = 0x%s, severity = 0x%s, message = %s\n",
-        currentTime.c_str(),
-        toHex(type).c_str(), toHex(source).c_str(), toHex(severity).c_str(),
-        type | source | severity,
-        (type == DEBUG_TYPE_ERROR ? " ** GL ERROR **" : ""),
-        toHex(type).c_str(), toHex(severity).c_str(), message.c_str()
-    );
+            currentTime.c_str(),
+            toHex(type).c_str(), toHex(source).c_str(), toHex(severity).c_str(),
+            type | source | severity,
+            string(" **" + string(source == DEBUG_SOURCE_API ? " GL" : "") + " ERROR **").c_str(),
+            toHex(type).c_str(), toHex(severity).c_str(), message.c_str());
 
     fclose(debugLog);
 };
@@ -187,6 +192,36 @@ void GLDebugContext::logAppInfo(const string& message) {
         DEBUG_SOURCE_APPLICATION,
         DEBUG_TYPE_OTHER,
         DEBUG_SEVERITY_INFO,
+        message
+    );
+};
+
+void GLDebugContext::logApiInfo(const string& message) {
+    glDebugMessageCallback(
+        DEBUG_SOURCE_API,
+        DEBUG_TYPE_OTHER,
+        DEBUG_SEVERITY_INFO,
+        message
+    );
+};
+
+void GLDebugContext::logSysInfo(const string& message) {
+    glDebugMessageCallback(
+        DEBUG_SOURCE_OS_X_SYSTEM,
+        DEBUG_TYPE_OTHER,
+        DEBUG_SEVERITY_INFO,
+        message
+    );
+};
+
+void GLDebugContext::logAppVerb(const string& message) {
+    if (!l_cfg->log_verbose) {
+        return;
+    }
+    glDebugMessageCallback(
+        DEBUG_SOURCE_OS_X_SYSTEM,
+        DEBUG_TYPE_OTHER,
+        DEBUG_SEVERITY_VERBOSE,
         message
     );
 };

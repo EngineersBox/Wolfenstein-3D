@@ -31,6 +31,7 @@ class AStar {
         vector<GraphNode> neighbors(GraphNode node);
         inline int gCost(GraphNode current, GraphNode next);
         inline void initCosts(unordered_map<GraphNode, int>& cost);
+        void logPath(vector<Coords>& path);
 
         GameMap map;
 };
@@ -71,6 +72,7 @@ vector<Coords>* AStar::rebuildPath(unordered_map<GraphNode, GraphNode>& traversa
     }
     path.push_back(Coords(start.x, start.y));
     reverse(path.begin(), path.end());
+    logPath(path);
     return new vector<Coords>(path);
 };
 
@@ -89,6 +91,23 @@ inline int AStar::gCost(GraphNode current, GraphNode next) {
 inline int AStar::heuristic(GraphNode next, GraphNode goal) {
     return abs(next.x - goal.x) + abs(next.y - goal.y);
 };
+
+void AStar::logPath(vector<Coords>& path) {
+    debugContext.logAppVerb(
+        "Found path for ("
+        + to_string(map.start.first)
+        + ","
+        + to_string(map.start.second)
+        + ") -> ("
+        + to_string(map.end.first)
+        + ","
+        + to_string(map.end.second)
+        + ")"
+    );
+    for (Coords coord : path) {
+        debugContext.logAppVerb("(" + to_string(coord.first) + "," + to_string(coord.second) + ")");
+    }
+}
 
 // FIXME: Should not traverse between walls:
 // _|_|_
@@ -144,14 +163,14 @@ void AStar::renderPath(vector<Coords>* path, Colour path_colour, int sw, int sh,
     }
     int xOffset = minimapCfg.isLeft() ? sw - (map.map_width * minimapCfg.size) : 0;
     int yOffset = minimapCfg.isTop() ? 0 : sh - (map.map_height * minimapCfg.size);
-    for (int i = 0; i < path->size() - 2; i++) {
+    int inBlockOffset = IDIV_2(minimapCfg.size);
+    for (int i = 0; i < path->size() - 1; i++) {
         renderRay(
-            xOffset + (path->at(i).first * scalingX),
-            yOffset + (path->at(i).second * scalingY),
-            xOffset + (path->at(i + 1).first * scalingX),
-            yOffset + (path->at(i + 1).second * scalingY),
+            inBlockOffset + xOffset + ((path->at(i).first * map.wall_width) * scalingX),
+            inBlockOffset + yOffset + ((path->at(i).second * map.wall_height) * scalingY),
+            inBlockOffset + xOffset + ((path->at(i + 1).first * map.wall_width) * scalingX),
+            inBlockOffset + yOffset + ((path->at(i + 1).second * map.wall_height) * scalingY),
             5,
-            path_colour
-        );
+            path_colour);
     }
 };

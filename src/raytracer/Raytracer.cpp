@@ -574,12 +574,11 @@ void init(Colour background_colour) {
     toClearColour(background_colour);
     gluOrtho2D(0, screenW, screenH, 0);
     player = Player(
-        250,
-        250,
+        gameMap.start.first * gameMap.wall_width + IDIV_2(gameMap.wall_width),
+        gameMap.start.second * gameMap.wall_height + IDIV_2(gameMap.wall_height),
         cos(player.angle) * 5,
         sin(player.angle) * 5,
-        0
-    );
+        0);
     debugContext.logAppInfo("Initialised player object");
 }
 
@@ -605,16 +604,16 @@ int main(int argc, char *argv[]) {
     debugContext.logAppInfo("---- COMPLETED APPLICATION INIT PHASE ----");
 
     glutDisplayFunc(display);
-    debugContext.logAppInfo("Initialised glutDisplayFunc at: " + FUNC_ADDR(display));
+    debugContext.logApiInfo("Initialised glutDisplayFunc at: " + FUNC_ADDR(display));
     glutReshapeFunc(reshape);
-    debugContext.logAppInfo("Initialised glutReshapeFunc at: " + FUNC_ADDR(reshape));
+    debugContext.logApiInfo("Initialised glutReshapeFunc at: " + FUNC_ADDR(reshape));
     glutKeyboardFunc(keyPress);
-    debugContext.logAppInfo("Initialised glutKeyboardFunc at: " + FUNC_ADDR(keyPress));
+    debugContext.logApiInfo("Initialised glutKeyboardFunc at: " + FUNC_ADDR(keyPress));
     glutIdleFunc(idle);
-    debugContext.logAppInfo("Initialised glutIdleFunc at: " + FUNC_ADDR(idle));
+    debugContext.logApiInfo("Initialised glutIdleFunc at: " + FUNC_ADDR(idle));
     glutPostRedisplay();
-    debugContext.logAppInfo("---- COMPLETED OpenGL/GLUT INIT PHASE ----");
-    debugContext.logAppInfo("Starting glutMainLoop() ...");
+    debugContext.logApiInfo("---- COMPLETED OpenGL/GLUT INIT PHASE ----");
+    debugContext.logApiInfo("Starting glutMainLoop() ...");
     glutMainLoop();
 
     return 0;

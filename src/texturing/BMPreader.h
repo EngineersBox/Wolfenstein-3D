@@ -172,6 +172,7 @@ struct BMP {
                 }
                 file_header.file_size += static_cast<uint32_t>(data.size()) + bmp_info_header.height * static_cast<uint32_t>(padding_row.size());
             }
+            debugContext.logSysInfo("Retrieved BMP file: " + string(fname));
         } else {
             throw ImageFileStreamError(fname);
         }

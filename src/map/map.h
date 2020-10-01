@@ -123,7 +123,7 @@ void GameMap::readMapFromJSON(string filename) {
             "Unable to load map file: " + filename
         );
     }
-    debugContext.logAppInfo("Retrieved map file: " + string(filename));
+    debugContext.logSysInfo("Retrieved map file: " + filename);
     debugContext.logAppInfo("---- STARTED MAP PROCESSING [" + filename +"] ----");
     this->map_width = jsonres["Params"]["Width"].as<int>();
     this->map_height = jsonres["Params"]["Height"].as<int>();
@@ -161,7 +161,7 @@ void GameMap::readMapFromJSON(string filename) {
             )
         );
     }
-    debugContext.logAppInfo("Processed in " + to_string(wallarr.size()) + " wall objects");
+    debugContext.logAppInfo("Processed " + to_string(wallarr.size()) + " wall objects");
     debugContext.logAppInfo("---- FINISHED MAP PROCESSING [" + filename + "] ----");
 };
 

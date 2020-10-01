@@ -50,15 +50,48 @@ inline bool AStar::inMap(GraphNode node) {
 
 vector<GraphNode> AStar::neighbors(GraphNode node) {
     vector<GraphNode> map_neighbors;
-    for (int x_off = -1; x_off <= 1; x_off++) {
-        for (int y_off = -1; y_off <= 1; y_off++) {
-            if (x_off == 0 && y_off == 0) {
+    Coords loc_to_check[4][3] = {
+        {Coords(-1,-1),Coords(0,-1),Coords(-1,0)},
+        {Coords(1,-1),Coords(0,-1),Coords(1,0)},
+        {Coords(1,1),Coords(1,0),Coords(0,1)},
+        {Coords(-1,1),Coords(0,1),Coords(-1,0)}
+    };
+    for (int i = 0; i < 4; i++) {
+        int cx{loc_to_check[i][0].first}, cy{loc_to_check[i][0].second};
+        bool cInMap = inMap(Coords(node.x + cx, node.y + cy));
+        bool cIsWall = !cInMap ? false : map.getAt(node.x + cx, node.y + cy).wf_left.f_colour != NONE;
+        int cx1{loc_to_check[i][1].first}, cy1{loc_to_check[i][1].second};
+        bool c1InMap = inMap(Coords(node.x + cx1, node.y + cy1));
+        bool c1IsWall = !c1InMap ? false : map.getAt(node.x + cx1, node.y + cy1).wf_left.f_colour != NONE;
+        int cx2{loc_to_check[i][1].first}, cy2{loc_to_check[i][1].second};
+        bool c2InMap = inMap(Coords(node.x + cx2, node.y + cy2));
+        bool c2IsWall = !c2InMap ? false : map.getAt(node.x + cx2, node.y + cy2).wf_left.f_colour != NONE;
+        if (cInMap) {
+            if (cIsWall) {
+                if (c1InMap && !c1IsWall) {
+                    map_neighbors.push_back(Coords(node.x + cx1, node.y + cy1));
+                }
+                if (c2InMap && ! c2IsWall) {
+                    map_neighbors.push_back(Coords(node.x + cx2, node.y + cy2));
+                }
                 continue;
             }
-            if (inMap(Coords{node.x + x_off, node.y + y_off}) && map.getAt(node.x + x_off, node.y + y_off).wf_left.f_colour == NONE) {
-                map_neighbors.push_back(Coords{node.x + x_off, node.y + y_off});
+            if (c1InMap && c1IsWall && c2InMap && c2IsWall) {
+                continue;
             }
+            map_neighbors.push_back(Coords(node.x + cx, node.y + cy));
+            map_neighbors.push_back(Coords(
+                    node.x + (c1InMap && !c1IsWall ? cx1 : cx2),
+                    node.y + (c1InMap && !c1IsWall ? cy1 : cy2)
+                )
+            );
+            continue;
         }
+        map_neighbors.push_back(Coords(
+                node.x + (c1InMap && !c1IsWall ? cx1 : cx2),
+                node.y + (c1InMap && !c1IsWall ? cy1 : cy2)
+            )
+        );
     }
     return map_neighbors;
 };

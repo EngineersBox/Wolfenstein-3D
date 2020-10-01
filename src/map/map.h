@@ -117,7 +117,7 @@ void GameMap::readMapFromJSON(string filename) {
         fileBuffer.close();
     } else {
         debugContext.glDebugMessageCallback(
-            GL_DEBUG_SOURCE::DEBUG_SOURCE_OS_X_SYSTEM,
+            GL_DEBUG_SOURCE::DEBUG_SOURCE_SYSTEM,
             GL_DEBUG_TYPE::DEBUG_TYPE_ERROR,
             GL_DEBUG_SEVERITY::DEBUG_SEVERITY_HIGH,
             "Unable to load map file: " + filename

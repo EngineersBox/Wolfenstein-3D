@@ -56,13 +56,22 @@ static const string GL_DEBUG_TYPE_LUT[] = {
 
 enum GL_DEBUG_SOURCE : u_int16_t {
     DEBUG_SOURCE_API = 0x010,
-    DEBUG_SOURCE_OS_X_SYSTEM = 0x020,
+    DEBUG_SOURCE_SYSTEM = 0x020,
     DEBUG_SOURCE_SHADER_COMPILER = 0x030,
     DEBUG_SOURCE_THIRD_PARTY = 0x040,
     DEBUG_SOURCE_APPLICATION = 0x050,
     DEBUG_SOURCE_OTHER = 0x060
 };
 
+#if _WIN64 || _WIN32
+static const string GL_DEBUG_SOURCE_LUT[] = {
+    "DEBUG_SOURCE_API",
+    "DEBUG_SOURCE_WINDOWS_SYSTEM",
+    "DEBUG_SOURCE_SHADER_COMPILER",
+    "DEBUG_SOURCE_THIRD_PARTY",
+    "DEBUG_SOURCE_APPLICATION",
+    "DEBUG_SOURCE_OTHER"};
+#elif __APPLE__
 static const string GL_DEBUG_SOURCE_LUT[] = {
     "DEBUG_SOURCE_API",
     "DEBUG_SOURCE_OS_X_SYSTEM",
@@ -71,6 +80,16 @@ static const string GL_DEBUG_SOURCE_LUT[] = {
     "DEBUG_SOURCE_APPLICATION",
     "DEBUG_SOURCE_OTHER"
 };
+#elif __linux__
+static const string GL_DEBUG_SOURCE_LUT[] = {
+    "DEBUG_SOURCE_API",
+    "DEBUG_SOURCE_LINUX_SYSTEM",
+    "DEBUG_SOURCE_SHADER_COMPILER",
+    "DEBUG_SOURCE_THIRD_PARTY",
+    "DEBUG_SOURCE_APPLICATION",
+    "DEBUG_SOURCE_OTHER"
+};
+#endif
 
 #define GL_DEBUG_SOURCE_STRING(gl_source) GL_DEBUG_SOURCE_LUT[(gl_source >> 4) - 1]
 
@@ -207,7 +226,7 @@ void GLDebugContext::logApiInfo(const string& message) {
 
 void GLDebugContext::logSysInfo(const string& message) {
     glDebugMessageCallback(
-        DEBUG_SOURCE_OS_X_SYSTEM,
+        DEBUG_SOURCE_SYSTEM,
         DEBUG_TYPE_OTHER,
         DEBUG_SEVERITY_INFO,
         message
@@ -219,7 +238,7 @@ void GLDebugContext::logAppVerb(const string& message) {
         return;
     }
     glDebugMessageCallback(
-        DEBUG_SOURCE_OS_X_SYSTEM,
+        DEBUG_SOURCE_APPLICATION,
         DEBUG_TYPE_OTHER,
         DEBUG_SEVERITY_VERBOSE,
         message

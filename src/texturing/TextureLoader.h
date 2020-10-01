@@ -87,7 +87,7 @@ bool TextureLoader::verifyFileExistance(const std::string& filename) {
     struct stat buffer;
     if (stat(std::string("resources/textures/" + filename).c_str(), &buffer) != 0) {
         debugContext.glDebugMessageCallback(
-            GL_DEBUG_SOURCE::DEBUG_SOURCE_OS_X_SYSTEM,
+            GL_DEBUG_SOURCE::DEBUG_SOURCE_SYSTEM,
             GL_DEBUG_TYPE::DEBUG_TYPE_ERROR,
             GL_DEBUG_SEVERITY::DEBUG_SEVERITY_LOW,
             "[" + filename + "] File does not exist, skipping."

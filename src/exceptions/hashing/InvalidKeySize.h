@@ -20,7 +20,7 @@ class InvalidKeySize : virtual public exception {
      virtual const char* what() const throw() {
         string retVal = "Key [" + key + "] is longer than 32 bytes: " + to_string(key.length());
         debugContext.glDebugMessageCallback(
-            GL_DEBUG_SOURCE::DEBUG_SOURCE_OS_X_SYSTEM,
+            GL_DEBUG_SOURCE::DEBUG_SOURCE_APPLICATION,
             GL_DEBUG_TYPE::DEBUG_TYPE_ERROR,
             GL_DEBUG_SEVERITY::DEBUG_SEVERITY_HIGH,
             retVal

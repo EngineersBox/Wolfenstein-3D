@@ -23,7 +23,7 @@ class HashTableCapacity : virtual public exception {
         string retVal = message;
         retVal.append(to_string(max_size));
         debugContext.glDebugMessageCallback(
-            GL_DEBUG_SOURCE::DEBUG_SOURCE_OS_X_SYSTEM,
+            GL_DEBUG_SOURCE::DEBUG_SOURCE_APPLICATION,
             GL_DEBUG_TYPE::DEBUG_TYPE_ERROR,
             GL_DEBUG_SEVERITY::DEBUG_SEVERITY_HIGH,
             retVal

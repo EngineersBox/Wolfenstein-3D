@@ -21,6 +21,8 @@ FILE(GLOB logs_contents "logs/*.log")
 
 add_custom_target(clean_out ALL)
 add_custom_target(clean_logs ALL)
+add_custom_target(archive_logs ALL)
+add_custom_target(clean_archives ALL)
 add_custom_target(destroy ALL)
 add_custom_target(run ALL)
 add_custom_command(
@@ -39,8 +41,32 @@ add_custom_command(
 	COMMAND ${CMAKE_COMMAND} -E cmake_echo_color --red --bold --no-newline \"log/*\"
 	COMMAND ${CMAKE_COMMAND} -E cmake_echo_color --white \"]\"
 	COMMAND echo \"--------------------------------\"
-	COMMAND [ `ls -A logs/ | wc -m` == "0" ] && cmake -E cmake_echo_color --red --bold "No logs to remove" || rm -rvf logs/*
-    COMMAND rm -rvf logs/*
+	COMMAND [ `ls -A logs/*.log 2>/dev/null | wc -m` == "0" ] && cmake -E cmake_echo_color --red --bold "No logs to remove" || rm -rvf logs/*.log
+	COMMAND ${CMAKE_COMMAND} -E cmake_echo_color --white --no-newline \"\"
+    COMMAND echo \"--------------------------------\\n\"
+)
+add_custom_command(
+    TARGET archive_logs
+    COMMAND ${CMAKE_COMMAND} -E cmake_echo_color --cyan --bold --no-newline \"\>\> \"
+	COMMAND ${CMAKE_COMMAND} -E cmake_echo_color --green --no-newline \"Archiving logs in \"
+	COMMAND ${CMAKE_COMMAND} -E cmake_echo_color --white --no-newline \"[\"
+	COMMAND ${CMAKE_COMMAND} -E cmake_echo_color --red --bold --no-newline \"log/*\"
+	COMMAND ${CMAKE_COMMAND} -E cmake_echo_color --white \"]\"
+	COMMAND echo \"--------------------------------\"
+	COMMAND [ `ls -A logs/*.log 2>/dev/null | wc -m` == "0" ] && cmake -E cmake_echo_color --red --bold "No logs to archive" || zip -r logs/archive-$$\(date +"%Y-%m-%d_%H-%M-%S"\)\.zip logs/*.log
+	COMMAND ${CMAKE_COMMAND} -E cmake_echo_color --white --no-newline \"\"
+    COMMAND echo \"--------------------------------\\n\"
+	COMMAND make clean_logs
+)
+add_custom_command(
+    TARGET clean_archives
+    COMMAND ${CMAKE_COMMAND} -E cmake_echo_color --cyan --bold --no-newline \"\>\> \"
+	COMMAND ${CMAKE_COMMAND} -E cmake_echo_color --green --no-newline \"Removing logs in \"
+	COMMAND ${CMAKE_COMMAND} -E cmake_echo_color --white --no-newline \"[\"
+	COMMAND ${CMAKE_COMMAND} -E cmake_echo_color --red --bold --no-newline \"log/*\"
+	COMMAND ${CMAKE_COMMAND} -E cmake_echo_color --white \"]\"
+	COMMAND echo \"--------------------------------\"
+	COMMAND [ `ls -A logs/archive-*.zip 2>/dev/null | wc -m` == "0" ] && cmake -E cmake_echo_color --red --bold "No archives to remove" || rm -rvf logs/archive-*.zip
 	COMMAND ${CMAKE_COMMAND} -E cmake_echo_color --white --no-newline \"\"
     COMMAND echo \"--------------------------------\\n\"
 )
@@ -56,7 +82,6 @@ add_custom_command(
 	COMMAND rm -rvf out
 	COMMAND echo \"--------------------------------\\n\"
 )
-
 add_custom_command(
     TARGET run
 	COMMAND ${CMAKE_COMMAND} -E cmake_echo_color --cyan --bold --no-newline \"\>\> \"

@@ -143,17 +143,17 @@ BSP/fast:
 .PHONY : BSP/fast
 
 #=============================================================================
-# Target rules for targets named run
+# Target rules for targets named archive_logs
 
 # Build rule for target.
-run: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 run
-.PHONY : run
+archive_logs: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 archive_logs
+.PHONY : archive_logs
 
 # fast build rule for target.
-run/fast:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/run.dir/build.make CMakeFiles/run.dir/build
-.PHONY : run/fast
+archive_logs/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/archive_logs.dir/build.make CMakeFiles/archive_logs.dir/build
+.PHONY : archive_logs/fast
 
 #=============================================================================
 # Target rules for targets named clean_logs
@@ -180,6 +180,32 @@ destroy: cmake_check_build_system
 destroy/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/destroy.dir/build.make CMakeFiles/destroy.dir/build
 .PHONY : destroy/fast
+
+#=============================================================================
+# Target rules for targets named run
+
+# Build rule for target.
+run: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 run
+.PHONY : run
+
+# fast build rule for target.
+run/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/run.dir/build.make CMakeFiles/run.dir/build
+.PHONY : run/fast
+
+#=============================================================================
+# Target rules for targets named clean_archives
+
+# Build rule for target.
+clean_archives: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 clean_archives
+.PHONY : clean_archives
+
+# fast build rule for target.
+clean_archives/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/clean_archives.dir/build.make CMakeFiles/clean_archives.dir/build
+.PHONY : clean_archives/fast
 
 #=============================================================================
 # Target rules for targets named clean_out
@@ -229,6 +255,8 @@ help:
 	@echo "... depend"
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
+	@echo "... archive_logs"
+	@echo "... clean_archives"
 	@echo "... clean_logs"
 	@echo "... clean_out"
 	@echo "... destroy"

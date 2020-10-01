@@ -80,18 +80,17 @@ vector<GraphNode> AStar::neighbors(GraphNode node) {
                 continue;
             }
             map_neighbors.push_back(Coords(node.x + cx, node.y + cy));
-            map_neighbors.push_back(Coords(
-                    node.x + (c1InMap && !c1IsWall ? cx1 : cx2),
-                    node.y + (c1InMap && !c1IsWall ? cy1 : cy2)
-                )
-            );
-            continue;
         }
-        map_neighbors.push_back(Coords(
-                node.x + (c1InMap && !c1IsWall ? cx1 : cx2),
-                node.y + (c1InMap && !c1IsWall ? cy1 : cy2)
-            )
-        );
+        if (c1InMap && !c1IsWall) {
+            map_neighbors.push_back(Coords(
+                node.x + cx1,
+                node.y + cy1));
+        }
+        if (c2InMap && !c2IsWall) {
+            map_neighbors.push_back(Coords(
+                node.x + cx2,
+                node.y + cy2));
+        }
     }
     return map_neighbors;
 };

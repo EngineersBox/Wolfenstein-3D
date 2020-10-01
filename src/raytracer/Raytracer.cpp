@@ -567,7 +567,7 @@ void init(Colour background_colour) {
     mapScalingY = (minimapCfg.size / (float)mapScreenH) * gameMap.map_height;
 
     astar = AStar(gameMap);
-    path = astar.find(gameMap.start, gameMap.end); // TEST: Ensure path rendering works
+    path = astar.find(gameMap.start, gameMap.end);
 
     fill(emptyCol.begin(), emptyCol.end(), background_colour);
 

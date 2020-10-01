@@ -142,10 +142,6 @@ void AStar::logPath(vector<Coords>& path) {
     }
 }
 
-// FIXME: Should not traverse between walls:
-// _|_|_
-// _|#|/
-// _|/|#
 vector<Coords>* AStar::find(Coords start_loc, Coords end_loc) {
     if (start_loc == end_loc) {
         throw InvalidPathTargets(start_loc, end_loc);

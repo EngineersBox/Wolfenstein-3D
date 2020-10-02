@@ -193,8 +193,7 @@ void GLDebugContext::glDebugMessageCallback(GL_DEBUG_SOURCE source, GL_DEBUG_TYP
                 string(A_YEL + GL_DEBUG_SOURCE_STRING(source) + RST).c_str(), message.c_str());
     }
 
-    FILE *debugLog;
-    debugLog = fopen(filename.c_str(), "a");
+    FILE *debugLog = fopen(filename.c_str(), "a");
 
     fprintf(debugLog, "[%s] {%s|%s|%s ~ %s}%s type = 0x%s, severity = 0x%s, message = %s\n",
             currentTime.c_str(),

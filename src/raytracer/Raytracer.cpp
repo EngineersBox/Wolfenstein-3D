@@ -121,6 +121,7 @@ inline float dist(float ax, float ay, float bx, float by, float ang) {
 ///
 /// @return void
 ///
+// TODO: Unify checkHorizontal and checkVertical
 static inline void checkHorizontal(int &mx, int &my, int &mp, float &dof,
                      float &rx, float &ry, float &ra, float &x_off, float &y_off,
                      float &hx, float &hy, float &disH) {
@@ -326,20 +327,6 @@ inline Wall validateSideRender(float &rx, float &ry, float &disH, float &hx, flo
     }
 }
 
-inline void updatePrevious(const bool isLR, float ry, float rx, WallFace& prev_wall_face, bool updateTexture, Texture &wall_texture, vector<Colour> &bmpColStrip, vector<Colour> &prevCol, Wall &prev_wall, Wall hitWall, NormalDir &prev_dir, NormalDir nDir) {
-    const int wallIntersectPoint = isLR ? ry : rx;
-    const int wallSize = (isLR ? mapScreenW : mapScreenH) / (isLR ? gameMap.map_width : gameMap.map_height);
-    const float wallOffset = ((wallIntersectPoint - (radToCoord(wallIntersectPoint))) % wallSize) / (float)wallSize;
-    prev_wall_face = hitWall.getFace(nDir);
-    if (updateTexture) {
-        textures.get(prev_wall_face.f_texture, wall_texture);
-    }
-    bmpColStrip = wall_texture.texture.getCol(1.0 - wallOffset);
-    prevCol = bmpColStrip;
-    prev_wall = hitWall;
-    prev_dir = nDir;
-}
-
 inline int convertCoord(float coord) {
     int int_coord = coord;
     int converted = radToCoord(coord);
@@ -353,7 +340,7 @@ inline int convertCoord(float coord) {
 ///
 void renderRays2Dto3D(vector<Ray>& rays) {
     int mx{0}, my{0}, mp{0};
-    float dof, rx{0}, ry{0}, ra, x_off{0}, y_off{0}, distT{0}, prev_wall_offset, disH, hx, hy, disV, vx, vy;
+    float dof, rx{0}, ry{0}, ra, x_off{0}, y_off{0}, distT{0}, disH, hx, hy, disV, vx, vy;
     vector<Colour> prevCol = emptyCol;
     NormalDir normalDir;
     Wall hitWall;
@@ -444,7 +431,7 @@ static void reshape(int width, int height) {
     drawCeiling(width, height);
     drawFloor(width, height);
     if (minimapCfg.enable) {
-        renderMap2D(width, height);
+        renderMap2D(SCREEN_WIDTH, SCREEN_HEIGHT);
         renderPlayerPos();
         if (minimapCfg.render_rays) {
             renderMapRays(rays);

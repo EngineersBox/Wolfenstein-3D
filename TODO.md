@@ -33,3 +33,4 @@
 * ~~Implement minmap and player position scaling~~
 * Fix ray rendering on minimap
 * Fix linux GL window rendering
+* Change TextureLoader to iterate through `resources/textures/*` and load all in there (verify existance and format)

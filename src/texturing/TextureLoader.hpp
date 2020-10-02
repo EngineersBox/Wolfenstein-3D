@@ -15,6 +15,7 @@
 
 #define MAX_TEXTURE_AMOUNT 20
 
+// TODO: Change loader to iterate through all files in resources/textures/*
 class TextureLoader {
     public:
         TextureLoader();

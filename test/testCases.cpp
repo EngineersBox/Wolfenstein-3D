@@ -6,7 +6,7 @@
 // #include "asset_loading/texture_load_test.cpp"
 // #include "hashing/hashtable_test.cpp"
 // #include "io/BMP_read_test.cpp"
-// #include "io/INI_read_test.cpp"
+#include "io/INI_read_test.cpp"
 #include "io/JSON_read_test.cpp"
 // #include "pathfinding/AStar_test.cpp"
 

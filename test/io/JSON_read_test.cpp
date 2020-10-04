@@ -29,38 +29,38 @@ void getResource(const string& filename, RSJresource& res) {
     }
 }
 
-TEST_CASE("1: Can load valid JSON file successfully", "[multi-file:2]") {
+TEST_CASE("2.1: Can load valid JSON file successfully", "[multi-file:2]") {
     REQUIRE_NOTHROW(getResource(VALID_JSON, validJsonRes));
     REQUIRE(validJsonRes.exists() == true);
     REQUIRE(validJsonRes.is_parsed() == false);
 }
 
-TEST_CASE("2: Fails to parse invalid JSON file", "[multi-file:2]"){
+TEST_CASE("2.2: Fails to parse invalid JSON file", "[multi-file:2]") {
     getResource(INVALID_JSON, invalidJsonRes);
     REQUIRE(invalidJsonRes.exists() == true);
     REQUIRE(invalidJsonRes.is_parsed() == false);
 }
 
-TEST_CASE("3: Fails to load non-existant JSON file", "[multi-file:2]") {
+TEST_CASE("2.3: Fails to load non-existant JSON file", "[multi-file:2]") {
     REQUIRE_THROWS_AS(
         getResource(NON_EXISTANT_JSON, invalidJsonRes),
         runtime_error
     );
 }
 
-TEST_CASE("3: Can read base types from JSON resource", "[multi-file:2]") {
+TEST_CASE("2.3: Can read base types from JSON resource", "[multi-file:2]") {
     REQUIRE(validJsonRes["some_string"].as<string>() == "string value");
     REQUIRE(validJsonRes["some_int"].as<int>() == 13531);
     REQUIRE(validJsonRes["some_float"].as<double>() == 5.35235);
     REQUIRE(validJsonRes["some_boolean"].as<bool>() == true);
 }
 
-TEST_CASE("4: Can read object types", "[multi-file:2]") {
+TEST_CASE("2.4: Can read object types", "[multi-file:2]") {
     RSJobject rsjTestObj = validJsonRes["some_object"].as_object();
-    SECTION("4.1 Object key count is correct") {
+    SECTION("2.4.1 Object key count is correct") {
         REQUIRE(rsjTestObj.size() == 4);
     }
-    SECTION("4.2 Object field values are correct") {
+    SECTION("2.4.2 Object field values are correct") {
         REQUIRE(rsjTestObj["some_string"].as<string>() == "another string value");
         REQUIRE(rsjTestObj["some_int"].as<int>() == 634285);
         REQUIRE(rsjTestObj["some_float"].as<double>() == 3.14159);
@@ -68,22 +68,22 @@ TEST_CASE("4: Can read object types", "[multi-file:2]") {
     }
 }
 
-TEST_CASE("5: Can read array types", "[multi-file:2]") {
+TEST_CASE("2.5: Can read array types", "[multi-file:2]") {
     RSJarray rsjTestArray = validJsonRes["some_array"].as_array();
-    SECTION("5.1 Array size is correct") {
+    SECTION("2.5.1 Array size is correct") {
         REQUIRE(rsjTestArray.size() == 5);
     }
-    SECTION("5.2 Array base type fields are correct") {
+    SECTION("2.5.2 Array base type fields are correct") {
         REQUIRE(rsjTestArray[0].as<string>() == "more strings");
         REQUIRE(rsjTestArray[1].as<int>() == 8953134);
         REQUIRE(rsjTestArray[2].as<double>() == 8.595736);
         REQUIRE(rsjTestArray[3].as<bool>() == true);
     }
     RSJobject rsjTestArrObj = rsjTestArray[4].as_object();
-    SECTION("5.3 Object in array has correct key count") {
+    SECTION("2.5.3 Object in array has correct key count") {
         REQUIRE(rsjTestArrObj.size() == 4);
     }
-    SECTION("5.4 Object in array has correct field values") {
+    SECTION("2.5.4 Object in array has correct field values") {
         REQUIRE(rsjTestArrObj["some_string"].as<string>() == "yet more string values");
         REQUIRE(rsjTestArrObj["some_int"].as<int>() == 4895837);
         REQUIRE(rsjTestArrObj["some_float"].as<double>() == 2.69382);

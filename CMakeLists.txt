@@ -116,7 +116,8 @@ add_custom_command(
 	COMMAND echo \"--------------------------------\"
 	COMMAND mkdir -p out
 	COMMAND mkdir -p out/tests
-	COMMAND time ${CMAKE_CXX_COMPILER} -std=c++${CMAKE_CXX_STANDARD} ${CATCH_TESTS_SOURCE} -o ${CATCH_TEST_BUILD_OUT} | echo "Built tests in "
+	COMMAND echo "Built tests in "
+	COMMAND time ${CMAKE_CXX_COMPILER} -std=c++${CMAKE_CXX_STANDARD} ${CATCH_TESTS_SOURCE} -o ${CATCH_TEST_BUILD_OUT}
 	COMMAND ${CMAKE_COMMAND} -E cmake_echo_color --white --no-newline \"\"
     COMMAND echo \"--------------------------------\\n\"
 )

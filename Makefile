@@ -75,17 +75,6 @@ CMAKE_BINARY_DIR = "/Users/jackkilrain/Desktop/Work/Second-Year/COMP3600/Final P
 #=============================================================================
 # Targets provided globally by CMake.
 
-# Special rule for the target rebuild_cache
-rebuild_cache:
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake to regenerate build system..."
-	/Applications/CMake.app/Contents/bin/cmake --regenerate-during-build -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
-.PHONY : rebuild_cache
-
-# Special rule for the target rebuild_cache
-rebuild_cache/fast: rebuild_cache
-
-.PHONY : rebuild_cache/fast
-
 # Special rule for the target edit_cache
 edit_cache:
 	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake cache editor..."
@@ -96,6 +85,17 @@ edit_cache:
 edit_cache/fast: edit_cache
 
 .PHONY : edit_cache/fast
+
+# Special rule for the target rebuild_cache
+rebuild_cache:
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --cyan "Running CMake to regenerate build system..."
+	/Applications/CMake.app/Contents/bin/cmake --regenerate-during-build -S$(CMAKE_SOURCE_DIR) -B$(CMAKE_BINARY_DIR)
+.PHONY : rebuild_cache
+
+# Special rule for the target rebuild_cache
+rebuild_cache/fast: rebuild_cache
+
+.PHONY : rebuild_cache/fast
 
 # The main all target
 all: cmake_check_build_system
@@ -130,6 +130,19 @@ depend:
 .PHONY : depend
 
 #=============================================================================
+# Target rules for targets named run_tests_wo
+
+# Build rule for target.
+run_tests_wo: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 run_tests_wo
+.PHONY : run_tests_wo
+
+# fast build rule for target.
+run_tests_wo/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/run_tests_wo.dir/build.make CMakeFiles/run_tests_wo.dir/build
+.PHONY : run_tests_wo/fast
+
+#=============================================================================
 # Target rules for targets named BSP
 
 # Build rule for target.
@@ -143,6 +156,32 @@ BSP/fast:
 .PHONY : BSP/fast
 
 #=============================================================================
+# Target rules for targets named run_tests
+
+# Build rule for target.
+run_tests: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 run_tests
+.PHONY : run_tests
+
+# fast build rule for target.
+run_tests/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/run_tests.dir/build.make CMakeFiles/run_tests.dir/build
+.PHONY : run_tests/fast
+
+#=============================================================================
+# Target rules for targets named build_tests
+
+# Build rule for target.
+build_tests: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 build_tests
+.PHONY : build_tests
+
+# fast build rule for target.
+build_tests/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/build_tests.dir/build.make CMakeFiles/build_tests.dir/build
+.PHONY : build_tests/fast
+
+#=============================================================================
 # Target rules for targets named archive_logs
 
 # Build rule for target.
@@ -154,6 +193,19 @@ archive_logs: cmake_check_build_system
 archive_logs/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/archive_logs.dir/build.make CMakeFiles/archive_logs.dir/build
 .PHONY : archive_logs/fast
+
+#=============================================================================
+# Target rules for targets named clean_archives
+
+# Build rule for target.
+clean_archives: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 clean_archives
+.PHONY : clean_archives
+
+# fast build rule for target.
+clean_archives/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/clean_archives.dir/build.make CMakeFiles/clean_archives.dir/build
+.PHONY : clean_archives/fast
 
 #=============================================================================
 # Target rules for targets named clean_logs
@@ -193,19 +245,6 @@ run: cmake_check_build_system
 run/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/run.dir/build.make CMakeFiles/run.dir/build
 .PHONY : run/fast
-
-#=============================================================================
-# Target rules for targets named clean_archives
-
-# Build rule for target.
-clean_archives: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 clean_archives
-.PHONY : clean_archives
-
-# fast build rule for target.
-clean_archives/fast:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/clean_archives.dir/build.make CMakeFiles/clean_archives.dir/build
-.PHONY : clean_archives/fast
 
 #=============================================================================
 # Target rules for targets named clean_out
@@ -256,11 +295,14 @@ help:
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... archive_logs"
+	@echo "... build_tests"
 	@echo "... clean_archives"
 	@echo "... clean_logs"
 	@echo "... clean_out"
 	@echo "... destroy"
 	@echo "... run"
+	@echo "... run_tests"
+	@echo "... run_tests_wo"
 	@echo "... BSP"
 	@echo "... src/raytracer/Raytracer.o"
 	@echo "... src/raytracer/Raytracer.i"

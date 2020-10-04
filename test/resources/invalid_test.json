@@ -1,0 +1,13 @@
+{
+    "invalid_field": 43ts,
+    "invalid_object": {
+        {
+        "field": 120
+    },
+    "invalid_array": [
+        {},
+        [,
+        583925,
+        "test"
+    ]
+}

@@ -22,12 +22,17 @@ jobs:
       working-directory: ${{runner.workspace}}/BSPMinimalRendering
       run: cmake .
 
-    - name: Build
+    - name: Build Raycaster
       working-directory: ${{runner.workspace}}/BSPMinimalRendering
       shell: bash
       run: make BSP
 
-#     - name: Test
-#       working-directory: ${{runner.workspace}}/build
-#       shell: bash
-#       run: ctest -C $BUILD_TYPE
+    - name: Build Tests
+      working-directory: ${{runner.workspace}}/BSPMinimalRendering
+      shell: bash
+      run: make build_tests
+
+    - name: Run Tests
+      working-directory: ${{runner.workspace}}/BSPMinimalRendering
+      shell: bash
+      run: make run_tests_wo

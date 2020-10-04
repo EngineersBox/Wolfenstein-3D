@@ -79,9 +79,9 @@ void GameMap::readMapFromFile(string filename) {
         MapFormatError err(mapFormat);
         if (debugContext.l_cfg->map_skip_invalid) {
             debugContext.glDebugMessageCallback(
-                DEBUG_SOURCE_API,
-                DEBUG_TYPE_ERROR,
-                DEBUG_SEVERITY_LOW,
+                GL_DEBUG_SOURCE::DEBUG_SOURCE_API,
+                GL_DEBUG_TYPE::DEBUG_TYPE_ERROR,
+                GL_DEBUG_SEVERITY::DEBUG_SEVERITY_LOW,
                 string(err.what())
             );
         } else {

@@ -97,6 +97,58 @@ add_custom_command(
 	COMMAND echo \"\\n\"
 )
 
+# Set test source file
+set(CATCH_TESTS_SOURCE "test/testCases.cpp")
+
+# Set test output
+set(CATCH_TEST_BUILD_OUT "out/tests/testcases")
+
+add_custom_target(build_tests ALL)
+add_custom_target(run_tests ALL)
+add_custom_target(run_tests_wo ALL)
+add_custom_command(
+	TARGET build_tests
+	COMMAND ${CMAKE_COMMAND} -E cmake_echo_color --cyan --bold --no-newline \"\>\> \"
+	COMMAND ${CMAKE_COMMAND} -E cmake_echo_color --green --no-newline \"Building tests to \"
+	COMMAND ${CMAKE_COMMAND} -E cmake_echo_color --white --no-newline \"[\"
+	COMMAND ${CMAKE_COMMAND} -E cmake_echo_color --red --bold --no-newline \"out/tests/*\"
+	COMMAND ${CMAKE_COMMAND} -E cmake_echo_color --white \"]\"
+	COMMAND echo \"--------------------------------\"
+	COMMAND mkdir -p out
+	COMMAND mkdir -p out/tests
+	COMMAND time ${CMAKE_CXX_COMPILER} -std=c++${CMAKE_CXX_STANDARD} ${CATCH_TESTS_SOURCE} -o ${CATCH_TEST_BUILD_OUT} | echo "Built tests in "
+	COMMAND ${CMAKE_COMMAND} -E cmake_echo_color --white --no-newline \"\"
+    COMMAND echo \"--------------------------------\\n\"
+)
+add_custom_command(
+	TARGET run_tests
+	COMMAND ${CMAKE_COMMAND} -E cmake_echo_color --cyan --bold --no-newline \"\>\> \"
+	COMMAND ${CMAKE_COMMAND} -E cmake_echo_color --green --no-newline \"Running test cases \"
+	COMMAND ${CMAKE_COMMAND} -E cmake_echo_color --white --no-newline \"[\"
+	COMMAND ${CMAKE_COMMAND} -E cmake_echo_color --red --bold --no-newline \"${CATCH_TEST_BUILD_OUT}\"
+	COMMAND ${CMAKE_COMMAND} -E cmake_echo_color --white \"]\"
+	COMMAND echo \"--------------------------------\"
+	COMMAND ./${CATCH_TEST_BUILD_OUT}
+	COMMAND echo \"--------------------------------\"
+	COMMAND ${CMAKE_COMMAND} -E cmake_echo_color --cyan --bold --no-newline \"\>\> \"
+	COMMAND ${CMAKE_COMMAND} -E cmake_echo_color --green \"Stopped running\"
+	COMMAND echo \"\\n\"
+)
+add_custom_command(
+	TARGET run_tests_wo
+	COMMAND ${CMAKE_COMMAND} -E cmake_echo_color --cyan --bold --no-newline \"\>\> \"
+	COMMAND ${CMAKE_COMMAND} -E cmake_echo_color --green --no-newline \"Running test cases \"
+	COMMAND ${CMAKE_COMMAND} -E cmake_echo_color --white --no-newline \"[\"
+	COMMAND ${CMAKE_COMMAND} -E cmake_echo_color --red --bold --no-newline \"${CATCH_TEST_BUILD_OUT}\"
+	COMMAND ${CMAKE_COMMAND} -E cmake_echo_color --white \"]\"
+	COMMAND echo \"--------------------------------\"
+	COMMAND ./${CATCH_TEST_BUILD_OUT} --success
+	COMMAND echo \"--------------------------------\"
+	COMMAND ${CMAKE_COMMAND} -E cmake_echo_color --cyan --bold --no-newline \"\>\> \"
+	COMMAND ${CMAKE_COMMAND} -E cmake_echo_color --green \"Stopped running\"
+	COMMAND echo \"\\n\"
+)
+
 # SET THE EXECUTABLE TO THE SOURCE AND LINK LIBRARIES
 add_executable(BSP ${SOURCES})
 target_link_libraries(${PROJECT_NAME} ${OPENGL_LIBRARIES} ${GLUT_LIBRARY} )

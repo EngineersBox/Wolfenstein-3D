@@ -17,14 +17,13 @@ using namespace std;
 #define PRIME_BASE 11
 
 template <typename V>
-class HMEntry {
-    public:
-        HMEntry(const string& key, V value);
-        ~HMEntry();
+struct HMEntry {
+    HMEntry(const string& key, V value);
+    ~HMEntry();
 
-        const string key;
-        V value;
-        HMEntry *next;
+    const string key;
+    V value;
+    HMEntry *next;
 };
 
 template <typename V>

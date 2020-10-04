@@ -1,0 +1,17 @@
+{
+    "some_string": "string value",
+    "some_int": 13531,
+    "some_float": 5.35235,
+    "some_object": {
+        "field_1": "field 1 value",
+        "field_2": 6436235
+    },
+    "some_array": [
+        "test",
+        4632,
+        {
+            "field_1": "field 1 value",
+            "field_2": 6436235
+        }
+    ]
+}

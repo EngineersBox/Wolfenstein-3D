@@ -23,14 +23,15 @@ class GraphNode {
         int f = 0;
 };
 
-template<> struct hash<GraphNode> {
-  typedef GraphNode argument_type;
-  typedef size_t result_type;
-  size_t operator()(const GraphNode& key) const noexcept {
-      // Using Cantor's enumeration of pairs to assign a
-      // single natural number to every 2D coordinate pair
-      return hash<int>()(((key.x + key.y) * (key.x + key.y + 1) / 2) + key.y);
-  }
+template <>
+struct std::hash<GraphNode> {
+    typedef GraphNode argument_type;
+    typedef size_t result_type;
+    size_t operator()(const GraphNode& key) const noexcept {
+        // Using Cantor's enumeration of pairs to assign a
+        // single natural number to every 2D coordinate pair
+        return std::hash<int>()(((key.x + key.y) * (key.x + key.y + 1) / 2) + key.y);
+    }
 };
 
 GraphNode::GraphNode(){};

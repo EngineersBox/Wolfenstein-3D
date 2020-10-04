@@ -445,7 +445,7 @@ static void reshape(int width, int height) {
 /// @return void
 ///
 static void display(void) {
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT);
     drawCeiling();
     drawFloor();
 
@@ -582,7 +582,7 @@ int main(int argc, char *argv[]) {
     debugContext.logApiInfo("Initialised glutIdleFunc at: " + FUNC_ADDR(idle));
     glutPostRedisplay();
     debugContext.logApiInfo("---- COMPLETED OpenGL/GLUT INIT PHASE ----");
-    debugContext.logApiInfo("Starting glutMainLoop() ...");
+    debugContext.logApiInfo("Started glutMainLoop()");
     glutMainLoop();
 
     return 0;

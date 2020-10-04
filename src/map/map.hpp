@@ -14,35 +14,34 @@
 using namespace std;
 #define MAP_DELIM ";"
 
-class GameMap {
-    private:
-    public:
-        GameMap(vector<Wall> walls, int width, int height);
-        GameMap();
-        ~GameMap();
+struct GameMap {
+    GameMap(vector<Wall> walls, int width, int height);
+    GameMap();
+    ~GameMap();
 
-        void fromArray(Wall walls[], int width, int height);
-        void readMapFromFile(string filename);
-        void readMapFromJSON(string filename);
-        Wall getAt(int x, int y);
-        Wall getAtPure(int loc);
-        
-        int map_width;
-        int map_height;
-        int size;
-        int wall_width;
-        int wall_height;
+    void fromArray(Wall walls[], int width, int height);
+    void readMapFromFile(string filename);
+    void readMapFromJSON(string filename);
+    Wall getAt(int x, int y);
+    Wall getAtPure(int loc);
+    
+    int map_width;
+    int map_height;
+    int size;
+    int wall_width;
+    int wall_height;
 
-        Coords start;
-        Coords end;
+    Coords start;
+    Coords end;
 
-        vector<Wall> _walls;
+    vector<Wall> walls;
+    vector<Coords> tree_order_walls;
 };
 
 GameMap::GameMap(vector<Wall> walls, int width, int height) {
     this->map_width = width;
     this->map_width = height;
-    this->_walls = walls;
+    this->walls = walls;
     this->size = width * height;
 }
 
@@ -54,7 +53,7 @@ void GameMap::fromArray(Wall walls[], int width, int height) {
     this->map_width = width;
     this->map_width = height;
     for (int i = 0; i < width * height; i++) {
-        this->_walls.at(i) = walls[i];
+        this->walls.at(i) = walls[i];
     }
     this->size = width * height;
 }
@@ -89,7 +88,7 @@ void GameMap::readMapFromFile(string filename) {
             throw err;
         }
     }
-    this->_walls = vector<Wall>(this->map_width * this->map_height);
+    this->walls = vector<Wall>(this->map_width * this->map_height);
 
     for (int y = 0; y < this->map_height; y++) {
         string currentEntry;
@@ -98,10 +97,10 @@ void GameMap::readMapFromFile(string filename) {
         for (int x = 0; x < this->map_width; x++) {
             string cToken = s.at(x);
             if (mapFormat == 1) {
-                this->_walls.at((y * this->map_width) + x) = Wall(x, y, toTexColour(cToken));
+                this->walls.at((y * this->map_width) + x) = Wall(x, y, toTexColour(cToken));
                 continue;
             }
-            this->_walls.at((y * this->map_width) + x) = Wall(x, y, cToken == "NONE" ? NONE : WHITE, cToken);
+            this->walls.at((y * this->map_width) + x) = Wall(x, y, cToken == "NONE" ? NONE : WHITE, cToken);
         }
     }
     this->size = this->map_width * this->map_height;
@@ -139,7 +138,7 @@ void GameMap::readMapFromJSON(string filename) {
         RSJobject right = wallObj["Right"].as<RSJobject>();
         RSJobject up = wallObj["Up"].as<RSJobject>();
         RSJobject down = wallObj["Down"].as<RSJobject>();
-        this->_walls.push_back(Wall(
+        this->walls.push_back(Wall(
                 x, y,
                 toTexColour(left["Colour"].as<string>()),
                 WallFace(
@@ -160,15 +159,18 @@ void GameMap::readMapFromJSON(string filename) {
                 )
             )
         );
+        if (x != 0 || x != (this->map_width - 1) || y != 0 || y != (this->map_height - 1)) {
+            this->tree_order_walls.push_back(Coords(x,y));
+        }
     }
     debugContext.logAppInfo("Processed " + to_string(wallarr.size()) + " wall objects");
     debugContext.logAppInfo("---- FINISHED MAP PROCESSING [" + filename + "] ----");
 };
 
 Wall GameMap::getAt(int x, int y) {
-    return this->_walls.at((y * this->map_width) + x);
+    return this->walls.at((y * this->map_width) + x);
 };
 
 Wall GameMap::getAtPure(int loc) {
-    return this->_walls.at(loc);
+    return this->walls.at(loc);
 };

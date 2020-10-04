@@ -4,6 +4,8 @@
 
 Finding the minimal amount of polygons to render based with A* and BSP trees.
 
+Something important to note about this repo and its implementation. The idea behind this is to use the most low level OpenGL functionality and handle of all of the graphics processing manually. This means not using OpenGL/GLUT texturing managing and perspective polygon rendering + scaling. Instead all of this is calculated as part of the raycasting implementation.
+
 ## Building and running
 
 This project is set up in a way that makes it easy to build and run the raycaster. That said, it does differ slightly depending on your system and whether you have cmake installed.

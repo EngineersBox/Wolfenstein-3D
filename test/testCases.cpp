@@ -4,7 +4,8 @@
 
 // #include "asset_loading/map_test.cpp"
 // #include "asset_loading/texture_load_test.cpp"
-// #include "hashing/hashtable_test.cpp"
+// #include "hashing/hash_func_test.cpp"
+#include "hashing/hashtable_test.cpp"
 // #include "io/BMP_read_test.cpp"
 #include "io/INI_read_test.cpp"
 #include "io/JSON_read_test.cpp"

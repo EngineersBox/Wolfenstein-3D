@@ -18,8 +18,8 @@
   * A*
   * BSP
   * BMP read
-  * INI read
-  * JSON read
+  * ~~INI read~~
+  * ~~JSON read~~
   * map load
   * texture load
   * hash table usage

@@ -12,7 +12,11 @@ class HashTableCapacity : virtual public exception {
         size_t max_size;
         string message;
     public:
-     explicit HashTableCapacity(size_t max_capacity, const string& msg = "Hash table maximum size reached: ") :
+     explicit HashTableCapacity(size_t max_capacity):
+        max_size(max_capacity),
+        message("Hash table maximum size reached: ")
+     {};
+     explicit HashTableCapacity(size_t max_capacity, const string& msg) :
         max_size(max_capacity),
         message(msg)
      {};

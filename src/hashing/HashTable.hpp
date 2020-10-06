@@ -13,25 +13,27 @@ using namespace std;
 #define HASH_TABLE_MAX_SIZE 1024
 #define HASH_TABLE_DEFAULT_SIZE 16
 
-#define PRIME_MOD 22801763489 // Closest prime to 1e9 - 9
-#define PRIME_BASE 11
+#define FNV_PRIME_MOD 22801763489 // Closest prime to 1e9 - 9
+#define FNV_PRIME_32 16777619
+#define FNV_OFFSET_32 2166136261
 
 template <typename V>
-struct HMEntry {
-    HMEntry(const string& key, V value);
-    ~HMEntry();
+class HMEntry {
+    public:
+        HMEntry(const string& key, V& value);
+        ~HMEntry();
 
-    const string key;
-    V value;
-    HMEntry *next;
+        string key;
+        V value;
+        HMEntry *next = nullptr;
 };
 
 template <typename V>
-HMEntry<V>::HMEntry(const string& key, V value):
-    key(key),
-    value(value),
-    next(NULL)
-{};
+HMEntry<V>::HMEntry(const string& key, V& value){
+    this->key = key;
+    this->value = value;
+    this->next = nullptr;
+};
 
 template<typename V>
 HMEntry<V>::~HMEntry(){};
@@ -39,72 +41,77 @@ HMEntry<V>::~HMEntry(){};
 template <typename V>
 class HashTable {
    public:
-        HashTable();
+        explicit HashTable();
         explicit HashTable(int size);
         ~HashTable();
 
-        void get(const string& key, V& value);
+        bool get(const string& key, V& value);
         void insert(const string& key, V value);
         void remove(const string& key);
 
         size_t size() const noexcept;
+        unsigned long hashFunc(const string& key) const;
    private:
         size_t element_count;
         int table_size;
-        HMEntry<V> **buckets;
+        vector<HMEntry<V>*> buckets;
 
-        inline void findNextNonNull(HMEntry<V>* prev, HMEntry<V>* entry, const string& key);
-        unsigned long hashFunc(const string& key) const;
-        unsigned long cantorHash(const string& key) const;
+        inline void getSequentialNonNull(HMEntry<V>* prev, HMEntry<V>* entry, const string& key);
 };
 
 template <typename V>
 HashTable<V>::HashTable(int size) {
     if (size > HASH_TABLE_MAX_SIZE) {
-        throw HashTableCapacity(HASH_TABLE_MAX_SIZE, "HashTable size cannot exceed max size limit.");
+        throw HashTableCapacity(size);
     }
     this->table_size = size;
-    this->buckets = new HMEntry<V>*[size]();
+    this->buckets = vector<HMEntry<V>*>(size);
+    this->element_count = 0;
+    fill(this->buckets.begin(), this->buckets.end(), nullptr);
 };
 
 template <typename V>
 HashTable<V>::HashTable() {
     this->table_size = HASH_TABLE_DEFAULT_SIZE;
-    this->buckets = new HMEntry<V>*[HASH_TABLE_DEFAULT_SIZE]();
+    this->buckets = vector<HMEntry<V>*>(HASH_TABLE_DEFAULT_SIZE);
+    this->element_count = 0;
+    fill(this->buckets.begin(), this->buckets.end(), nullptr);
 };
 
 template <typename V>
 HashTable<V>::~HashTable() {
     for (int i = table_size - 1; i != -1; i--) {
-        HMEntry<V>* entry = buckets[i];
-        while (entry != NULL) {
-            HMEntry<V>* prev = entry;
+        HMEntry<V> *entry = buckets[i];
+        while (entry != nullptr) {
+            HMEntry<V> *current = entry;
             entry = entry->next;
-            delete prev;
+            delete current;
         }
-        buckets[i] = NULL;
+        buckets[i] = nullptr;
     }
-    delete[] buckets;
 };
 
 template <typename V>
-void HashTable<V>::get(const string& key, V& value) {
+bool HashTable<V>::get(const string& key, V& value) {
+    if (this->element_count == 0) {
+        throw HashTableCapacity(this->element_count, "No elements in table. Size is: ");
+    }
     unsigned long hashValue = hashFunc(key);
     HMEntry<V>* entry = buckets[hashValue];
-
-    while (entry != NULL) {
+    while (entry != nullptr) {
         if (entry->key == key) {
             value = entry->value;
-            return;
+            return true;
         }
         entry = entry->next;
     }
+    return false;
 };
 
 template <typename V>
-inline void HashTable<V>::findNextNonNull(HMEntry<V>* prev, HMEntry<V>* entry, const string& key) {
-    while (entry != NULL && entry->key != key) {
-        prev = entry;
+inline void HashTable<V>::getSequentialNonNull(HMEntry<V>* prev, HMEntry<V>* entry, const string& key) {
+    while (entry != nullptr && entry->key != key) {
+        prev = entry; 
         entry = entry->next;
     }
 };
@@ -112,38 +119,40 @@ inline void HashTable<V>::findNextNonNull(HMEntry<V>* prev, HMEntry<V>* entry, c
 template <typename V>
 void HashTable<V>::insert(const string& key, V value) {
     unsigned long hashValue = hashFunc(key);
-    HMEntry<V>* prev = NULL;
+    HMEntry<V>* prev = nullptr;
     HMEntry<V>* entry = buckets[hashValue];
 
-    findNextNonNull(prev, entry, key);
+    getSequentialNonNull(prev, entry, key);
 
-    if (entry != NULL) {
+    if (entry != nullptr) {
         entry->value = value;
         this->element_count++;
         return;
     }
 
     entry = new HMEntry<V>(key, value);
-    if (prev == NULL) {
+    if (prev == nullptr) {
         buckets[hashValue] = entry;
     } else {
         prev->next = entry;
     }
     this->element_count++;
+    cout << "KEY: " << entry->key << endl;
 };
 
 template <typename V>
 void HashTable<V>::remove(const string& key) {
     unsigned long hashValue = hashFunc(key);
-    HMEntry<V>* prev = NULL;
+    HMEntry<V>* prev = nullptr;
     HMEntry<V>* entry = buckets[hashValue];
 
-    findNextNonNull(prev, entry, key);
+    getSequentialNonNull(prev, entry, key);
 
-    if (entry == NULL) {
+    if (entry == nullptr) {
         return;
     }
-    if (prev == NULL) {
+
+    if (prev == nullptr) {
         buckets[hashValue] = entry->next;
     } else {
         prev->next = entry->next;
@@ -162,10 +171,11 @@ unsigned long HashTable<V>::hashFunc(const string& key) const {
     if (key.length() > 32) {
         throw InvalidKeySize(key);
     }
-    unsigned long hashVal = PRIME_BASE;
+    unsigned long prime_power = 31;
+    unsigned long hashVal = FNV_OFFSET_32;
     for (int i = key.length(); i != -1; i--) {
-        hashVal = (hashVal * PRIME_MOD) ^ key[i];
-        hashVal %= table_size;
+        hashVal = (hashVal + (key[i] ^ FNV_PRIME_32) * prime_power) % table_size;
+        prime_power = (prime_power * FNV_PRIME_MOD) % table_size;
     }
     return hashVal;
 };

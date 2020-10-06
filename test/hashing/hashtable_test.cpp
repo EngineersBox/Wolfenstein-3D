@@ -46,61 +46,51 @@ TEST_CASE("4.1: Create new hash table of size", "[multi-file:4]") {
 }
 
 TEST_CASE("4.2: Insert objects into table", "[multi-file:4]") {
+    TestHashableObject testobj = TestHashableObject{0, "", nullptr};
     SECTION("4.2.1: Insert object 1") {
-        TestHashableObject* testobj = new TestHashableObject{0,"",nullptr};
-        REQUIRE_THROWS_AS(testTable.get(obj1_key, *testobj), HashTableCapacity);
-        REQUIRE(testobj->test_point_obj == nullptr);
+        testobj = TestHashableObject{0,"",nullptr};
+        REQUIRE_THROWS_AS(testTable.get(obj1_key, testobj), HashTableCapacity);
+        REQUIRE(testobj.test_point_obj == nullptr);
         REQUIRE_NOTHROW(testTable.insert(obj1_key, obj1));
         REQUIRE(testTable.size() == 1);
-        delete testobj;
-        testobj = nullptr;
     }
     SECTION("4.2.2: Insert object 2") {
         cout << "1" << endl;
-        TestHashableObject* testobj = new TestHashableObject{0,"",nullptr};
-        REQUIRE_NOTHROW(testTable.get(obj2_key, *testobj));
-        REQUIRE(testobj->test_point_obj == nullptr);
+        testobj = TestHashableObject{0,"",nullptr};
+        REQUIRE_NOTHROW(testTable.get(obj2_key, testobj));
+        REQUIRE(testobj.test_point_obj == nullptr);
         REQUIRE_NOTHROW(testTable.insert(obj2_key, obj2));
         REQUIRE(testTable.size() == 2);
-        delete testobj;
-        testobj = nullptr;
     }
     SECTION("4.2.3: Insert object 3") {
-        TestHashableObject* testobj = new TestHashableObject{0,"",nullptr};
-        REQUIRE_NOTHROW(testTable.get(obj3_key, *testobj));
-        REQUIRE(testobj->test_point_obj == nullptr);
+        testobj = TestHashableObject{0,"",nullptr};
+        REQUIRE_NOTHROW(testTable.get(obj3_key, testobj));
+        REQUIRE(testobj.test_point_obj == nullptr);
         REQUIRE_NOTHROW(testTable.insert(obj3_key, obj3));
         REQUIRE(testTable.size() == 3);
-        delete testobj;
-        testobj = nullptr;
     }
 }
 
 TEST_CASE("4.3: Get object and ensure they have correct structure", "[multi-file:4]") {
+    TestHashableObject testobj;
     SECTION("4.3.1: Get object 1") {
-        TestHashableObject* testobj = new TestHashableObject{0, "", nullptr};
-        REQUIRE_NOTHROW(testTable.get(obj1_key, *testobj));
-        cout << obj1.string_value << " " << testobj->string_value << endl;
-        REQUIRE(obj1 == *testobj);
+        testobj = TestHashableObject{0, "", nullptr};
+        REQUIRE_NOTHROW(testTable.get(obj1_key, testobj));
+        cout << obj1.string_value << " " << testobj.string_value << endl;
+        REQUIRE(obj1 == testobj);
         REQUIRE(testTable.size() == 3);
-        delete testobj;
-        testobj = nullptr;
     }
     SECTION("4.3.2: Get object 2") {
-        TestHashableObject* testobj = new TestHashableObject{0, "", nullptr};
-        REQUIRE_NOTHROW(testTable.get(obj2_key, *testobj));
-        REQUIRE(obj2 == *testobj);
+        testobj = TestHashableObject{0, "", nullptr};
+        REQUIRE_NOTHROW(testTable.get(obj2_key, testobj));
+        REQUIRE(obj2 == testobj);
         REQUIRE(testTable.size() == 3);
-        delete testobj;
-        testobj = nullptr;
     }
     SECTION("4.3.3: Get object 3") {
-        TestHashableObject* testobj = new TestHashableObject{0, "", nullptr};
-        REQUIRE_NOTHROW(testTable.get(obj3_key, *testobj));
-        REQUIRE(obj3 == *testobj);
+        testobj = TestHashableObject{0, "", nullptr};
+        REQUIRE_NOTHROW(testTable.get(obj3_key, testobj));
+        REQUIRE(obj3 == testobj);
         REQUIRE(testTable.size() == 3);
-        delete testobj;
-        testobj = nullptr;
     }
 }
 

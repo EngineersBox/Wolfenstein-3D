@@ -29,8 +29,8 @@ string random_string(size_t length) {
             "abcdefghijklmnopqrstuvwxyz";
         return charset[getRandInRange(0, sizeof(charset) - 1)];
     };
-    std::string str(length, 0);
-    std::generate_n(str.begin(), length, randchar);
+    string str(length, 0);
+    generate_n(str.begin(), length, randchar);
     return str;
 }
 

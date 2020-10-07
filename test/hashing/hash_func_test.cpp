@@ -11,6 +11,8 @@
 
 using namespace std;
 
+#define MAX_COLLISION_RATE 40
+
 random_device randomDevice;
 mt19937 gen(randomDevice());
 
@@ -56,7 +58,7 @@ TEST_CASE("5.3: Ensure hash collisions are minimal", "[multi-file:5]") {
     vector<string> testStrings(HASH_TABLE_MAX_SIZE);
     generateRandStringArray(testStrings);
     int collisions = 0;
-    SECTION("5.3.2: All generated hashes are valid") {
+    SECTION("5.3.1: All generated hashes are valid") {
         unordered_set<size_t> seen_before;
         seen_before.reserve(HASH_TABLE_MAX_SIZE);
         for (int i = testStrings.size() - 1; i != -1; i--) {
@@ -71,6 +73,7 @@ TEST_CASE("5.3: Ensure hash collisions are minimal", "[multi-file:5]") {
             }
         }
     }
-    INFO("Number of collisions is: " + to_string(collisions));
-    INFO("Collision percentage is: " + to_string((((float)collisions) / HASH_TABLE_MAX_SIZE) * 100));
+    SECTION("5.3.2: Collision rate is within reason") {
+        REQUIRE((((float) collisions / HASH_TABLE_MAX_SIZE) * 100) < MAX_COLLISION_RATE);
+    }
 }

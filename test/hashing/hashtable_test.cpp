@@ -55,7 +55,6 @@ TEST_CASE("4.2: Insert objects into table", "[multi-file:4]") {
         REQUIRE(testTable.size() == 1);
     }
     SECTION("4.2.2: Insert object 2") {
-        cout << "1" << endl;
         testobj = TestHashableObject{0,"",nullptr};
         REQUIRE_NOTHROW(testTable.get(obj2_key, testobj));
         REQUIRE(testobj.test_point_obj == nullptr);

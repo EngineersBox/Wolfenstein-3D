@@ -170,7 +170,7 @@ size_t HashTable<V>::hashFunc(const string& key) const {
     if (key.length() > 32) {
         throw InvalidKeySize(key);
     }
-    size_t prime_power = 31;
+    size_t prime_power = 13;
     size_t hashVal = FNV_OFFSET_32;
     for (int i = key.length(); i != -1; i--) {
         hashVal = (hashVal + (key[i] ^ FNV_PRIME_32) * prime_power) % table_size;

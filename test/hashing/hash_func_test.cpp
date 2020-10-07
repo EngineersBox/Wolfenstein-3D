@@ -54,10 +54,11 @@ TEST_CASE("5.2: Throws on invalid size keys", "[multi-file:5]") {
     REQUIRE_THROWS_AS(hashVal = hashTestTable.hashFunc(random_string(40)), InvalidKeySize);
 }
 
+int collisions = 0;
+
 TEST_CASE("5.3: Ensure hash collisions are minimal", "[multi-file:5]") {
     vector<string> testStrings(HASH_TABLE_MAX_SIZE);
     generateRandStringArray(testStrings);
-    int collisions = 0;
     SECTION("5.3.1: All generated hashes are valid") {
         unordered_set<size_t> seen_before;
         seen_before.reserve(HASH_TABLE_MAX_SIZE);

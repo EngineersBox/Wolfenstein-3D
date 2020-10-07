@@ -14,7 +14,7 @@
 #define SCREEN_WIDTH glutGet(GLUT_WINDOW_WIDTH)
 #define SCREEN_HEIGHT glutGet(GLUT_WINDOW_HEIGHT)
 
-#define FUNC_ADDR(f) string("0x") + to_string((unsigned long int) (&f))
+#define FUNC_ADDR(f) string("0x") + to_string((size_t) (&f))
 
 using namespace std;
 

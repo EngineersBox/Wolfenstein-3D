@@ -36,10 +36,10 @@ TestHashableObject obj3{343, "string value 3", new TestPointToObject{2.69463}};
 string obj3_key = "the final key string";
 
 TEST_CASE("4.1: Create new hash table of size", "[multi-file:4]") {
-    SECTION("4.1.1: Invalid size: " + to_string(HASH_TABLE_MAX_SIZE + 1)) {
+    SECTION("4.1.1: Table of invalid size: " + to_string(HASH_TABLE_MAX_SIZE + 1)) {
         REQUIRE_THROWS_AS(HashTable<TestHashableObject>(HASH_TABLE_MAX_SIZE + 1), HashTableCapacity);
     }
-    SECTION("4.1.2: Valid size: " + to_string(HASH_TABLE_DEFAULT_SIZE)) {
+    SECTION("4.1.2: Table of valid size: " + to_string(HASH_TABLE_DEFAULT_SIZE)) {
         REQUIRE_NOTHROW(testTable = HashTable<TestHashableObject>());
         REQUIRE(testTable.size() == 0);
     }
@@ -76,7 +76,6 @@ TEST_CASE("4.3: Get object and ensure they have correct structure", "[multi-file
     SECTION("4.3.1: Get object 1") {
         testobj = TestHashableObject{0, "", nullptr};
         REQUIRE_NOTHROW(testTable.get(obj1_key, testobj));
-        cout << obj1.string_value << " " << testobj.string_value << endl;
         REQUIRE(obj1 == testobj);
         REQUIRE(testTable.size() == 3);
     }
@@ -105,11 +104,8 @@ TEST_CASE("4.4: Remove objects from table", "[multi-file:4]") {
         REQUIRE(testobj.test_point_obj == nullptr);
         REQUIRE(testTable.size() == 2);
     }
-    cout << "-2" << endl;
     SECTION("4.4.2: Remove object 2") {
-        cout << "-1" << endl;
         testobj = TestHashableObject{0, "", nullptr};
-        cout << "0" << endl;
         REQUIRE_NOTHROW(testTable.remove(obj2_key));
         REQUIRE_NOTHROW(testTable.get(obj2_key, testobj));
         REQUIRE(testobj.int_value == 0);

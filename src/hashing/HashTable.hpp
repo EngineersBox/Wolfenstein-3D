@@ -50,7 +50,7 @@ class HashTable {
         void remove(const string& key);
 
         size_t size() const noexcept;
-        unsigned long hashFunc(const string& key) const;
+        size_t hashFunc(const string& key) const;
    private:
         size_t element_count;
         int table_size;
@@ -96,7 +96,7 @@ bool HashTable<V>::get(const string& key, V& value) {
     if (this->element_count == 0) {
         throw HashTableCapacity(this->element_count, "No elements in table. Size is: ");
     }
-    unsigned long hashValue = hashFunc(key);
+    size_t hashValue = hashFunc(key);
     HMEntry<V>* entry = buckets[hashValue];
     while (entry != nullptr) {
         if (entry->key == key) {
@@ -118,7 +118,7 @@ inline void HashTable<V>::getSequentialNonNull(HMEntry<V>* prev, HMEntry<V>* ent
 
 template <typename V>
 void HashTable<V>::insert(const string& key, V value) {
-    unsigned long hashValue = hashFunc(key);
+    size_t hashValue = hashFunc(key);
     HMEntry<V>* prev = nullptr;
     HMEntry<V>* entry = buckets[hashValue];
 
@@ -137,12 +137,11 @@ void HashTable<V>::insert(const string& key, V value) {
         prev->next = entry;
     }
     this->element_count++;
-    cout << "KEY: " << entry->key << endl;
 };
 
 template <typename V>
 void HashTable<V>::remove(const string& key) {
-    unsigned long hashValue = hashFunc(key);
+    size_t hashValue = hashFunc(key);
     HMEntry<V>* prev = nullptr;
     HMEntry<V>* entry = buckets[hashValue];
 
@@ -167,12 +166,12 @@ size_t HashTable<V>::size() const noexcept {
 };
 
 template <typename V>
-unsigned long HashTable<V>::hashFunc(const string& key) const {
+size_t HashTable<V>::hashFunc(const string& key) const {
     if (key.length() > 32) {
         throw InvalidKeySize(key);
     }
-    unsigned long prime_power = 31;
-    unsigned long hashVal = FNV_OFFSET_32;
+    size_t prime_power = 31;
+    size_t hashVal = FNV_OFFSET_32;
     for (int i = key.length(); i != -1; i--) {
         hashVal = (hashVal + (key[i] ^ FNV_PRIME_32) * prime_power) % table_size;
         prime_power = (prime_power * FNV_PRIME_MOD) % table_size;

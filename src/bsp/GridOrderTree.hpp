@@ -55,8 +55,8 @@ GridOrderTree::GridOrderTree(GameMap map, vector<Wall>* ordered_walls) {
 GridOrderTree::~GridOrderTree(){};
 
 bool GridOrderTree::isBehind(GONode* a, GONode* b) {
-    return (a->wall_coords.second * this->map.map_width + a->wall_coords.first)
-        > (b->wall_coords.second * this->map.map_width + b->wall_coords.first);
+    return (a->wall_coords.y * this->map.map_width + a->wall_coords.x)
+        > (b->wall_coords.y * this->map.map_width + b->wall_coords.x);
 };
 
 // TEST: make sure this inserts nodes and links correctly
@@ -89,7 +89,7 @@ void GridOrderTree::insertNode(GONode* root_node, GONode* node) {
 };
 
 double GridOrderTree::sqDist(Coords a, Coords b) {
-    return pow(abs(b.first - a.first), 2) + pow(abs(b.second - a.second), 2);
+    return pow(abs(b.x - a.x), 2) + pow(abs(b.y - a.y), 2);
 };
 
 void GridOrderTree::findMiddle() {
@@ -128,7 +128,7 @@ void GridOrderTree::printPreorder(GONode* node) {
     if (node == NULL) {
         return;
     }
-    cout << "(" << node->wall_coords.first << "," << node->wall_coords.second << ") ";
+    cout << "(" << node->wall_coords.x << "," << node->wall_coords.y << ") ";
     printPreorder(node->infront);
     printPreorder(node->behind);
 };

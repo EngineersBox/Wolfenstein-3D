@@ -543,8 +543,8 @@ void init(Colour background_colour) {
     toClearColour(background_colour);
     gluOrtho2D(0, screenW, screenH, 0);
     player = Player(
-        gameMap.start.first * gameMap.wall_width + IDIV_2(gameMap.wall_width),
-        gameMap.start.second * gameMap.wall_height + IDIV_2(gameMap.wall_height),
+        gameMap.start.x * gameMap.wall_width + IDIV_2(gameMap.wall_width),
+        gameMap.start.y * gameMap.wall_height + IDIV_2(gameMap.wall_height),
         cos(player.angle) * 5,
         sin(player.angle) * 5,
         0);

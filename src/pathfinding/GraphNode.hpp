@@ -36,7 +36,7 @@ struct std::hash<GraphNode> {
 
 GraphNode::GraphNode(){};
 
-GraphNode::GraphNode(Coords loc): GraphNode(loc.first, loc.second){};
+GraphNode::GraphNode(Coords loc): GraphNode(loc.x, loc.y){};
 
 GraphNode::GraphNode(int x, int y) {
     this->x = x;

@@ -81,13 +81,13 @@ HashTable<V>::HashTable() {
 template <typename V>
 HashTable<V>::~HashTable() {
     for (int i = table_size - 1; i != -1; i--) {
-        HMEntry<V> *entry = buckets[i];
+        HMEntry<V> *entry = this->buckets[i];
         while (entry != nullptr) {
             HMEntry<V> *current = entry;
             entry = entry->next;
             delete current;
         }
-        buckets[i] = nullptr;
+        this->buckets[i] = nullptr;
     }
 };
 
@@ -97,7 +97,7 @@ bool HashTable<V>::get(const string& key, V& value) {
         throw HashTableCapacity(this->element_count, "No elements in table. Size is: ");
     }
     size_t hashValue = hashFunc(key);
-    HMEntry<V>* entry = buckets[hashValue];
+    HMEntry<V>* entry = this->buckets[hashValue];
     while (entry != nullptr) {
         if (entry->key == key) {
             value = entry->value;
@@ -120,7 +120,7 @@ template <typename V>
 void HashTable<V>::insert(const string& key, V value) {
     size_t hashValue = hashFunc(key);
     HMEntry<V>* prev = nullptr;
-    HMEntry<V>* entry = buckets[hashValue];
+    HMEntry<V>* entry = this->buckets[hashValue];
 
     getSequentialNonNull(prev, entry, key);
 
@@ -132,7 +132,7 @@ void HashTable<V>::insert(const string& key, V value) {
 
     entry = new HMEntry<V>(key, value);
     if (prev == nullptr) {
-        buckets[hashValue] = entry;
+        this->buckets[hashValue] = entry;
     } else {
         prev->next = entry;
     }
@@ -143,7 +143,7 @@ template <typename V>
 void HashTable<V>::remove(const string& key) {
     size_t hashValue = hashFunc(key);
     HMEntry<V>* prev = nullptr;
-    HMEntry<V>* entry = buckets[hashValue];
+    HMEntry<V>* entry = this->buckets[hashValue];
 
     getSequentialNonNull(prev, entry, key);
 
@@ -152,7 +152,7 @@ void HashTable<V>::remove(const string& key) {
     }
 
     if (prev == nullptr) {
-        buckets[hashValue] = entry->next;
+        this->buckets[hashValue] = entry->next;
     } else {
         prev->next = entry->next;
     }
@@ -173,8 +173,8 @@ size_t HashTable<V>::hashFunc(const string& key) const {
     size_t prime_power = 13;
     size_t hashVal = FNV_OFFSET_32;
     for (int i = key.length(); i != -1; i--) {
-        hashVal = (hashVal + (key[i] ^ FNV_PRIME_32) * prime_power) % table_size;
-        prime_power = (prime_power * FNV_PRIME_MOD) % table_size;
+        hashVal = (hashVal + (key[i] ^ FNV_PRIME_32) * prime_power) % this->table_size;
+        prime_power = (prime_power * FNV_PRIME_MOD) % this->table_size;
     }
     return hashVal;
 };

@@ -6,6 +6,8 @@
 #include "../configuration/mappers/RenderCfg.hpp"
 #include "../logging/GLDebug.hpp"
 
+#include <iostream>
+
 #define IMUL_2(x) (x << 1)
 #define IDIV_2(x) (x >> 1)
 #define IMUL_4(x) (x << 2)
@@ -32,7 +34,41 @@
 // ../../../~
 #define DEFAULT_CONFIG CFG_DIR + "config.ini"
 
-typedef pair<int, int> Coords;
+template<typename T>
+struct Coordinates {
+    Coordinates(){};
+    Coordinates(T x, T y) {
+        this->x = x;
+        this->y = y;
+    };
+    Coordinates(const Coordinates& other) {
+        this->x = other.x;
+        this->y = other.y;
+    };
+
+    bool isLeft(Coordinates other) {
+        return other.x < this->x;
+    }
+    bool isAbove(Coordinates other) {
+        return other.y < this->y;
+    }
+
+    bool operator==(const Coordinates& other) const {
+        return this->x == other.x && this->y == other.y;
+    }
+    bool operator!=(const Coordinates& other) const {
+        return this->x != other.x || this->y != other.y;
+    }
+
+    friend ostream& operator<<(ostream& os, const Coordinates& c) {
+        return os << "(" << c.x << "," << c.y << ")";
+    }
+
+    T x;
+    T y;
+};
+
+typedef Coordinates<int> Coords;
 
 static PlayerCfg playerCfg = PlayerCfg();
 static MinimapCfg minimapCfg = MinimapCfg();

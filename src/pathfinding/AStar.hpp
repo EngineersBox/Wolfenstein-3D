@@ -57,13 +57,13 @@ vector<GraphNode> AStar::neighbors(GraphNode node) {
         {Coords(-1,1),Coords(0,1),Coords(-1,0)}
     };
     for (int i = 0; i < 4; i++) {
-        int cx{loc_to_check[i][0].first}, cy{loc_to_check[i][0].second};
+        int cx{loc_to_check[i][0].x}, cy{loc_to_check[i][0].y};
         bool cInMap = inMap(Coords(node.x + cx, node.y + cy));
         bool cIsWall = !cInMap ? false : map.getAt(node.x + cx, node.y + cy).wf_left.f_colour != NONE;
-        int cx1{loc_to_check[i][1].first}, cy1{loc_to_check[i][1].second};
+        int cx1{loc_to_check[i][1].x}, cy1{loc_to_check[i][1].y};
         bool c1InMap = inMap(Coords(node.x + cx1, node.y + cy1));
         bool c1IsWall = !c1InMap ? false : map.getAt(node.x + cx1, node.y + cy1).wf_left.f_colour != NONE;
-        int cx2{loc_to_check[i][1].first}, cy2{loc_to_check[i][1].second};
+        int cx2{loc_to_check[i][1].x}, cy2{loc_to_check[i][1].y};
         bool c2InMap = inMap(Coords(node.x + cx2, node.y + cy2));
         bool c2IsWall = !c2InMap ? false : map.getAt(node.x + cx2, node.y + cy2).wf_left.f_colour != NONE;
         if (cInMap) {
@@ -127,17 +127,17 @@ inline int AStar::heuristic(GraphNode next, GraphNode goal) {
 void AStar::logPath(vector<Coords>& path) {
     debugContext.logAppVerb(
         "Found path for ("
-        + to_string(map.start.first)
+        + to_string(map.start.x)
         + ","
-        + to_string(map.start.second)
+        + to_string(map.start.y)
         + ") -> ("
-        + to_string(map.end.first)
+        + to_string(map.end.x)
         + ","
-        + to_string(map.end.second)
+        + to_string(map.end.y)
         + ")"
     );
     for (Coords coord : path) {
-        debugContext.logAppVerb("(" + to_string(coord.first) + "," + to_string(coord.second) + ")");
+        debugContext.logAppVerb("(" + to_string(coord.x) + "," + to_string(coord.y) + ")");
     }
 }
 
@@ -194,10 +194,10 @@ void AStar::renderPath(vector<Coords>* path, Colour path_colour, int sw, int sh,
     int inBlockOffset = IDIV_2(minimapCfg.size);
     for (int i = 0; i < path->size() - 1; i++) {
         renderRay(
-            inBlockOffset + xOffset + ((path->at(i).first * map.wall_width) * scalingX),
-            inBlockOffset + yOffset + ((path->at(i).second * map.wall_height) * scalingY),
-            inBlockOffset + xOffset + ((path->at(i + 1).first * map.wall_width) * scalingX),
-            inBlockOffset + yOffset + ((path->at(i + 1).second * map.wall_height) * scalingY),
+            inBlockOffset + xOffset + ((path->at(i).x * map.wall_width) * scalingX),
+            inBlockOffset + yOffset + ((path->at(i).y * map.wall_height) * scalingY),
+            inBlockOffset + xOffset + ((path->at(i + 1).x * map.wall_width) * scalingX),
+            inBlockOffset + yOffset + ((path->at(i + 1).y * map.wall_height) * scalingY),
             5,
             path_colour);
     }

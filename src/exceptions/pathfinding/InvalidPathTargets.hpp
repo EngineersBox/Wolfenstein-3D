@@ -21,7 +21,7 @@ class InvalidPathTargets : virtual public exception {
         virtual ~InvalidPathTargets() throw(){};
 
         virtual const char* what() const throw() {
-            string ret_val = "Start and end targets are identical: (" + to_string(start_pos.first) + "," + to_string(start_pos.second) + ") == (" + to_string(start_pos.first) + "," + to_string(start_pos.second) + ")";
+            string ret_val = "Start and end targets are identical: (" + to_string(start_pos.x) + "," + to_string(start_pos.y) + ") == (" + to_string(start_pos.x) + "," + to_string(start_pos.y) + ")";
             debugContext.glDebugMessageCallback(
                 GL_DEBUG_SOURCE::DEBUG_SOURCE_APPLICATION,
                 GL_DEBUG_TYPE::DEBUG_TYPE_ERROR,

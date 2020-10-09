@@ -9,11 +9,6 @@
 * [x] Create texture hashing by string using polynomial rolling
 * [ ] *Change rendering to BMP columns* (WIP)
 * [x] Add config files and reader
-* Implement logging:
-  * [x] OpenGL + GLUT ([OpenGL debug wiki](https://www.khronos.org/opengl/wiki/Debug_Output))
-  * [ ] Player position
-  * [x] Texture processing
-  * [x] Map processing
 * [x] Change renderer to query wall texture
 * [x] Fix HashTable (change to hashmap K,V pairs) and fix Texture
 * [x] Change map file to JSON and map reader to parse JSON
@@ -25,6 +20,14 @@
 * [ ] Fix ray rendering on minimap
 * [ ] Fix Linux + Windows GL window rendering (incorrect scaling)
 * [ ] Change TextureLoader to iterate through `resources/textures/*` and load all in there (verify existance and format)
+
+## Logging
+
+* [x] OpenGL + GLUT ([OpenGL debug wiki](https://www.khronos.org/opengl/wiki/Debug_Output))
+* [ ] Player position
+* [x] Texture processing
+* [x] Map processing
+* [ ] Add multiple verbosity levels
 
 ## Map maker
 

@@ -12,20 +12,20 @@ using namespace std;
 
 #define HASH_TABLE_MAX_SIZE 1024
 #define HASH_TABLE_DEFAULT_SIZE 16
+#define HASH_TABLE_MAX_KEY_SIZE 32
 
 #define FNV_PRIME_MOD 22801763489 // Closest prime to 1e9 - 9
 #define FNV_PRIME_32 16777619
 #define FNV_OFFSET_32 2166136261
 
 template <typename V>
-class HMEntry {
-    public:
-        HMEntry(const string& key, V& value);
-        ~HMEntry();
+struct HMEntry {
+    HMEntry(const string& key, V& value);
+    ~HMEntry();
 
-        string key;
-        V value;
-        HMEntry *next = nullptr;
+    string key;
+    V value;
+    HMEntry *next = nullptr;
 };
 
 template <typename V>
@@ -49,6 +49,7 @@ class HashTable {
         void insert(const string& key, V value);
         void remove(const string& key);
 
+        size_t bucketsCount() const noexcept;
         size_t size() const noexcept;
         size_t hashFunc(const string& key) const;
    private:
@@ -56,7 +57,10 @@ class HashTable {
         int table_size;
         vector<HMEntry<V>*> buckets;
 
-        inline void getSequentialNonNull(HMEntry<V>* prev, HMEntry<V>* entry, const string& key);
+        inline void processBucketLinking(size_t hashValue, HMEntry<V>* prev, HMEntry<V>* bucket);
+
+        inline void validateKeySize(const string& key) const;
+        inline void getSequentialNonNull(HMEntry<V>* prev, HMEntry<V>* bucket, const string& key);
 };
 
 template <typename V>
@@ -65,26 +69,24 @@ HashTable<V>::HashTable(int size) {
         throw HashTableCapacity(size);
     }
     this->table_size = size;
-    this->buckets = vector<HMEntry<V>*>(size);
+    this->buckets = vector<HMEntry<V>*>(size, nullptr);
     this->element_count = 0;
-    fill(this->buckets.begin(), this->buckets.end(), nullptr);
 };
 
 template <typename V>
 HashTable<V>::HashTable() {
     this->table_size = HASH_TABLE_DEFAULT_SIZE;
-    this->buckets = vector<HMEntry<V>*>(HASH_TABLE_DEFAULT_SIZE);
+    this->buckets = vector<HMEntry<V>*>(HASH_TABLE_DEFAULT_SIZE, nullptr);
     this->element_count = 0;
-    fill(this->buckets.begin(), this->buckets.end(), nullptr);
 };
 
 template <typename V>
 HashTable<V>::~HashTable() {
     for (int i = table_size - 1; i != -1; i--) {
-        HMEntry<V> *entry = this->buckets[i];
-        while (entry != nullptr) {
-            HMEntry<V> *current = entry;
-            entry = entry->next;
+        HMEntry<V> *bucket = this->buckets[i];
+        while (bucket != nullptr) {
+            HMEntry<V>* current = bucket;
+            bucket = bucket->next;
             delete current;
         }
         this->buckets[i] = nullptr;
@@ -96,67 +98,75 @@ bool HashTable<V>::get(const string& key, V& value) {
     if (this->element_count == 0) {
         throw HashTableCapacity(this->element_count, "No elements in table. Size is: ");
     }
+
+    validateKeySize(key);
+
     size_t hashValue = hashFunc(key);
-    HMEntry<V>* entry = this->buckets[hashValue];
-    while (entry != nullptr) {
-        if (entry->key == key) {
-            value = entry->value;
+    HMEntry<V>* bucket = this->buckets[hashValue];
+    while (bucket != nullptr) {
+        if (bucket->key == key) {
+            value = bucket->value;
             return true;
         }
-        entry = entry->next;
+        bucket = bucket->next;
     }
     return false;
 };
 
 template <typename V>
-inline void HashTable<V>::getSequentialNonNull(HMEntry<V>* prev, HMEntry<V>* entry, const string& key) {
-    while (entry != nullptr && entry->key != key) {
-        prev = entry; 
-        entry = entry->next;
+inline void HashTable<V>::getSequentialNonNull(HMEntry<V>* prev, HMEntry<V>* bucket, const string& key) {
+    while (bucket != nullptr && bucket->key != key) {
+        prev = bucket;
+        bucket = bucket->next;
     }
 };
 
 template <typename V>
+inline void HashTable<V>::processBucketLinking(size_t hashValue, HMEntry<V>* prev, HMEntry<V>* bucket) {
+    if (prev == nullptr) {
+        this->buckets[hashValue] = bucket;
+    } else {
+        prev->next = bucket;
+    }
+}
+
+template <typename V>
 void HashTable<V>::insert(const string& key, V value) {
+    validateKeySize(key);
+
     size_t hashValue = hashFunc(key);
     HMEntry<V>* prev = nullptr;
-    HMEntry<V>* entry = this->buckets[hashValue];
+    HMEntry<V>* bucket = this->buckets[hashValue];
 
-    getSequentialNonNull(prev, entry, key);
+    getSequentialNonNull(prev, bucket, key);
 
-    if (entry != nullptr) {
-        entry->value = value;
+    if (bucket != nullptr) {
+        bucket->value = value;
         this->element_count++;
         return;
     }
 
-    entry = new HMEntry<V>(key, value);
-    if (prev == nullptr) {
-        this->buckets[hashValue] = entry;
-    } else {
-        prev->next = entry;
-    }
+    bucket = new HMEntry<V>(key, value);
+    processBucketLinking(hashValue, prev, bucket);
     this->element_count++;
 };
 
 template <typename V>
 void HashTable<V>::remove(const string& key) {
+    validateKeySize(key);
+    
     size_t hashValue = hashFunc(key);
     HMEntry<V>* prev = nullptr;
-    HMEntry<V>* entry = this->buckets[hashValue];
+    HMEntry<V>* bucket = this->buckets[hashValue];
 
-    getSequentialNonNull(prev, entry, key);
+    getSequentialNonNull(prev, bucket, key);
 
-    if (entry == nullptr) {
+    if (bucket == nullptr) {
         return;
     }
 
-    if (prev == nullptr) {
-        this->buckets[hashValue] = entry->next;
-    } else {
-        prev->next = entry->next;
-    }
-    delete entry;
+    processBucketLinking(hashValue, prev, bucket->next);
+    delete bucket;
     this->element_count--;
 };
 
@@ -166,10 +176,21 @@ size_t HashTable<V>::size() const noexcept {
 };
 
 template <typename V>
-size_t HashTable<V>::hashFunc(const string& key) const {
-    if (key.length() > 32) {
+size_t HashTable<V>::bucketsCount() const noexcept {
+    return this->table_size;
+};
+
+template <typename V>
+inline void HashTable<V>::validateKeySize(const string& key) const {
+    if (key.length() > HASH_TABLE_MAX_KEY_SIZE) {
         throw InvalidKeySize(key);
     }
+}
+
+template <typename V>
+size_t HashTable<V>::hashFunc(const string& key) const {
+    validateKeySize(key);
+
     size_t prime_power = 13;
     size_t hashVal = FNV_OFFSET_32;
     for (int i = key.length(); i != -1; i--) {

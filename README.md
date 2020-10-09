@@ -30,6 +30,9 @@ Below is a full list of commands and their usages:
 |`make clean_logs`| Removes all log files from `logs/`|
 |`make archive_logs`| Compress all `*.log` files into a date time named zip archive in the format: `archive-DD-MM-YYYY_HH-MM-SS.zip`|
 |`make clean_archives`| Remove all archives from `logs/`|
+|`make build_tests`| Build the test cases to `out/tests`|
+|`make run_tests`| Run the test cases with assertion fails only|
+|`make run_tests`| Run the test cases with output for all assertions|
 
 ### Using `g++/clang++`
 

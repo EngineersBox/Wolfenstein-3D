@@ -120,7 +120,11 @@ void GridOrderTree::buildTree() {
 vector<Coords>* GridOrderTree::queryWalls(Coords origin, vector<Ray>* rays) {
     // TODO: implement tree traversal and node query against rays
     vector<Coords> intersections;
-    
+    GONode *curr = this->root;
+    int raysQueried = 0;
+    while (raysQueried < rays->size()) {
+        continue;
+    }
     return new vector<Coords>(intersections);
 };
 

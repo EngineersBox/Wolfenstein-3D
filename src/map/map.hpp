@@ -17,7 +17,6 @@ using namespace std;
 struct GameMap {
     GameMap(vector<Wall> walls, int width, int height);
     GameMap();
-    ~GameMap();
 
     void fromArray(Wall walls[], int width, int height);
     void readMapFromFile(string filename);
@@ -45,9 +44,12 @@ GameMap::GameMap(vector<Wall> walls, int width, int height) {
     this->size = width * height;
 }
 
-GameMap::GameMap(): GameMap(vector<Wall>(0), 0, 0){};
-
-GameMap::~GameMap(){}
+GameMap::GameMap(){
+    this->walls = vector<Wall>(0);
+    this->map_width = 0;
+    this->map_height = 0;
+    this->size = 0;
+};
 
 void GameMap::fromArray(Wall walls[], int width, int height) {
     this->map_width = width;

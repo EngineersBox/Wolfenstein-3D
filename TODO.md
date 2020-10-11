@@ -24,7 +24,7 @@
 ## Logging
 
 * [x] OpenGL + GLUT ([OpenGL debug wiki](https://www.khronos.org/opengl/wiki/Debug_Output))
-* [ ] Player position
+* [x] Player position
 * [x] Texture processing
 * [x] Map processing
 * [ ] Add multiple verbosity levels

@@ -37,6 +37,7 @@
 #include "Ray.hpp"
 #include "Globals.hpp"
 #include "../pathfinding/AStar.hpp"
+#include "../partitioning/QSPTree.hpp"
 
 #define _USE_MATH_DEFINES
 

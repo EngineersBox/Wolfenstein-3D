@@ -25,7 +25,6 @@ Colour bg_colour = {0.3, 0.3, 0.3, 0.0};
 
 TextureLoader texLoader;
 HashTable<Texture> textures;
-vector<Colour> emptyCol(screenH);
 AStar astar;
 vector<Coords>* path = new vector<Coords>();
 // Player
@@ -341,7 +340,7 @@ inline int convertCoord(float coord) {
 void renderRays2Dto3D(vector<Ray>& rays) {
     int mx{0}, my{0}, mp{0};
     float dof, rx{0}, ry{0}, ra, x_off{0}, y_off{0}, distT{0}, disH, hx, hy, disV, vx, vy;
-    vector<Colour> prevCol = emptyCol;
+    vector<Colour> prevCol(screenH, bg_colour);
     NormalDir normalDir;
     Wall hitWall;
     WallFace prev_wall_face;
@@ -509,11 +508,9 @@ static void keyPress(unsigned char key, int x, int y) {
 ///
 /// Initialise the display rendering and player position
 ///
-/// @param Colour background_colour: Colour to set background of window to
-///
 /// @return void
 ///
-void init(Colour background_colour) {
+void init() {
     cfgInit.initAll(playerCfg, minimapCfg, loggingCfg, renderCfg);
     if (minimapCfg.enable) {
         mapScreenW = IDIV_2(mapScreenW);
@@ -538,9 +535,7 @@ void init(Colour background_colour) {
     astar = AStar(gameMap);
     path = astar.find(gameMap.start, gameMap.end);
 
-    fill(emptyCol.begin(), emptyCol.end(), background_colour);
-
-    toClearColour(background_colour);
+    toClearColour(bg_colour);
     gluOrtho2D(0, screenW, screenH, 0);
     player = Player(
         gameMap.start.x * gameMap.wall_width + IDIV_2(gameMap.wall_width),
@@ -569,7 +564,7 @@ int main(int argc, char *argv[]) {
     glutInitWindowSize(screenW, screenH);
     glutCreateWindow("Ray Tracer");
 
-    init(bg_colour);
+    init();
     debugContext.logAppInfo("---- COMPLETED APPLICATION INIT PHASE ----");
 
     glutDisplayFunc(display);

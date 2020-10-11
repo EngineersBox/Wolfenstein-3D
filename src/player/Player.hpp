@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../logging/GLDebug.hpp"
+#include "../raytracer/Globals.hpp"
 
 using namespace std;
 
@@ -10,7 +11,7 @@ class Player {
         Player(float x, float y, float dx, float dy, float angle);
         ~Player();
         void printLocation();
-        void logLocation(GLDebugContext *debugContext);
+        void logLocation();
 
         float x;
         float y;
@@ -35,6 +36,6 @@ void Player::printLocation() {
     cout << "Player Position: (" << to_string(this->x) << "," << to_string(this->y) << ")" << endl;
 };
 
-void Player::logLocation(GLDebugContext *debugContext) {
-    debugContext->logAppInfo(string("Player Position: (" + to_string(this->x) + "," + to_string(this->y) +")"));
+void Player::logLocation() {
+    debugContext.logAppInfo(string("Player Position: (" + to_string(this->x) + "," + to_string(this->y) +")"));
 };

@@ -2,6 +2,7 @@
 
 #include <algorithm>
 
+#include "../map/Coordinates.hpp"
 #include "../raytracer/Globals.hpp"
 
 using namespace std;

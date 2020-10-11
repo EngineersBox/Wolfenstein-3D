@@ -29,6 +29,7 @@
 #include "../environment/Walls.hpp"
 #include "../hashing/HashTable.hpp"
 #include "../map/map.hpp"
+#include "../map/Coordinates.hpp"
 #include "../player/Player.hpp"
 #include "../texturing/TextureColours.hpp"
 #include "../texturing/TextureLoader.hpp"

@@ -1,17 +1,18 @@
 #pragma once
 
 #include <algorithm>
+#include <iostream>
 #include <queue>
 #include <unordered_map>
 #include <vector>
-#include <iostream>
 
+#include "../drawing/DrawingUtils.hpp"
+#include "../exceptions/pathfinding/InvalidPathTargets.hpp"
+#include "../map/Coordinates.hpp"
 #include "../map/map.hpp"
 #include "../raytracer/Globals.hpp"
-#include "GraphNode.hpp"
-#include "../exceptions/pathfinding/InvalidPathTargets.hpp"
-#include "../drawing/DrawingUtils.hpp"
 #include "../texturing/TextureColours.hpp"
+#include "GraphNode.hpp"
 
 using namespace std;
 

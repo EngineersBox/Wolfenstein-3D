@@ -7,8 +7,9 @@
 
 #include "../environment/Walls.hpp"
 #include "../exceptions/map/MapFormatError.hpp"
-#include "../logging/GLDebug.hpp"
 #include "../io/JSONParser.hpp"
+#include "../logging/GLDebug.hpp"
+#include "../map/Coordinates.hpp"
 #include "../raytracer/Globals.hpp"
 
 using namespace std;

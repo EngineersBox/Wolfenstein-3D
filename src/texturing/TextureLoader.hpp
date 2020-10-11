@@ -47,13 +47,13 @@ bool TextureLoader::hasExt(const std::string& filename, const std::string& exten
 
 std::string TextureLoader::stripExt(const std::string& filename, const std::string& extension) {
     if (!hasExt(filename, extension)) {
-        throw FileFormatError("[" + filename + "] Has different extension: ", extension);
+        throw FileFormatError("[" + filename + "] Has different extension to: ", extension);
     }
     return filename.substr(0, filename.find("."));
 }
 
 std::vector<std::string>* TextureLoader::getTextureFileNames() {
-    DIR* dir = opendir(std::string("resources/textures").c_str());
+    DIR* dir = opendir(std::string(TEX_DIR).c_str());
     struct dirent* dp;
     std::vector<std::string> files;
     int texCount = 0;
@@ -80,13 +80,13 @@ void TextureLoader::loadTextures(HashTable<Texture> &textures) {
             continue;
         }
         string stripped_fname = fname.substr(0, fname.find_first_of("."));
-        textures.insert(stripped_fname, Texture("resources/textures/" + fname, stripped_fname));
+        textures.insert(stripped_fname, Texture(TEX_DIR + fname, stripped_fname));
     }
 }
 
 bool TextureLoader::verifyFileExistance(const std::string& filename) {
     struct stat buffer;
-    if (stat(std::string("resources/textures/" + filename).c_str(), &buffer) != 0) {
+    if (stat(std::string(TEX_DIR + filename).c_str(), &buffer) != 0) {
         debugContext.glDebugMessageCallback(
             GL_DEBUG_SOURCE::DEBUG_SOURCE_SYSTEM,
             GL_DEBUG_TYPE::DEBUG_TYPE_ERROR,

@@ -14,8 +14,6 @@
 #define SCREEN_WIDTH glutGet(GLUT_WINDOW_WIDTH)
 #define SCREEN_HEIGHT glutGet(GLUT_WINDOW_HEIGHT)
 
-#define ADDR_OF(f) string("0x") + to_string((size_t) (&f))
-
 using namespace std;
 
 // Screen

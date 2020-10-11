@@ -1,7 +1,7 @@
 #pragma once
 
-#include <string>
 #include <cmath>
+#include <string>
 
 #include "../texturing/TextureColours.hpp"
 #include "../texturing/texture.hpp"

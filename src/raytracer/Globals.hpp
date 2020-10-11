@@ -5,8 +5,12 @@
 #include "../configuration/mappers/PlayerCfg.hpp"
 #include "../configuration/mappers/RenderCfg.hpp"
 #include "../logging/GLDebug.hpp"
+#include "../map/Coordinates.hpp"
 
 #include <iostream>
+#include <sstream>
+
+using namespace std;
 
 #define IMUL_2(x) (x << 1)
 #define IDIV_2(x) (x >> 1)
@@ -34,47 +38,15 @@
 // ../../../~
 #define DEFAULT_CONFIG CFG_DIR + "config.ini"
 
-template<typename T>
-struct Coordinates {
-    Coordinates(){};
-    Coordinates(T x, T y) {
-        this->x = x;
-        this->y = y;
-    };
-    Coordinates(const Coordinates& other) {
-        this->x = other.x;
-        this->y = other.y;
-    };
-
-    bool isLeft(Coordinates other) {
-        return other.x < this->x;
-    }
-    bool isAbove(Coordinates other) {
-        return other.y < this->y;
-    }
-
-    bool operator==(const Coordinates& other) const {
-        return this->x == other.x && this->y == other.y;
-    }
-    bool operator!=(const Coordinates& other) const {
-        return this->x != other.x || this->y != other.y;
-    }
-
-    friend ostream& operator<<(ostream& os, const Coordinates& c) {
-        return os << c.asString();
-    }
-
-    inline string asString() const {
-        return "(" + to_string(this->x) + "," + to_string(this->y) + ")";
-    }
-
-    T x;
-    T y;
+string toHex(int value) noexcept {
+    stringstream sstream;
+    sstream << hex << value;
+    return sstream.str();
 };
 
-constexpr double THREE_HALF_PI = 3 * M_PI / 2;
+#define ADDR_OF(f) string("0x") + toHex((size_t)(&f))
 
-typedef Coordinates<int> Coords;
+constexpr double THREE_HALF_PI = 3 * M_PI / 2;
 
 static PlayerCfg playerCfg = PlayerCfg();
 static MinimapCfg minimapCfg = MinimapCfg();

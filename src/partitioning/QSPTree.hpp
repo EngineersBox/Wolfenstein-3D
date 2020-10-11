@@ -1,14 +1,15 @@
 #pragma once
 
 #include <cmath>
-#include <vector>
 #include <stack>
+#include <vector>
 
 #include "../environment/Walls.hpp"
+#include "../map/Coordinates.hpp"
+#include "../map/map.hpp"
 #include "../raytracer/Globals.hpp"
 #include "../raytracer/Ray.hpp"
 #include "QuadNode.hpp"
-#include "../map/map.hpp"
 
 using namespace std;
 
@@ -151,6 +152,7 @@ void QSPTree::buildTree() {
         this->root->R = insertNode(this->root->R, new QuadNode(Coords(wall.posX, wall.posY)));
     }
     debugContext.logAppInfo("Inserted " + to_string(this->right_boundary->size()) + " 'RIGHT' boundary leaves");
+    debugContext.logAppInfo("---- FINISHED BUILDING QSP TREE [" + string(ADDR_OF(*this)) + "] ----");
 };
 
 void QSPTree::queryWalls(Coords origin, vector<Ray>* rays, vector<Coords>& ret_walls) {

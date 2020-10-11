@@ -1,11 +1,11 @@
 #pragma once
 
 #include <cmath>
-#include <vector>
 #include <limits>
 #include <stack>
+#include <vector>
 
-#include "../environment/Walls.hpp"
+#include "../environment/AABB.hpp"
 #include "../map/map.hpp"
 #include "../raytracer/Globals.hpp"
 #include "../raytracer/Ray.hpp"

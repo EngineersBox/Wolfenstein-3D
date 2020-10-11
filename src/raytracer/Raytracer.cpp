@@ -305,7 +305,7 @@ void draw3DWalls(int &r, float &ra, float &distT, vector<Colour> *colourStrip, c
     }
 }
 
-inline Wall validateSideRender(float &rx, float &ry, float &disH, float &hx, float &hy, float &disV, float &vx, float &vy, float &distT, bool &shouldRender) {
+inline AABB validateSideRender(float &rx, float &ry, float &disH, float &hx, float &hy, float &disV, float &vx, float &vy, float &distT, bool &shouldRender) {
     if (disV < disH) {
         rx = vx;
         ry = vy;
@@ -320,7 +320,7 @@ inline Wall validateSideRender(float &rx, float &ry, float &disH, float &hx, flo
         rx = 0;
         ry = 0;
         shouldRender = false;
-        return Wall();
+        return AABB();
     }
 }
 
@@ -340,8 +340,8 @@ void renderRays2Dto3D(vector<Ray>& rays) {
     float dof, rx{0}, ry{0}, ra, x_off{0}, y_off{0}, distT{0}, disH, hx, hy, disV, vx, vy;
     vector<Colour> prevCol(screenH, bg_colour);
     NormalDir normalDir;
-    Wall hitWall;
-    WallFace prev_wall_face;
+    AABB hitWall;
+    AABBFace prev_wall_face;
     Texture wall_texture;
     string prev_tex_name;
     float prev_wallOffset = 0.0;
@@ -470,8 +470,8 @@ inline void checkPlayerCollision(float newx, float newy) {
             + ") [PURE COORDS]"
         );
     }
-    Wall hitwall = gameMap.getAt(radToCoord(newx), radToCoord(newy));
-    WallFace hitwallface = hitwall.wf_left;
+    AABB hitwall = gameMap.getAt(radToCoord(newx), radToCoord(newy));
+    AABBFace hitwallface = hitwall.wf_left;
     if (hitwallface.f_colour != NONE) {
         if (loggingCfg.player_pos) {
             debugContext.logAppVerb("Player collision with wall "

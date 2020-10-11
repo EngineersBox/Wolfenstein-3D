@@ -4,7 +4,7 @@
 #include <stack>
 #include <vector>
 
-#include "../environment/Walls.hpp"
+#include "../environment/AABB.hpp"
 #include "../map/Coordinates.hpp"
 #include "../map/map.hpp"
 #include "../raytracer/Globals.hpp"
@@ -23,7 +23,7 @@ enum RelativePosition : size_t {
 class QSPTree {
     public:
         QSPTree();
-        QSPTree(GameMap map, vector<Wall>* ordered_walls, vector<Wall>* u_bound, vector<Wall>* d_bound, vector<Wall>* l_bound, vector<Wall>* r_bound);
+        QSPTree(GameMap map, vector<AABB>* ordered_walls, vector<AABB>* u_bound, vector<AABB>* d_bound, vector<AABB>* l_bound, vector<AABB>* r_bound);
         ~QSPTree();
 
         void buildTree();
@@ -39,18 +39,18 @@ class QSPTree {
         void findMiddle();
 
         GameMap map;
-        vector<Wall>* walls;
-        vector<Wall>* up_boundary;
-        vector<Wall>* down_boundary;
-        vector<Wall>* left_boundary;
-        vector<Wall>* right_boundary;
+        vector<AABB>* walls;
+        vector<AABB>* up_boundary;
+        vector<AABB>* down_boundary;
+        vector<AABB>* left_boundary;
+        vector<AABB>* right_boundary;
         Coords mid;
         QuadNode* root;
 };
 
 QSPTree::QSPTree(){};
 
-QSPTree::QSPTree(GameMap map, vector<Wall>* ordered_walls, vector<Wall>* u_bound, vector<Wall>* d_bound, vector<Wall>* l_bound, vector<Wall>* r_bound) {
+QSPTree::QSPTree(GameMap map, vector<AABB>* ordered_walls, vector<AABB>* u_bound, vector<AABB>* d_bound, vector<AABB>* l_bound, vector<AABB>* r_bound) {
     this->map = map;
     this->walls = ordered_walls;
     findMiddle();
@@ -85,7 +85,7 @@ void QSPTree::findMiddle() {
     }
     this->walls->erase(this->walls->begin() + current_wall_idx);
     this->mid = current_mid;
-    debugContext.logAppInfo("Closest wall to actuall map centre at: " + current_mid.asString());
+    debugContext.logAppInfo("Closest AABB to actuall map centre at: " + current_mid.asString());
     this->root = new QuadNode(current_mid);
 };
 
@@ -131,25 +131,25 @@ QuadNode* QSPTree::insertNode(QuadNode* root, QuadNode* node) {
 
 void QSPTree::buildTree() {
     debugContext.logAppInfo("---- STARTED BUILDING QSP TREE ----");
-    for (Wall wall : *this->walls) {
-        this->root = insertNode(this->root, new QuadNode(Coords(wall.posX, wall.posY)));
+    for (AABB AABB : *this->walls) {
+        this->root = insertNode(this->root, new QuadNode(Coords(AABB.posX, AABB.posY)));
     }
-    debugContext.logAppInfo("Inserted " + to_string(this->walls->size()) + " wall nodes");
+    debugContext.logAppInfo("Inserted " + to_string(this->walls->size()) + " AABB nodes");
     // Inserting boundaries last will garuantee them as leaf nodes
-    for (Wall wall : *this->up_boundary) {
-        this->root->U = insertNode(this->root->U, new QuadNode(Coords(wall.posX, wall.posY)));
+    for (AABB AABB : *this->up_boundary) {
+        this->root->U = insertNode(this->root->U, new QuadNode(Coords(AABB.posX, AABB.posY)));
     }
     debugContext.logAppInfo("Inserted " + to_string(this->up_boundary->size()) + " 'TOP' boundary leaves");
-    for (Wall wall : *this->down_boundary) {
-        this->root->D = insertNode(this->root->D, new QuadNode(Coords(wall.posX, wall.posY)));
+    for (AABB AABB : *this->down_boundary) {
+        this->root->D = insertNode(this->root->D, new QuadNode(Coords(AABB.posX, AABB.posY)));
     }
     debugContext.logAppInfo("Inserted " + to_string(this->down_boundary->size()) + " 'DOWN' boundary leaves");
-    for (Wall wall : *this->left_boundary) {
-        this->root->L = insertNode(this->root->L, new QuadNode(Coords(wall.posX, wall.posY)));
+    for (AABB AABB : *this->left_boundary) {
+        this->root->L = insertNode(this->root->L, new QuadNode(Coords(AABB.posX, AABB.posY)));
     }
     debugContext.logAppInfo("Inserted " + to_string(this->left_boundary->size()) + " 'LEFT' boundary leaves");
-    for (Wall wall : *this->right_boundary) {
-        this->root->R = insertNode(this->root->R, new QuadNode(Coords(wall.posX, wall.posY)));
+    for (AABB AABB : *this->right_boundary) {
+        this->root->R = insertNode(this->root->R, new QuadNode(Coords(AABB.posX, AABB.posY)));
     }
     debugContext.logAppInfo("Inserted " + to_string(this->right_boundary->size()) + " 'RIGHT' boundary leaves");
     debugContext.logAppInfo("---- FINISHED BUILDING QSP TREE [" + string(ADDR_OF(*this)) + "] ----");
@@ -160,8 +160,9 @@ void QSPTree::queryWalls(Coords origin, vector<Ray>* rays, vector<Coords>& ret_w
     stack<QuadNode*> s;
     QuadNode* curr = this->root;
     int raysQueried = 0;
+    debugContext.logAppVerb("Querying " + to_string(rays->size()) + " in QSP tree [" + ADDR_OF(*this) + "]");
     while (raysQueried < rays->size() && (curr != nullptr || !s.empty())) {
-        // NOTE: Add wall cordinates to ret_walls argument
+        // NOTE: Add AABB cordinates to ret_walls argument
         // NOTE: During traversal, cull branches that are not relevant
         // such as if the player is in the right branch and they are
         // looking through the right to the top then cull the left and bottom branches

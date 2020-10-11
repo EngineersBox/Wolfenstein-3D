@@ -5,7 +5,7 @@
 
 #include "../texturing/TextureColours.hpp"
 #include "../texturing/texture.hpp"
-#include "WallFace.hpp"
+#include "AABBFace.hpp"
 
 using namespace std;
 
@@ -23,49 +23,49 @@ static const string NormalDirLUT[] = {
     "DOWN"
 };
 
-class Wall {
+class AABB {
    public:
-    Wall(int x, int y, Colour colour, string texture);
-    Wall(int x, int y, Colour colour);
-    Wall(int x, int y, string texture);
-    Wall(int x, int y, Colour colour, WallFace wf_left, WallFace wf_right, WallFace wf_up, WallFace wf_down);
-    Wall();
-    ~Wall();
-    bool operator==(Wall& other);
-    bool operator!=(Wall& other);
+    AABB(int x, int y, Colour colour, string texture);
+    AABB(int x, int y, Colour colour);
+    AABB(int x, int y, string texture);
+    AABB(int x, int y, Colour colour, AABBFace wf_left, AABBFace wf_right, AABBFace wf_up, AABBFace wf_down);
+    AABB();
+    ~AABB();
+    bool operator==(AABB& other);
+    bool operator!=(AABB& other);
     NormalDir getNormDir(int x, int y);
-    WallFace getFace(NormalDir normDir);
-    WallFace getFace(int x, int y);
+    AABBFace getFace(NormalDir normDir);
+    AABBFace getFace(int x, int y);
 
     int posX;
     int posY;
     Colour texColour;
     string texture_name;
 
-    WallFace wf_left;
-    WallFace wf_right;
-    WallFace wf_up;
-    WallFace wf_down;
+    AABBFace wf_left;
+    AABBFace wf_right;
+    AABBFace wf_up;
+    AABBFace wf_down;
 };
 
 ///
-/// Wall object that stores a location and colour
+/// AABB object that stores a location and colour
 ///
 /// @param int x: X-axis location
 /// @param int y: Y-axis location
-/// @param Colour colour: A colour to set as the wall
-/// @param string texture: Name of texture for the wall
+/// @param Colour colour: A colour to set as the AABB
+/// @param string texture: Name of texture for the AABB
 ///
-/// @returns Wall
+/// @returns AABB
 ///
-Wall::Wall(int x, int y, Colour colour, string texture) {
+AABB::AABB(int x, int y, Colour colour, string texture) {
     this->posX = x;
     this->posY = y;
     this->texColour = colour;
     this->texture_name = texture;
 }
 
-Wall::Wall(int x, int y, Colour colour, WallFace wf_left, WallFace wf_right, WallFace wf_up, WallFace wf_down) {
+AABB::AABB(int x, int y, Colour colour, AABBFace wf_left, AABBFace wf_right, AABBFace wf_up, AABBFace wf_down) {
     this->posX = x;
     this->posY = y;
     this->texColour = colour;
@@ -75,29 +75,29 @@ Wall::Wall(int x, int y, Colour colour, WallFace wf_left, WallFace wf_right, Wal
     this->wf_down = wf_down;
 };
 
-Wall::Wall() : Wall(0, 0, NONE, "") {};
+AABB::AABB() : AABB(0, 0, NONE, "") {};
 
-Wall::Wall(int x, int y, string texture) : Wall(x, y, NONE, texture) {};
+AABB::AABB(int x, int y, string texture) : AABB(x, y, NONE, texture) {};
 
-Wall::Wall(int x, int y, Colour colour) : Wall(x, y, colour, "") {};
+AABB::AABB(int x, int y, Colour colour) : AABB(x, y, colour, "") {};
 
-Wall::~Wall(){};
+AABB::~AABB(){};
 
-bool Wall::operator==(Wall& other) {
+bool AABB::operator==(AABB& other) {
     return (this->posX == other.posX)
         && (this->posY == other.posY)
         && (this->texColour == other.texColour)
         && (this->texture_name == other.texture_name);
 };
 
-bool Wall::operator!=(Wall& other) {
+bool AABB::operator!=(AABB& other) {
     return (this->posX != other.posX)
         && (this->posY != other.posY)
         && (this->texColour != other.texColour)
         && (this->texture_name != other.texture_name);
 };
 
-NormalDir Wall::getNormDir(int x, int y) {
+NormalDir AABB::getNormDir(int x, int y) {
     // cout << to_string(x) << " " << to_string(y) << endl;
     // cout << to_string(posX) << " " << to_string(posY) << endl;
     if ((x == posX || x == posX + 1) && y == posY) {
@@ -112,7 +112,7 @@ NormalDir Wall::getNormDir(int x, int y) {
     return NormalDir::LEFT;
 };
 
-WallFace Wall::getFace(NormalDir normDir) {
+AABBFace AABB::getFace(NormalDir normDir) {
     switch(normDir) {
         case NormalDir::LEFT:
             return this->wf_left;
@@ -131,6 +131,6 @@ WallFace Wall::getFace(NormalDir normDir) {
     }
 };
 
-WallFace Wall::getFace(int x, int y) {
+AABBFace AABB::getFace(int x, int y) {
     return getFace(getNormDir(x, y));
 };

@@ -34,6 +34,10 @@ struct GameMap {
     Coords end;
 
     vector<Wall> walls;
+    vector<Coords> up_boundary;
+    vector<Coords> down_boundary;
+    vector<Coords> left_boundary;
+    vector<Coords> right_boundary;
     vector<Coords> tree_order_walls;
 };
 
@@ -161,7 +165,15 @@ void GameMap::readMapFromJSON(string filename) {
                 )
             )
         );
-        if (x != 0 || x != (this->map_width - 1) || y != 0 || y != (this->map_height - 1)) {
+        if (x == 0) {
+            this->left_boundary.push_back(Coords(x,y));
+        } else if (x == this->map_width - 1) {
+            this->right_boundary.push_back(Coords(x,y));
+        } else if (y == 0) {
+            this->up_boundary.push_back(Coords(x,y));
+        } else if (y == this->map_height - 1) {
+            this->down_boundary.push_back(Coords(x,y));
+        } else {
             this->tree_order_walls.push_back(Coords(x,y));
         }
     }

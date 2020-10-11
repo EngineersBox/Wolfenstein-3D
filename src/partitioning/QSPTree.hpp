@@ -64,7 +64,9 @@ QSPTree::~QSPTree() {
 };
 
 double QSPTree::sqDist(Coords a, Coords b) {
-    return pow(abs(b.x - a.x), 2) + pow(abs(b.y - a.y), 2);
+    int delta_x = abs(b.x - a.x);
+    int delta_y = abs(b.y - a.y);
+    return (delta_x * delta_x) + (delta_y * delta_y);
 };
 
 void QSPTree::findMiddle() {
@@ -73,7 +75,7 @@ void QSPTree::findMiddle() {
     int current_wall_idx;
     for (int i = walls->size() - 1; i != -1; i--) {
         Coords loc = Coords(walls->at(i).posX, walls->at(i).posY);
-        double dist = sqDist(this->mid, loc);
+        int dist = sqDist(this->mid, loc);
         if (dist < current_min_dist) {
             current_mid = loc;
             current_min_dist = dist;
@@ -82,6 +84,7 @@ void QSPTree::findMiddle() {
     }
     this->walls->erase(this->walls->begin() + current_wall_idx);
     this->mid = current_mid;
+    debugContext.logAppInfo("Closest wall to actuall map centre at: " + current_mid.asString());
     this->root = new QuadNode(current_mid);
 };
 
@@ -94,7 +97,7 @@ RelativePosition QSPTree::position(Coords a, Coords b) {
         return RelativePosition::REL_RIGHT;
     } else if (M_PI_2 <= angle && angle < M_PI) {
         return RelativePosition::REL_UP;
-    } else if (M_PI <= angle && angle <= (2 * M_PI) / 3) {
+    } else if (M_PI <= angle && angle <= THREE_HALF_PI) {
         return RelativePosition::REL_LEFT;
     } else {
         return RelativePosition::REL_DOWN;
@@ -126,22 +129,28 @@ QuadNode* QSPTree::insertNode(QuadNode* root, QuadNode* node) {
 };
 
 void QSPTree::buildTree() {
+    debugContext.logAppInfo("---- STARTED BUILDING QSP TREE ----");
     for (Wall wall : *this->walls) {
         this->root = insertNode(this->root, new QuadNode(Coords(wall.posX, wall.posY)));
     }
+    debugContext.logAppInfo("Inserted " + to_string(this->walls->size()) + " wall nodes");
     // Inserting boundaries last will garuantee them as leaf nodes
     for (Wall wall : *this->up_boundary) {
         this->root->U = insertNode(this->root->U, new QuadNode(Coords(wall.posX, wall.posY)));
     }
+    debugContext.logAppInfo("Inserted " + to_string(this->up_boundary->size()) + " 'TOP' boundary leaves");
     for (Wall wall : *this->down_boundary) {
         this->root->D = insertNode(this->root->D, new QuadNode(Coords(wall.posX, wall.posY)));
     }
+    debugContext.logAppInfo("Inserted " + to_string(this->down_boundary->size()) + " 'DOWN' boundary leaves");
     for (Wall wall : *this->left_boundary) {
         this->root->L = insertNode(this->root->L, new QuadNode(Coords(wall.posX, wall.posY)));
     }
+    debugContext.logAppInfo("Inserted " + to_string(this->left_boundary->size()) + " 'LEFT' boundary leaves");
     for (Wall wall : *this->right_boundary) {
         this->root->R = insertNode(this->root->R, new QuadNode(Coords(wall.posX, wall.posY)));
     }
+    debugContext.logAppInfo("Inserted " + to_string(this->right_boundary->size()) + " 'RIGHT' boundary leaves");
 };
 
 void QSPTree::queryWalls(Coords origin, vector<Ray>* rays, vector<Coords>& ret_walls) {
@@ -151,6 +160,9 @@ void QSPTree::queryWalls(Coords origin, vector<Ray>* rays, vector<Coords>& ret_w
     int raysQueried = 0;
     while (raysQueried < rays->size() && (curr != nullptr || !s.empty())) {
         // NOTE: Add wall cordinates to ret_walls argument
+        // NOTE: During traversal, cull branches that are not relevant
+        // such as if the player is in the right branch and they are
+        // looking through the right to the top then cull the left and bottom branches
         continue;
     }
 };
@@ -159,7 +171,7 @@ void QSPTree::printPreorder(QuadNode* node) {
     if (node == nullptr) {
         return;
     }
-    cout << "(" << node->wall_coords.x << "," << node->wall_coords.y << ") ";
+    cout << node->wall_coords.asString();
     printPreorder(node->U);
     printPreorder(node->D);
     printPreorder(node->L);

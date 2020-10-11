@@ -61,12 +61,18 @@ struct Coordinates {
     }
 
     friend ostream& operator<<(ostream& os, const Coordinates& c) {
-        return os << "(" << c.x << "," << c.y << ")";
+        return os << c.asString();
+    }
+
+    inline string asString() const {
+        return "(" + to_string(this->x) + "," + to_string(this->y) + ")";
     }
 
     T x;
     T y;
 };
+
+constexpr double THREE_HALF_PI = 3 * M_PI / 2;
 
 typedef Coordinates<int> Coords;
 

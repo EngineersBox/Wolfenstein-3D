@@ -126,19 +126,11 @@ inline int AStar::heuristic(GraphNode next, GraphNode goal) {
 
 void AStar::logPath(vector<Coords>& path) {
     debugContext.logAppVerb(
-        "Found path for ("
-        + to_string(map.start.x)
-        + ","
-        + to_string(map.start.y)
-        + ") -> ("
-        + to_string(map.end.x)
-        + ","
-        + to_string(map.end.y)
-        + ")"
+        "Found path for " + map.start.asString() + " -> " + map.end.asString()
     );
-    for (Coords coord : path) {
-        debugContext.logAppVerb("(" + to_string(coord.x) + "," + to_string(coord.y) + ")");
-    }
+    for_each(path.begin(), path.end(), [](Coords c) {
+        debugContext.logAppVerb(c.asString());
+    });
 }
 
 vector<Coords>* AStar::find(Coords start_loc, Coords end_loc) {

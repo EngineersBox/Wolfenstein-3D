@@ -40,6 +40,4 @@
 #include "../partitioning/QSPTree.hpp"
 
 #define _USE_MATH_DEFINES
-
-constexpr double THREE_HALF_PI = 3 * M_PI / 2;
 constexpr float DR = 0.0174533f;

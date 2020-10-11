@@ -28,6 +28,7 @@
 * [x] Texture processing
 * [x] Map processing
 * [ ] Add multiple verbosity levels
+* [x] QSP tree building
 
 ## Map maker
 

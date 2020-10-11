@@ -14,7 +14,7 @@
 #define SCREEN_WIDTH glutGet(GLUT_WINDOW_WIDTH)
 #define SCREEN_HEIGHT glutGet(GLUT_WINDOW_HEIGHT)
 
-#define FUNC_ADDR(f) string("0x") + to_string((size_t) (&f))
+#define ADDR_OF(f) string("0x") + to_string((size_t) (&f))
 
 using namespace std;
 
@@ -462,7 +462,31 @@ static void display(void) {
 }
 
 inline void checkPlayerCollision(float newx, float newy) {
-    if (gameMap.getAt(radToCoord(newx), radToCoord(newy)).wf_left.f_colour != NONE) {
+    if (loggingCfg.player_pos) {
+        debugContext.logAppVerb("Player "
+            + ADDR_OF(player)
+            + " at ("
+            + to_string(newx)
+            + ","
+            + to_string(newy)
+            + ") [PURE COORDS]"
+        );
+    }
+    Wall hitwall = gameMap.getAt(radToCoord(newx), radToCoord(newy));
+    WallFace hitwallface = hitwall.wf_left;
+    if (hitwallface.f_colour != NONE) {
+        if (loggingCfg.player_pos) {
+            debugContext.logAppVerb("Player collision with wall "
+                + ADDR_OF(hitwall)
+                + " on face "
+                + ADDR_OF(hitwallface)
+                + " at ("
+                + to_string(radToCoord(newx))
+                + ","
+                + to_string(radToCoord(newy))
+                + ") [GRID COORDS]"
+            );
+        }
         return;
     }
     player.x = newx;
@@ -568,13 +592,13 @@ int main(int argc, char *argv[]) {
     debugContext.logAppInfo("---- COMPLETED APPLICATION INIT PHASE ----");
 
     glutDisplayFunc(display);
-    debugContext.logApiInfo("Initialised glutDisplayFunc at: " + FUNC_ADDR(display));
+    debugContext.logApiInfo("Initialised glutDisplayFunc at: " + ADDR_OF(display));
     glutReshapeFunc(reshape);
-    debugContext.logApiInfo("Initialised glutReshapeFunc at: " + FUNC_ADDR(reshape));
+    debugContext.logApiInfo("Initialised glutReshapeFunc at: " + ADDR_OF(reshape));
     glutKeyboardFunc(keyPress);
-    debugContext.logApiInfo("Initialised glutKeyboardFunc at: " + FUNC_ADDR(keyPress));
+    debugContext.logApiInfo("Initialised glutKeyboardFunc at: " + ADDR_OF(keyPress));
     glutIdleFunc(idle);
-    debugContext.logApiInfo("Initialised glutIdleFunc at: " + FUNC_ADDR(idle));
+    debugContext.logApiInfo("Initialised glutIdleFunc at: " + ADDR_OF(idle));
     glutPostRedisplay();
     debugContext.logApiInfo("---- COMPLETED OpenGL/GLUT INIT PHASE ----");
     debugContext.logApiInfo("Started glutMainLoop()");

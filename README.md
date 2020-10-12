@@ -2,7 +2,7 @@
 
 ![GitHub Workflow Status](https://img.shields.io/github/workflow/status/EngineersBox/BSPMinimalRendering/CMake?style=for-the-badge) ![TODO Status](https://img.shields.io/badge/TODO-outstanding-yellow?style=for-the-badge&logo=markdown)
 
-Finding the minimal amount of polygons to render based with A* and BSP trees.
+Finding the minimal amount of polygons to render based with A* and QSP trees.
 
 Something important to note about this repo and its implementation. The idea behind this is to use the most low level OpenGL functionality and handle of all of the graphics processing manually. This means not using OpenGL/GLUT texturing managing and perspective polygon rendering + scaling. Instead all of this is calculated as part of the raycasting implementation.
 

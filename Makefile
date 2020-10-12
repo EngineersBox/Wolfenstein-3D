@@ -143,19 +143,6 @@ run_tests_wo/fast:
 .PHONY : run_tests_wo/fast
 
 #=============================================================================
-# Target rules for targets named BSP
-
-# Build rule for target.
-BSP: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 BSP
-.PHONY : BSP
-
-# fast build rule for target.
-BSP/fast:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/BSP.dir/build.make CMakeFiles/BSP.dir/build
-.PHONY : BSP/fast
-
-#=============================================================================
 # Target rules for targets named run_tests
 
 # Build rule for target.
@@ -180,6 +167,19 @@ build_tests: cmake_check_build_system
 build_tests/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/build_tests.dir/build.make CMakeFiles/build_tests.dir/build
 .PHONY : build_tests/fast
+
+#=============================================================================
+# Target rules for targets named QSP
+
+# Build rule for target.
+QSP: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 QSP
+.PHONY : QSP
+
+# fast build rule for target.
+QSP/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/QSP.dir/build.make CMakeFiles/QSP.dir/build
+.PHONY : QSP/fast
 
 #=============================================================================
 # Target rules for targets named archive_logs
@@ -265,7 +265,7 @@ src/raytracer/Raytracer.o: src/raytracer/Raytracer.cpp.o
 
 # target to build an object file
 src/raytracer/Raytracer.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/BSP.dir/build.make CMakeFiles/BSP.dir/src/raytracer/Raytracer.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/QSP.dir/build.make CMakeFiles/QSP.dir/src/raytracer/Raytracer.cpp.o
 .PHONY : src/raytracer/Raytracer.cpp.o
 
 src/raytracer/Raytracer.i: src/raytracer/Raytracer.cpp.i
@@ -274,7 +274,7 @@ src/raytracer/Raytracer.i: src/raytracer/Raytracer.cpp.i
 
 # target to preprocess a source file
 src/raytracer/Raytracer.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/BSP.dir/build.make CMakeFiles/BSP.dir/src/raytracer/Raytracer.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/QSP.dir/build.make CMakeFiles/QSP.dir/src/raytracer/Raytracer.cpp.i
 .PHONY : src/raytracer/Raytracer.cpp.i
 
 src/raytracer/Raytracer.s: src/raytracer/Raytracer.cpp.s
@@ -283,7 +283,7 @@ src/raytracer/Raytracer.s: src/raytracer/Raytracer.cpp.s
 
 # target to generate assembly for a file
 src/raytracer/Raytracer.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/BSP.dir/build.make CMakeFiles/BSP.dir/src/raytracer/Raytracer.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/QSP.dir/build.make CMakeFiles/QSP.dir/src/raytracer/Raytracer.cpp.s
 .PHONY : src/raytracer/Raytracer.cpp.s
 
 # Help Target
@@ -303,7 +303,7 @@ help:
 	@echo "... run"
 	@echo "... run_tests"
 	@echo "... run_tests_wo"
-	@echo "... BSP"
+	@echo "... QSP"
 	@echo "... src/raytracer/Raytracer.o"
 	@echo "... src/raytracer/Raytracer.i"
 	@echo "... src/raytracer/Raytracer.s"

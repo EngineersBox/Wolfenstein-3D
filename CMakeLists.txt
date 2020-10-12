@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
 
-set(PROJECT_NAME BSP)
+set(PROJECT_NAME QSP)
 project(${PROJECT_NAME})
 
 # SET CXX VERSION
@@ -151,5 +151,5 @@ add_custom_command(
 )
 
 # SET THE EXECUTABLE TO THE SOURCE AND LINK LIBRARIES
-add_executable(BSP ${SOURCES})
+add_executable(QSP ${SOURCES})
 target_link_libraries(${PROJECT_NAME} ${OPENGL_LIBRARIES} ${GLUT_LIBRARY} )

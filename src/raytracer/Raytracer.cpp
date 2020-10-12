@@ -7,7 +7,7 @@
 #define CEILING_COLOUR LIGHT_GREY
 #define FLOOR_COLOUR DARK_GREY
 
-#define SIGMOID(x, mult) 1 / 1 + exp(mult * x)
+#define SIGMOID(x, mult) 1 / 1 + exp(mult *x)
 #define DIST_SHADING_MULTIPLIER 0.01
 #define DIST_SHADING_THRESHOLD 1.6666666666666667
 
@@ -24,12 +24,12 @@ Colour bg_colour = {0.3, 0.3, 0.3, 0.0};
 TextureLoader texLoader;
 HashTable<Texture> textures;
 AStar astar;
-vector<Coords>* path = new vector<Coords>();
+vector<Coords> *path = new vector<Coords>();
 // Player
 Player player;
 
 // Map
-int mapScreenW = screenW; // x >> 1 == x / 2
+int mapScreenW = screenW;  // x >> 1 == x / 2
 int mapScreenH = screenH;
 
 float mapScalingX;
@@ -120,8 +120,8 @@ inline float dist(float ax, float ay, float bx, float by, float ang) {
 ///
 // TODO: Unify checkHorizontal and checkVertical
 static inline void checkHorizontal(int &mx, int &my, int &mp, float &dof,
-                     float &rx, float &ry, float &ra, float &x_off, float &y_off,
-                     float &hx, float &hy, float &disH) {
+                                   float &rx, float &ry, float &ra, float &x_off, float &y_off,
+                                   float &hx, float &hy, float &disH) {
     float aTan = -1 / tan(ra);
     if (ra > M_PI) {
         // Looking up
@@ -183,8 +183,8 @@ static inline void checkHorizontal(int &mx, int &my, int &mp, float &dof,
 /// @return void
 ///
 static inline void checkVertical(int &mx, int &my, int &mp, float &dof,
-                   float &rx, float &ry, float &ra, float &x_off, float &y_off,
-                   float &vx, float &vy, float &disV) {
+                                 float &rx, float &ry, float &ra, float &x_off, float &y_off,
+                                 float &vx, float &vy, float &disV) {
     float nTan = -tan(ra);
     if (ra > M_PI_2 && ra < THREE_HALF_PI) {
         // Looking left
@@ -260,12 +260,12 @@ void draw3DWalls(int &r, float &ra, float &distT, vector<Colour> *colourStrip, c
     float lineInViewPercentage = 1;
 
     if (lineH > SH) {
-        lineInViewPercentage = 1 - ((lineH - ((float) SH)) / lineH);
-        lineH = (float) SH;
+        lineInViewPercentage = 1 - ((lineH - ((float)SH)) / lineH);
+        lineH = (float)SH;
     }
 
     const float line_off = (SH / 2) - (lineH / 2);
-    const float screen_off = (SW / playerCfg.fov ) * r;
+    const float screen_off = (SW / playerCfg.fov) * r;
 
     int cStripSize = colourStrip->size();
     int cOffset = 0;
@@ -282,24 +282,20 @@ void draw3DWalls(int &r, float &ra, float &distT, vector<Colour> *colourStrip, c
         Colour c;
         try {
             c = colourStrip->at(max(0, cOffset + min((int)floor(pixelOffset), cStripLast)));
-        } catch (const out_of_range& e) {
+        } catch (const out_of_range &e) {
             throw PixelColumnInvalidIndex(max(0, cOffset + min((int)floor(pixelOffset), cStripLast)));
         }
         glScissor(screen_off * 2, yPos * 2, x_width, y_height);
         Colour appliedDirectionalShader = colourMask<GLdouble>(
             c,
             directionalShader,
-            shaderOperator
-        );
+            shaderOperator);
         toClearColour(
-            distanceShading ?
-            colourMask(
-                appliedDirectionalShader,
-                distance_shader,
-                shaderOperator
-            )
-            : appliedDirectionalShader
-        );
+            distanceShading ? colourMask(
+                                  appliedDirectionalShader,
+                                  distance_shader,
+                                  shaderOperator)
+                            : appliedDirectionalShader);
         glClear(GL_COLOR_BUFFER_BIT);
         pixelOffset += pixelStepSize;
     }
@@ -335,7 +331,7 @@ inline int convertCoord(float coord) {
 ///
 /// @return void
 ///
-void renderRays2Dto3D(vector<Ray>& rays) {
+void renderRays2Dto3D(vector<Ray> &rays) {
     int mx{0}, my{0}, mp{0};
     float dof, rx{0}, ry{0}, ra, x_off{0}, y_off{0}, distT{0}, disH, hx, hy, disV, vx, vy;
     vector<Colour> prevCol(screenH, bg_colour);
@@ -383,7 +379,7 @@ void renderRays2Dto3D(vector<Ray>& rays) {
         const int wallIntersectPoint = isLR ? ry : rx;
         const int wallSize = (isLR ? mapScreenW : mapScreenH) / (isLR ? gameMap.map_width : gameMap.map_height);
         const float wallOffset = ((wallIntersectPoint - (radToCoord(wallIntersectPoint))) % wallSize) / (float)wallSize;
-        
+
         prev_wall_face = hitWall.getFace(normalDir);
         textures.get(prev_wall_face.f_texture, wall_texture);
         if (prev_tex_name != prev_wall_face.f_texture || prev_wallOffset != wallOffset) {
@@ -418,7 +414,7 @@ inline void drawFloor(int width = SCREEN_WIDTH, int height = SCREEN_HEIGHT) {
     drawRectangle(0, IDIV_2(height), width, height, true);
 }
 
-inline void renderMapRays(vector<Ray>& rays) {
+inline void renderMapRays(vector<Ray> &rays) {
     for (Ray ray : rays) {
         renderRay(ray.ax, ray.ay, ray.bx, ray.by, ray.line_width, WHITE);
     }
@@ -461,29 +457,13 @@ static void display(void) {
 
 inline void checkPlayerCollision(float newx, float newy) {
     if (loggingCfg.player_pos) {
-        debugContext.logAppVerb("Player "
-            + ADDR_OF(player)
-            + " at ("
-            + to_string(newx)
-            + ","
-            + to_string(newy)
-            + ") [PURE COORDS]"
-        );
+        debugContext.logAppVerb("Player " + ADDR_OF(player) + " at (" + to_string(newx) + "," + to_string(newy) + ") [PURE COORDS]");
     }
     AABB hitwall = gameMap.getAt(radToCoord(newx), radToCoord(newy));
     AABBFace hitwallface = hitwall.wf_left;
     if (hitwallface.f_colour != NONE) {
         if (loggingCfg.player_pos) {
-            debugContext.logAppVerb("Player collision with wall "
-                + ADDR_OF(hitwall)
-                + " on face "
-                + ADDR_OF(hitwallface)
-                + " at ("
-                + to_string(radToCoord(newx))
-                + ","
-                + to_string(radToCoord(newy))
-                + ") [GRID COORDS]"
-            );
+            debugContext.logAppVerb("Player collision with wall " + ADDR_OF(hitwall) + " on face " + ADDR_OF(hitwallface) + " at (" + to_string(radToCoord(newx)) + "," + to_string(radToCoord(newy)) + ") [GRID COORDS]");
         }
         return;
     }

@@ -1,4 +1,4 @@
-# BSPMinimalRendering
+# QSPMinimalRendering
 
 ![GitHub Workflow Status](https://img.shields.io/github/workflow/status/EngineersBox/BSPMinimalRendering/CMake?style=for-the-badge) ![TODO Status](https://img.shields.io/badge/TODO-outstanding-yellow?style=for-the-badge&logo=markdown)
 
@@ -96,13 +96,13 @@ In order to find the shortest path, an extension of Dijkstra's algorithm is used
 
 ![https://upload.wikimedia.org/wikipedia/commons/5/5d/Astar_progress_animation.gif](https://upload.wikimedia.org/wikipedia/commons/5/5d/Astar_progress_animation.gif)
 
-### Raycasting with BSP Trees
+### Raycasting with QSP Trees
 
 Rendering of the scene is done via a raycasting algorithm. This renders polygons based on rays cast outward from the players perspective, then renders a polygon based on the starting and ending positions determined from the rays. In order to optimise this process, binary space partitioning is used.
 
 ![https://upload.wikimedia.org/wikipedia/commons/8/81/Binary_space_partition.png](https://upload.wikimedia.org/wikipedia/commons/8/81/Binary_space_partition.png)
 
-This process involes havling the render space convex hull into smaller convex hulls. Once the render space is divided into minmal convex hulls, a render convex hull is formed that includes the minimal amount of polygons to render to fill the entire screen. This improves performance since polygons can be determined to render infront of others without having to query against them in a traditional raycaster
+This process involes quatering the render space convex hull into smaller convex hulls based on relative direction between parent and child nodes. Once the render space is divided into minmal convex hulls, a render convex hull is formed that includes the minimal amount of polygons to render to fill the entire screen. This improves performance since polygons can be determined to render infront of others without having to query against them in a traditional raycaster
 
 ![https://upload.wikimedia.org/wikipedia/commons/thumb/0/08/Example_of_BSP_tree_traversal.svg/1920px-Example_of_BSP_tree_traversal.svg.png](https://upload.wikimedia.org/wikipedia/commons/thumb/0/08/Example_of_BSP_tree_traversal.svg/1920px-Example_of_BSP_tree_traversal.svg.png)
 

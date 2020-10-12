@@ -30,7 +30,7 @@ add_custom_command(
 	COMMAND ${CMAKE_COMMAND} -E cmake_echo_color --cyan --bold --no-newline \"\>\> \"
 	COMMAND ${CMAKE_COMMAND} -E cmake_echo_color --green \"Removing previous builds\"
 	COMMAND echo \"--------------------------------\"
-	COMMAND rm -rvf out/*
+	COMMAND rm -vf out/*
 	COMMAND echo \"--------------------------------\\n\"
 )
 add_custom_command(

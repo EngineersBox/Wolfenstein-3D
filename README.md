@@ -16,7 +16,7 @@ If you have CMake installed then running the raycaster is really straight forwar
 
 1. Open up a terminal window and cd to this repo
 2. Run `cmake .` to set up the cmake build environment
-3. Build the raycaster with `make BSP`
+3. Build the raycaster with `make QSP`
 4. Start the built raycaster with `make run`
 
 Below is a full list of commands and their usages:
@@ -24,7 +24,7 @@ Below is a full list of commands and their usages:
 |Command|Description|
 |---|---|
 |`cmake .`| Initialise the build environment|
-|`make BSP`| Build the raycaster to `out/`|
+|`make QSP`| Build the raycaster to `out/`|
 |`make run`| Execute a build in `out/`|
 |`make destroy`| Removes all files in the `out/`|
 |`make clean_logs`| Removes all log files from `logs/`|
@@ -43,19 +43,19 @@ If you don't have CMake installed on your system, you can still build and run th
 To build the raycaster:
 
 ```bash
-clang++ -std=c++11 src/raytracer/Raytracer.cpp -framework OpenGL -framework GLUT -stdlib=libc++ -o out/BSP
+clang++ -std=c++11 src/raytracer/Raytracer.cpp -framework OpenGL -framework GLUT -stdlib=libc++ -o out/QSP
 ```
 
 *or*
 
 ```bash
-g++ -std=c++11 src/raytracer/Raytracer.cpp -framework OpenGL -framework GLUT -stdlib=libc++ -o out/BSP
+g++ -std=c++11 src/raytracer/Raytracer.cpp -framework OpenGL -framework GLUT -stdlib=libc++ -o out/QSP
 ```
 
 To run the built raycaster:
 
 ```bash
-./out/BSP
+./out/QSP
 ```
 
 #### Linux
@@ -63,13 +63,13 @@ To run the built raycaster:
 To build the raycaster:
 
 ```bash
-g++ -std=c++11 src/raytracer/Raytracer.cpp -lm -lGL -lGLU -lglut -o out/BSP
+g++ -std=c++11 src/raytracer/Raytracer.cpp -lm -lGL -lGLU -lglut -o out/QSP
 ```
 
 To run the built raycaster:
 
 ```bash
-./out/BSP
+./out/QSP
 ```
 
 #### Windows
@@ -77,13 +77,13 @@ To run the built raycaster:
 To build the raycaster:
 
 ```bash
-g++ -std=c++11 src/raytracer/Raytracer.cpp -lopengl32 -lfreeglut -lglu32 -o out/BSP
+g++ -std=c++11 src/raytracer/Raytracer.cpp -lopengl32 -lfreeglut -lglu32 -o out/QSP
 ```
 
 To run the built raycaster:
 
 ```bash
-./out/BSP
+./out/QSP
 ```
 
 ---
@@ -192,10 +192,11 @@ sensitivity = 2.0
 enable = true
 render_rays = false ; NOT YET IMPLEMENTED
 pos = "TOP_RIGHT"
+size = "MEDIUM"
 
 [logging]
 gl_debug = true
-player_pos = false ; NOT YET IMPLEMENTED
+player_pos = false
 hide_warnings = false ; NOT YET IMPLEMENTED
 hide_infos = false ; NOT YET IMPLEMENTED
 tex_skip_invalid = true
@@ -207,4 +208,3 @@ headless_mode = false
 double_buffer = false
 refresh_rate = 60 ; Value in Hz
 ```
-

@@ -4,7 +4,7 @@
 
 #include "../../src/hashing/HashTable.hpp"
 #include "../../src/exceptions/hashing/HashTableCapacity.hpp"
-#include "../framework/catch.hh"
+#include "../framework/catch.hpp"
 
 using namespace std;
 

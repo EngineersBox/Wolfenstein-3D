@@ -182,7 +182,7 @@ void AStar::renderPath(vector<Coords>* path, Colour path_colour, int sw, int sh,
     if (path->size() < 2) {
         return;
     }
-    int xOffset = minimapCfg.isLeft() ? sw - (map.map_width * minimapCfg.size) : 0;
+    int xOffset = minimapCfg.isLeft() ? 0 : sw - (map.map_width * minimapCfg.size);
     int yOffset = minimapCfg.isTop() ? 0 : sh - (map.map_height * minimapCfg.size);
     int inBlockOffset = IDIV_2(minimapCfg.size);
     for (int i = 0; i < path->size() - 1; i++) {

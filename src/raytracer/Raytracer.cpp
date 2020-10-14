@@ -46,7 +46,7 @@ vector<Ray> rays(0);
 /// @return void
 ///
 inline static void renderPlayerPos(int sw = SCREEN_WIDTH, int sh = SCREEN_HEIGHT) {
-    int xOffset = minimapCfg.isLeft() ? sw - (gameMap.map_width * minimapCfg.size) : 0;
+    int xOffset = minimapCfg.isLeft() ? 0 : sw - (gameMap.map_width * minimapCfg.size);
     int yOffset = minimapCfg.isTop() ? 0 : sh - (gameMap.map_height * minimapCfg.size);
 
     toColour(RED);
@@ -73,7 +73,7 @@ inline static void renderPlayerPos(int sw = SCREEN_WIDTH, int sh = SCREEN_HEIGHT
 /// @return void
 ///
 static void renderMap2D(int sw = SCREEN_WIDTH, int sh = SCREEN_HEIGHT) {
-    int xOffset = minimapCfg.isLeft() ? sw - (gameMap.map_width * minimapCfg.size) : 0;
+    int xOffset = minimapCfg.isLeft() ? 0 : sw - (gameMap.map_width * minimapCfg.size);
     int yOffset = minimapCfg.isTop() ? 0 : sh - (gameMap.map_height * minimapCfg.size);
     int x, y;
     for (y = 0; y < gameMap.map_height; y++) {

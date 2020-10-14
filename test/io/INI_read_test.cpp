@@ -3,7 +3,7 @@
 #include <string>
 
 #include "../../src/io/INIReader.hpp"
-#include "../framework/catch.hh"
+#include "../framework/catch.hpp"
 
 #define DIR_PREFIX string("test/resources/")
 #define VALID_INI DIR_PREFIX + string("valid_test.ini")

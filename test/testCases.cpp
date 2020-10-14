@@ -1,6 +1,6 @@
 #define CATCH_CONFIG_MAIN
 
-#include "framework/catch.hh"
+#include "framework/catch.hpp"
 
 // #include "asset_loading/map_test.cpp"
 // #include "asset_loading/texture_load_test.cpp"

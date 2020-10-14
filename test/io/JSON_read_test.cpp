@@ -5,7 +5,7 @@
 #include <string>
 #include <vector>
 
-#include "../framework/catch.hh"
+#include "../framework/catch.hpp"
 #include "../../src/io/JSONParser.hpp"
 
 #define DIR_PREFIX string("test/resources/")

@@ -160,7 +160,7 @@ void QSPTree::queryWalls(Coords origin, vector<Ray>* rays, vector<Coords>& ret_w
     stack<QuadNode*> s;
     QuadNode* curr = this->root;
     int raysQueried = 0;
-    debugContext.logAppVerb("Querying " + to_string(rays->size()) + " in QSP tree [" + ADDR_OF(*this) + "]");
+    debugContext.logAppVerb("Querying " + to_string(rays->size()) + " rays in QSP tree [" + ADDR_OF(*this) + "]");
     while (raysQueried < rays->size() && (curr != nullptr || !s.empty())) {
         // NOTE: Add AABB cordinates to ret_walls argument
         // NOTE: During traversal, cull branches that are not relevant

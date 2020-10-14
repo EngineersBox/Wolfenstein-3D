@@ -7,7 +7,7 @@
 
 #include "../../src/exceptions/hashing/InvalidKeySize.hpp"
 #include "../../src/hashing/HashTable.hpp"
-#include "../framework/catch.hh"
+#include "../framework/catch.hpp"
 
 using namespace std;
 

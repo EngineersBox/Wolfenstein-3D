@@ -40,6 +40,7 @@
 #include "../texturing/texture.hpp"
 #include "Globals.hpp"
 #include "Ray.hpp"
+#include "../world/World.hpp"
 
 #define _USE_MATH_DEFINES
 constexpr float DR = 0.0174533f;

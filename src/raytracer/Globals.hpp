@@ -54,3 +54,5 @@ static LoggingCfg loggingCfg = LoggingCfg();
 static RenderCfg renderCfg = RenderCfg();
 
 static GLDebugContext debugContext = GLDebugContext();
+
+typedef unsigned long int int_id;

@@ -1,9 +1,6 @@
 #pragma once
 
-#if _WIN64
-    #include <windows.h>
-    #include <GL/glut.h>
-#elif _WIN32
+#if _WIN64 || _WIN32
     #include <windows.h>
     #include <GL/glut.h>
 #elif __APPLE__

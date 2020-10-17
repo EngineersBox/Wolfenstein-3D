@@ -20,6 +20,15 @@ enum RelativePosition : size_t {
     REL_RIGHT = 3
 };
 
+struct TraversalRecord {
+    TraversalRecord(QuadNode* node, vector<RelativePosition> vec) {
+        this->node = node;
+        this->traversals = vec;
+    };
+    QuadNode* node;
+    vector<RelativePosition> traversals;
+};
+
 class QSPTree {
     public:
         QSPTree();
@@ -30,7 +39,7 @@ class QSPTree {
         QuadNode* insertNode(QuadNode* root, QuadNode* node);
         inline QuadNode* insertRelative(QuadNode* dir_node, QuadNode* node);
 
-        void queryWalls(Coords origin, vector<Ray>* rays, vector<Coords>& ret_walls);
+        void queryWalls(Coords origin, float player_angle, vector<Ray>* rays, vector<Coords>& ret_walls);
 
         void printPreorder(QuadNode* node);
     private:
@@ -117,14 +126,18 @@ inline QuadNode* QSPTree::insertRelative(QuadNode* dir_node, QuadNode* node) {
 
 QuadNode* QSPTree::insertNode(QuadNode* root, QuadNode* node) {
     RelativePosition relPos = position(root->wall_coords, node->wall_coords);
-    if (relPos == RelativePosition::REL_UP) {
-        root->U = insertRelative(root->U, node);
-    } else if (relPos == RelativePosition::REL_DOWN) {
-        root->D = insertRelative(root->D, node);
-    } else if (relPos == RelativePosition::REL_LEFT) {
-        root->L = insertRelative(root->L, node);
-    } else {
-        root->R = insertRelative(root->R, node);
+    switch (relPos) {
+        case RelativePosition::REL_UP:
+            root->U = insertRelative(root->U, node);
+            break;
+        case RelativePosition::REL_DOWN:
+            root->D = insertRelative(root->D, node);
+            break;
+        case RelativePosition::REL_LEFT:
+            root->L = insertRelative(root->L, node);
+        default:
+            root->R = insertRelative(root->R, node);
+            break;
     }
     return root;
 };
@@ -155,18 +168,74 @@ void QSPTree::buildTree() {
     debugContext.logAppInfo("---- FINISHED BUILDING QSP TREE [" + string(ADDR_OF(*this)) + "] ----");
 };
 
-void QSPTree::queryWalls(Coords origin, vector<Ray>* rays, vector<Coords>& ret_walls) {
+void QSPTree::queryWalls(Coords origin, float player_angle, vector<Ray>* rays, vector<Coords>& ret_walls) {
     // TODO: implement tree traversal and node query against rays
-    stack<QuadNode*> s;
-    QuadNode* curr = this->root;
+    stack<TraversalRecord> nodesVisited;
+    TraversalRecord currTraversal(this->root, vector<RelativePosition>());
+    QuadNode* currNode = this->root;
+    Coords cPos = Coords(radToCoord(currNode->wall_coords.x) + 0.5, radToCoord(currNode->wall_coords.y) + 0.5);
+    RelativePosition currBranch = position(cPos, origin);
     int raysQueried = 0;
     debugContext.logAppVerb("Querying " + to_string(rays->size()) + " rays in QSP tree [" + ADDR_OF(*this) + "]");
-    while (raysQueried < rays->size() && (curr != nullptr || !s.empty())) {
+    while (raysQueried < rays->size() && (!nodesVisited.empty())) {
         // NOTE: Add AABB cordinates to ret_walls argument
         // NOTE: During traversal, cull branches that are not relevant
         // such as if the player is in the right branch and they are
         // looking through the right to the top then cull the left and bottom branches
-        continue;
+
+        if (currNode == nullptr) {
+            currTraversal = nodesVisited.top();
+            nodesVisited.pop();
+            currNode = currTraversal.node;
+            continue;
+        }
+
+        cPos = Coords(radToCoord(currNode->wall_coords.x) + 0.5, radToCoord(currNode->wall_coords.x) + 0.5);
+        currBranch = position(cPos, origin);
+
+        for (Ray ray : *rays) {
+            // 1. Check if any rays intersect with the current wall
+            // If there is an intersection, log it and remove ray from pool
+            // and lastly increment rayQueried as needed
+            ;
+        }
+
+        // 2. Traverse tree, first through sector where origin is located
+        // Then procede through sector rays are pointed at.
+        // Then through other two sectors if in frustrum
+        RelativePosition nextBranch = currBranch;
+        if (currTraversal.traversals.size() == 4) {
+            currNode = nodesVisited.top().node;
+            nodesVisited.pop();
+            continue;
+        }
+        // 3.1 If already searched branch containing ray origin, try other branches
+        if (find(currTraversal.traversals.begin(), currTraversal.traversals.end(), currBranch) == currTraversal.traversals.end()) {
+            // 3.2 If already searched branch that rays at facing towards try other branches
+            // 3.3 If already searched non-behind branch, try behind branch
+        }
+        switch (currBranch) {
+            case RelativePosition::REL_UP:
+                currNode = currNode->U;
+                currTraversal.traversals.push_back(RelativePosition::REL_UP);
+                nodesVisited.push(currTraversal);
+                break;
+            case RelativePosition::REL_LEFT:
+                currNode = currNode->L;
+                currTraversal.traversals.push_back(RelativePosition::REL_LEFT);
+                nodesVisited.push(currTraversal);
+                break;
+            case RelativePosition::REL_DOWN:
+                currNode = currNode->D;
+                currTraversal.traversals.push_back(RelativePosition::REL_DOWN);
+                nodesVisited.push(currTraversal);
+                break;
+            default:
+                currNode = currNode->R;
+                currTraversal.traversals.push_back(RelativePosition::REL_RIGHT);
+                nodesVisited.push(currTraversal);
+                break;
+        }
     }
 };
 

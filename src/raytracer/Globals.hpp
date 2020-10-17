@@ -26,6 +26,8 @@ using namespace std;
 #define IMUL_64(x) (x << 6)
 #define IDIV_64(x) (x >> 6)
 
+#define radToCoord(r) IDIV_64((int) r)
+
 // ../~
 #define RES_DIR string("resources/")
 #define SRC_DIR string("src/")

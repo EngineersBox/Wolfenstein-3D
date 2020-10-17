@@ -1,0 +1,171 @@
+BLACK:=$(shell tput setaf 0)
+RED:=$(shell tput setaf 1)
+GREEN:=$(shell tput setaf 2)
+YELLOW:=$(shell tput setaf 3)
+BLUE:=$(shell tput setaf 4)
+MAGENTA:=$(shell tput setaf 5)
+CYAN:=$(shell tput setaf 6)
+WHITE:=$(shell tput setaf 7)
+
+BOLD:=$(shell tput bold)
+ULINE:=$(call tput smul)
+
+RESET := $(shell tput sgr0)
+
+SRC:=src/raytracer/Raytracer.cpp
+OUT:=out/QSP
+LOGS_DIR=logs
+
+OSX_FRAMEWORK:=-framework OpenGL -framework GLUT
+LINUX_FRAMEWORK:=-lm -lGL -lGLU -lglut
+WINDOWS_FRAMEWORK:=-lopengl32 -lfreeglut -lglu32
+
+CXX_VERSION=-std=c++11
+
+DATE:=$(shell date +"%Y-%m-%d_%H-%M-%S")
+
+# RAYCASTER
+
+build_osx_clang++:
+	@echo '$(CYAN)>> $(GREEN) Building QSP for Mac OSX $(WHITE)[$(RED)$(BOLD)$(OUT)$(RESET)$(WHITE)]'
+	@echo '--------------------------------'
+	@mkdir -p out
+	@clang++ $(CXX_VERSION) $(SRC) $(OSX_FRAMEWORK) -stdlib=libc++ -o $(OUT)
+	@echo '--------------------------------'
+	@echo '$(CYAN)>> $(GREEN) Finished building$(RESET)'
+
+build_osx_g++:
+	@echo '$(CYAN)>> $(GREEN) Building QSP for Mac OSX $(WHITE)[$(RED)$(BOLD)$(OUT)$(RESET)$(WHITE)]'
+	@echo '--------------------------------'
+	@mkdir -p out
+	@g++ $(CXX_VERSION) $(SRC) $(OSX_FRAMEWORK) -stdlib=libc++ -o $(OUT)
+	@echo '--------------------------------'
+	@echo '$(CYAN)>> $(GREEN) Finished building$(RESET)'
+
+build_linux:
+	@echo '$(CYAN)>> $(GREEN) Building QSP for Linux $(WHITE)[$(RED)$(BOLD)$(OUT)$(RESET)$(WHITE)]'
+	@echo '--------------------------------'
+	@mkdir -p out
+	@g++ $(CXX_VERSION) $(SRC) $(LINUX_FRAMEWORK) -o $(OUT)
+	@echo '--------------------------------'
+	@echo '$(CYAN)>> $(GREEN) Finished building$(RESET)'
+
+build_win:
+	@echo '$(CYAN)>> $(GREEN) Building QSP for Windows $(WHITE)[$(RED)$(BOLD)$(OUT)$(RESET)$(WHITE)]'
+	@echo '--------------------------------'
+	@mkdir -p out
+	@g++ $(CXX_VERSION) $(SRC) $(WINDOWS_FRAMEWORK) -o $(OUT)
+	@echo '--------------------------------'
+	@echo '$(CYAN)>> $(GREEN) Finished building$(RESET)'
+
+run:
+	@echo '$(CYAN)>> $(GREEN) Running new build $(WHITE)[$(RED)$(BOLD)$(OUT)$(RESET)$(WHITE)]'
+	@echo '--------------------------------'
+	@mkdir -p out
+	@ $(OUT)
+	@echo '--------------------------------'
+	@echo '$(CYAN)>> $(GREEN) Stopped running$(RESET)'
+
+clean_logs:
+	@echo '$(CYAN)>> $(GREEN) Removing logs in $(WHITE)[$(RED)$(BOLD)$(LOGS_DIR)/*$(RESET)$(WHITE)]'
+	@echo '--------------------------------'
+ifeq (,$(wildcard $(LOGS_DIR)/*.log))
+	@echo "$(RED)No files to remove$(RESET)"
+else
+	-@rm -rvf $(LOGS_DIR)/*.log
+endif
+	@echo '--------------------------------'
+
+clean_archives:
+	@echo '$(CYAN)>> $(GREEN) Removing archives in $(WHITE)[$(RED)$(BOLD)$(LOGS_DIR)/*$(RESET)$(WHITE)]'
+	@echo '--------------------------------'
+ifeq (,$(wildcard $(LOGS_DIR)/*.zip))
+	@echo "$(RED)No files to remove$(RESET)"
+else
+	-@rm -rvf $(LOGS_DIR)/*.zip
+endif
+	@echo '--------------------------------'
+
+clean_out:
+	@echo '$(CYAN)>> $(GREEN) Removing previous builds $(WHITE)[$(RED)$(BOLD)$(OUT)$(RESET)$(WHITE)]'
+	@echo '--------------------------------'
+	-@rm -rvf $(OUT)
+	@echo '--------------------------------'
+
+archive_logs:
+	@echo '$(CYAN)>> $(GREEN) Archiving logs in $(WHITE)[$(RED)$(BOLD)$(LOGS_DIR)$(RESET)$(WHITE)]'
+	@echo '--------------------------------'
+ifeq (,$(wildcard $(LOGS_DIR)/*.log))
+	@echo "$(RED)No logs to archive$(RESET)"
+else
+	-@zip -pr logs/archive-$(DATE).zip $(LOGS_DIR)/*.log
+endif
+	@echo '--------------------------------'
+	@make -f Makefile.alt clean_logs
+
+destroy:
+	@echo '$(CYAN)>> $(GREEN) Removing $(WHITE)[$(RED)$(BOLD)out$(RESET)$(WHITE)] $(GREEN)directory'
+	@echo '--------------------------------'
+	-@rm -rvf out
+	@echo '--------------------------------'
+
+# SUITES
+
+SUITES_DIR:=out/tests
+CATCH_SUITES:=test/testCases.cpp
+
+build_tests_osx_clang++:
+	@echo '$(CYAN)>> $(GREEN) Building tests for Mac OSX $(WHITE)[$(RED)$(BOLD)$(SUITES_DIR)$(RESET)$(WHITE)]'
+	@echo '--------------------------------'
+	@mkdir -p out
+	@mkdir -p $(SUITES_DIR)
+	@echo "Built tests in"
+	@time clang++ $(CXX_VERSION) $(CATCH_SUITES) -stdlib=libc++ -o $(SUITES_DIR)/testcases
+	@echo '--------------------------------'
+	@echo '$(CYAN)>> $(GREEN) Finished building$(RESET)'
+
+build_tests_osx_g++:
+	@echo '$(CYAN)>> $(GREEN) Building tests for Mac OSX $(WHITE)[$(RED)$(BOLD)$(SUITES_DIR)$(RESET)$(WHITE)]'
+	@echo '--------------------------------'
+	@mkdir -p out
+	@mkdir -p $(SUITES_DIR)
+	@echo "Built tests in"
+	@time g++ $(CXX_VERSION) $(CATCH_SUITES) -stdlib=libc++ -o $(SUITES_DIR)/testcases
+	@echo '--------------------------------'
+	@echo '$(CYAN)>> $(GREEN) Finished building$(RESET)'
+
+build_tests_linux:
+	@echo '$(CYAN)>> $(GREEN) Building tests for Linux $(WHITE)[$(RED)$(BOLD)$(SUITES_DIR)$(RESET)$(WHITE)]'
+	@echo '--------------------------------'
+	@mkdir -p out
+	@mkdir -p $(SUITES_DIR)
+	@echo "Built tests in"
+	@time ++ $(CXX_VERSION) $(CATCH_SUITES) -o $(SUITES_DIR)/testcases
+	@echo '--------------------------------'
+	@echo '$(CYAN)>> $(GREEN) Finished building$(RESET)'
+
+build_tests_win:
+	@echo '$(CYAN)>> $(GREEN) Building tests for Windows $(WHITE)[$(RED)$(BOLD)$(SUITES_DIR)$(RESET)$(WHITE)]'
+	@echo '--------------------------------'
+	@mkdir -p out
+	@mkdir -p $(SUITES_DIR)
+	@echo "Built tests in"
+	@time g++ $(CXX_VERSION) $(CATCH_SUITES) -o $(SUITES_DIR)/testcases
+	@echo '--------------------------------'
+	@echo '$(CYAN)>> $(GREEN) Finished building$(RESET)'
+
+run_tests:
+	@echo '$(CYAN)>> $(GREEN) Running test cases $(WHITE)[$(RED)$(BOLD)$(SUITES_DIR)/testcases$(RESET)$(WHITE)]'
+	@echo '--------------------------------'
+	@mkdir -p out
+	@ ./$(SUITES_DIR)/testcases
+	@echo '--------------------------------'
+	@echo '$(CYAN)>> $(GREEN) Stopped running$(RESET)'
+
+run_tests_wo:
+	@echo '$(CYAN)>> $(GREEN) Running test cases $(WHITE)[$(RED)$(BOLD)$(SUITES_DIR)/testcases$(RESET)$(WHITE)]'
+	@echo '--------------------------------'
+	@mkdir -p out
+	@ ./$(SUITES_DIR)/testcases --success
+	@echo '--------------------------------'
+	@echo '$(CYAN)>> $(GREEN) Stopped running$(RESET)'

@@ -2,8 +2,6 @@
 
 #include "Raytracer.hpp"
 
-#define radToCoord(r) (int)(r) >> 6
-
 #define CEILING_COLOUR LIGHT_GREY
 #define FLOOR_COLOUR DARK_GREY
 

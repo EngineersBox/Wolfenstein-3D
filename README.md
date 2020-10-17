@@ -34,28 +34,22 @@ Below is a full list of commands and their usages:
 |`make run_tests`| Run the test cases with assertion fails only|
 |`make run_tests`| Run the test cases with output for all assertions|
 
-### Using `g++/clang++`
+### Using alternate makefile
 
-If you don't have CMake installed on your system, you can still build and run the raycaster, but this requires manual building and execution.
+If you don't have CMake installed on your system, you can still build and run the raycaster, you'll just be using a seperate makefile
 
 #### Mac OS X
 
 To build the raycaster:
 
 ```bash
-clang++ -std=c++11 src/raytracer/Raytracer.cpp -framework OpenGL -framework GLUT -stdlib=libc++ -o out/QSP
+make -f Makefile.alt build_osx_clang++
 ```
 
 *or*
 
 ```bash
-g++ -std=c++11 src/raytracer/Raytracer.cpp -framework OpenGL -framework GLUT -stdlib=libc++ -o out/QSP
-```
-
-To run the built raycaster:
-
-```bash
-./out/QSP
+make -f Makefile.alt build_osx_g++
 ```
 
 #### Linux
@@ -63,13 +57,7 @@ To run the built raycaster:
 To build the raycaster:
 
 ```bash
-g++ -std=c++11 src/raytracer/Raytracer.cpp -lm -lGL -lGLU -lglut -o out/QSP
-```
-
-To run the built raycaster:
-
-```bash
-./out/QSP
+make -f Makefile.alt build_linux
 ```
 
 #### Windows
@@ -77,13 +65,74 @@ To run the built raycaster:
 To build the raycaster:
 
 ```bash
-g++ -std=c++11 src/raytracer/Raytracer.cpp -lopengl32 -lfreeglut -lglu32 -o out/QSP
+make -f Makefile.alt build_win
 ```
+
+### Running the raycaster
 
 To run the built raycaster:
 
 ```bash
-./out/QSP
+make -f Makefile.alt run
+```
+
+## Test cases
+
+### Testing with CMake
+
+If you have CMake installed then running the test cases is really straight forward:
+
+1. Open up a terminal window and cd to this repo
+2. Run `cmake .` to set up the cmake build environment
+3. Build the test cases with `make build_tests`
+4. Run the test cases with `make run_tests` (*or* `make run_tests_wo` *if you want to see each of the assertions*)
+
+### Testing with alternate makefile
+
+If you don't have CMake installed on your system, you can still build and run the test cases, you'll just be using a seperate makefile
+
+#### Mac OS X
+
+To build the tests:
+
+```bash
+make -f Makefile.alt build_tests_osx_clang++
+```
+
+*or*
+
+```bash
+make -f Makefile.alt build_tests_osx_g++
+```
+
+#### Linux
+
+To build the tests:
+
+```bash
+make -f Makefile.alt build_tests_linux
+```
+
+#### Windows
+
+To build the tests:
+
+```bash
+make -f Makefile.alt build_tests_win
+```
+
+### Running the tests
+
+To run the built tests:
+
+```bash
+make -f Makefile.alt run_tests
+```
+
+Or with assertion output:
+
+```bash
+make -f Makefile.alt run_tests_wo
 ```
 
 ---

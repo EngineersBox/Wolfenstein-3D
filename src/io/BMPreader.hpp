@@ -22,7 +22,7 @@
 #include "../exceptions/image/ImageDimensionsError.hpp"
 #include "../exceptions/image/ImageFileStreamError.hpp"
 #include "../exceptions/image/ImagePixelError.hpp"
-#include "TextureColours.hpp"
+#include "../texturing/TextureColours.hpp"
 
 #include "../raytracer/Globals.hpp"
 

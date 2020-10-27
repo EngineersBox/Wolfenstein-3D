@@ -9,6 +9,7 @@
 #include <vector>
 
 #include "texture.hpp"
+#include "../exceptions/image/FileFormatError.hpp"
 #include "../exceptions/textureLoader/ExceededMaxTextureImport.hpp"
 #include "../hashing/HashTable.hpp"
 #include "../raytracer/Globals.hpp"

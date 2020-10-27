@@ -6,6 +6,7 @@
 #include "../texturing/TextureColours.hpp"
 #include "../texturing/texture.hpp"
 #include "AABBFace.hpp"
+#include "../raytracer/Ray.hpp"
 
 using namespace std;
 
@@ -30,12 +31,13 @@ class AABB {
     AABB(int x, int y, string texture);
     AABB(int x, int y, Colour colour, AABBFace wf_left, AABBFace wf_right, AABBFace wf_up, AABBFace wf_down);
     AABB();
-    ~AABB();
+
     bool operator==(AABB& other);
     bool operator!=(AABB& other);
     NormalDir getNormDir(int x, int y);
     AABBFace getFace(NormalDir normDir);
     AABBFace getFace(int x, int y);
+    bool intersect(const Ray& ray, Coords& intersect_point);
 
     int posX;
     int posY;
@@ -80,8 +82,6 @@ AABB::AABB() : AABB(0, 0, NONE, "") {};
 AABB::AABB(int x, int y, string texture) : AABB(x, y, NONE, texture) {};
 
 AABB::AABB(int x, int y, Colour colour) : AABB(x, y, colour, "") {};
-
-AABB::~AABB(){};
 
 bool AABB::operator==(AABB& other) {
     return (this->posX == other.posX)
@@ -133,4 +133,21 @@ AABBFace AABB::getFace(NormalDir normDir) {
 
 AABBFace AABB::getFace(int x, int y) {
     return getFace(getNormDir(x, y));
+};
+
+bool AABB::intersect(const Ray& ray, Coords& intersect_point) {
+    double tx1 = (posX - ray.ax) * ray.bx;
+    double tx2 = (posX + 64 - ray.ax) * ray.bx;
+
+    double tmin = min(tx1, tx2);
+    double tmax = max(tx1, tx2);
+
+    double ty1 = (posY - ray.ay) * ray.by;
+    double ty2 = (posY + 64 - ray.ay) * ray.by;
+
+    tmin = max(tmin, min(ty1, ty2));
+    tmax = min(tmax, max(ty1, ty2));
+
+    intersect_point = Coords(tmax * ray.bx + ray.ay, tmax * ray.by + ray.ay);
+    return tmax >= tmin;
 };

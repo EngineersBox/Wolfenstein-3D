@@ -43,7 +43,6 @@ class MinimapCfg {
     public:
         MinimapCfg();
         MinimapCfg(bool enable, bool render_rays, MinimapPos pos, MinimapSize size);
-        ~MinimapCfg();
 
         inline bool isTop();
         inline bool isLeft();
@@ -62,8 +61,6 @@ MinimapCfg::MinimapCfg(bool enable, bool render_rays, MinimapPos pos, MinimapSiz
     this->pos = pos;
     this->size = size;
 };
-
-MinimapCfg::~MinimapCfg() {};
 
 inline bool MinimapCfg::isTop() {
     return this->pos == TOP_LEFT || this->pos == TOP_RIGHT;

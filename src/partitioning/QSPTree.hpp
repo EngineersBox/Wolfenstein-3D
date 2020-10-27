@@ -39,13 +39,14 @@ class QSPTree {
         QuadNode* insertNode(QuadNode* root, QuadNode* node);
         inline QuadNode* insertRelative(QuadNode* dir_node, QuadNode* node);
 
-        void queryWalls(Coords origin, float player_angle, vector<Ray>* rays, vector<Coords>& ret_walls);
+        void queryWalls(Coords origin, float player_angle, vector<Ray>& rays, vector<Coords>& ret_walls);
 
         void printPreorder(QuadNode* node);
     private:
         RelativePosition position(Coords a, Coords b);
         double sqDist(Coords a, Coords b);
         void findMiddle();
+        inline void traverseNext(RelativePosition& currBranch, QuadNode* currNode, TraversalRecord& currTraversal, stack<TraversalRecord>& nodesVisited);
 
         GameMap map;
         vector<AABB>* walls;
@@ -53,7 +54,7 @@ class QSPTree {
         vector<AABB>* down_boundary;
         vector<AABB>* left_boundary;
         vector<AABB>* right_boundary;
-        Coords mid;
+        AABB mid;
         QuadNode* root;
 };
 
@@ -80,21 +81,22 @@ double QSPTree::sqDist(Coords a, Coords b) {
 };
 
 void QSPTree::findMiddle() {
-    Coords current_mid((int)floor(map.map_width), (int)floor(map.map_height));
+    AABB current_mid;
+    Coords cMid = Coords((int)floor(map.map_width), (int)floor(map.map_height));
     double current_min_dist = numeric_limits<double>::max();
     int current_wall_idx;
     for (int i = walls->size() - 1; i != -1; i--) {
         Coords loc = Coords(walls->at(i).posX, walls->at(i).posY);
-        int dist = sqDist(this->mid, loc);
+        int dist = sqDist(cMid, loc);
         if (dist < current_min_dist) {
-            current_mid = loc;
+            current_mid = walls->at(i);
             current_min_dist = dist;
             current_wall_idx = i;
         }
     }
     this->walls->erase(this->walls->begin() + current_wall_idx);
     this->mid = current_mid;
-    debugContext.logAppInfo("Closest AABB to actuall map centre at: " + current_mid.asString());
+    debugContext.logAppInfo("Closest AABB to actuall map centre at: (" + to_string(current_mid.posX) + "," + to_string(current_mid.posY) + ")");
     this->root = new QuadNode(current_mid);
 };
 
@@ -125,7 +127,7 @@ inline QuadNode* QSPTree::insertRelative(QuadNode* dir_node, QuadNode* node) {
 };
 
 QuadNode* QSPTree::insertNode(QuadNode* root, QuadNode* node) {
-    RelativePosition relPos = position(root->wall_coords, node->wall_coords);
+    RelativePosition relPos = position(Coords(root->wall.posX, root->wall.posY), Coords(node->wall.posX, node->wall.posY));
     switch (relPos) {
         case RelativePosition::REL_UP:
             root->U = insertRelative(root->U, node);
@@ -145,44 +147,64 @@ QuadNode* QSPTree::insertNode(QuadNode* root, QuadNode* node) {
 void QSPTree::buildTree() {
     debugContext.logAppInfo("---- STARTED BUILDING QSP TREE ----");
     for (AABB AABB : *this->walls) {
-        this->root = insertNode(this->root, new QuadNode(Coords(AABB.posX, AABB.posY)));
+        this->root = insertNode(this->root, new QuadNode(AABB));
     }
     debugContext.logAppInfo("Inserted " + to_string(this->walls->size()) + " AABB nodes");
     // Inserting boundaries last will garuantee them as leaf nodes
     for (AABB AABB : *this->up_boundary) {
-        this->root->U = insertNode(this->root->U, new QuadNode(Coords(AABB.posX, AABB.posY)));
+        this->root->U = insertNode(this->root->U, new QuadNode(AABB));
     }
     debugContext.logAppInfo("Inserted " + to_string(this->up_boundary->size()) + " 'TOP' boundary leaves");
     for (AABB AABB : *this->down_boundary) {
-        this->root->D = insertNode(this->root->D, new QuadNode(Coords(AABB.posX, AABB.posY)));
+        this->root->D = insertNode(this->root->D, new QuadNode(AABB));
     }
     debugContext.logAppInfo("Inserted " + to_string(this->down_boundary->size()) + " 'DOWN' boundary leaves");
     for (AABB AABB : *this->left_boundary) {
-        this->root->L = insertNode(this->root->L, new QuadNode(Coords(AABB.posX, AABB.posY)));
+        this->root->L = insertNode(this->root->L, new QuadNode(AABB));
     }
     debugContext.logAppInfo("Inserted " + to_string(this->left_boundary->size()) + " 'LEFT' boundary leaves");
     for (AABB AABB : *this->right_boundary) {
-        this->root->R = insertNode(this->root->R, new QuadNode(Coords(AABB.posX, AABB.posY)));
+        this->root->R = insertNode(this->root->R, new QuadNode(AABB));
     }
     debugContext.logAppInfo("Inserted " + to_string(this->right_boundary->size()) + " 'RIGHT' boundary leaves");
     debugContext.logAppInfo("---- FINISHED BUILDING QSP TREE [" + string(ADDR_OF(*this)) + "] ----");
 };
 
-void QSPTree::queryWalls(Coords origin, float player_angle, vector<Ray>* rays, vector<Coords>& ret_walls) {
+inline void QSPTree::traverseNext(RelativePosition& currBranch, QuadNode* currNode, TraversalRecord& currTraversal, stack<TraversalRecord>& nodesVisited) {
+    switch (currBranch) {
+        case RelativePosition::REL_UP:
+            currNode = currNode->U;
+            currTraversal.traversals.push_back(RelativePosition::REL_UP);
+            nodesVisited.push(currTraversal);
+            break;
+        case RelativePosition::REL_LEFT:
+            currNode = currNode->L;
+            currTraversal.traversals.push_back(RelativePosition::REL_LEFT);
+            nodesVisited.push(currTraversal);
+            break;
+        case RelativePosition::REL_DOWN:
+            currNode = currNode->D;
+            currTraversal.traversals.push_back(RelativePosition::REL_DOWN);
+            nodesVisited.push(currTraversal);
+            break;
+        default:
+            currNode = currNode->R;
+            currTraversal.traversals.push_back(RelativePosition::REL_RIGHT);
+            nodesVisited.push(currTraversal);
+            break;
+    }
+};
+
+void QSPTree::queryWalls(Coords origin, float player_angle, vector<Ray>& rays, vector<Coords>& ret_walls) {
     // TODO: implement tree traversal and node query against rays
     stack<TraversalRecord> nodesVisited;
     TraversalRecord currTraversal(this->root, vector<RelativePosition>());
     QuadNode* currNode = this->root;
-    Coords cPos = Coords(radToCoord(currNode->wall_coords.x) + 0.5, radToCoord(currNode->wall_coords.y) + 0.5);
+    Coords cPos = Coords(radToCoord(currNode->wall.posX) + 0.5, radToCoord(currNode->wall.posY) + 0.5);
     RelativePosition currBranch = position(cPos, origin);
     int raysQueried = 0;
-    debugContext.logAppVerb("Querying " + to_string(rays->size()) + " rays in QSP tree [" + ADDR_OF(*this) + "]");
-    while (raysQueried < rays->size() && (!nodesVisited.empty())) {
-        // NOTE: Add AABB cordinates to ret_walls argument
-        // NOTE: During traversal, cull branches that are not relevant
-        // such as if the player is in the right branch and they are
-        // looking through the right to the top then cull the left and bottom branches
-
+    debugContext.logAppVerb("Querying " + to_string(rays.size()) + " rays in QSP tree [" + ADDR_OF(*this) + "]");
+    while (raysQueried < rays.size() && (!nodesVisited.empty())) {
         if (currNode == nullptr) {
             currTraversal = nodesVisited.top();
             nodesVisited.pop();
@@ -190,19 +212,21 @@ void QSPTree::queryWalls(Coords origin, float player_angle, vector<Ray>* rays, v
             continue;
         }
 
-        cPos = Coords(radToCoord(currNode->wall_coords.x) + 0.5, radToCoord(currNode->wall_coords.x) + 0.5);
+        cPos = Coords(radToCoord(currNode->wall.posX) + 0.5, radToCoord(currNode->wall.posY) + 0.5);
         currBranch = position(cPos, origin);
 
-        for (Ray ray : *rays) {
-            // 1. Check if any rays intersect with the current wall
-            // If there is an intersection, log it and remove ray from pool
-            // and lastly increment rayQueried as needed
-            ;
+        vector<Ray> newRays;
+        for (Ray ray : rays) {
+            Coords intersection;
+            if (currNode->wall.intersect(ray, intersection)) {
+                raysQueried++;
+                ret_walls.push_back(intersection);
+            } else {
+                newRays.push_back(ray);
+            }
         }
+        rays = newRays;
 
-        // 2. Traverse tree, first through sector where origin is located
-        // Then procede through sector rays are pointed at.
-        // Then through other two sectors if in frustrum
         RelativePosition nextBranch = currBranch;
         if (currTraversal.traversals.size() == 4) {
             currNode = nodesVisited.top().node;
@@ -214,28 +238,7 @@ void QSPTree::queryWalls(Coords origin, float player_angle, vector<Ray>* rays, v
             // 3.2 If already searched branch that rays at facing towards try other branches
             // 3.3 If already searched non-behind branch, try behind branch
         }
-        switch (currBranch) {
-            case RelativePosition::REL_UP:
-                currNode = currNode->U;
-                currTraversal.traversals.push_back(RelativePosition::REL_UP);
-                nodesVisited.push(currTraversal);
-                break;
-            case RelativePosition::REL_LEFT:
-                currNode = currNode->L;
-                currTraversal.traversals.push_back(RelativePosition::REL_LEFT);
-                nodesVisited.push(currTraversal);
-                break;
-            case RelativePosition::REL_DOWN:
-                currNode = currNode->D;
-                currTraversal.traversals.push_back(RelativePosition::REL_DOWN);
-                nodesVisited.push(currTraversal);
-                break;
-            default:
-                currNode = currNode->R;
-                currTraversal.traversals.push_back(RelativePosition::REL_RIGHT);
-                nodesVisited.push(currTraversal);
-                break;
-        }
+        traverseNext(currBranch, currNode, currTraversal, nodesVisited);
     }
 };
 
@@ -243,7 +246,7 @@ void QSPTree::printPreorder(QuadNode* node) {
     if (node == nullptr) {
         return;
     }
-    cout << node->wall_coords.asString();
+    cout << "(" + to_string(node->wall.posX) + "," + to_string(node->wall.posY) + ")";
     printPreorder(node->U);
     printPreorder(node->D);
     printPreorder(node->L);

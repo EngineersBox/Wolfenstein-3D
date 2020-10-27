@@ -14,7 +14,7 @@
 
 #include <string>
 #include "../raytracer/Globals.hpp"
-#include "BMPreader.hpp"
+#include "../io/BMPreader.hpp"
 
 using namespace std;
 

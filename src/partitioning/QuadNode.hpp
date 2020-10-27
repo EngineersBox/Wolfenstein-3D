@@ -13,10 +13,10 @@
 using namespace std;
 
 struct QuadNode {
-    QuadNode(Coords wall_coords);
+    QuadNode(AABB& wall);
     ~QuadNode();
 
-    Coords wall_coords;
+    AABB wall;
     QuadNode* U = nullptr;
     QuadNode* D = nullptr;
     QuadNode* L = nullptr;
@@ -24,8 +24,8 @@ struct QuadNode {
     QuadNode* parent = nullptr;
 };
 
-QuadNode::QuadNode(Coords wall_coords) {
-    this->wall_coords = wall_coords;
+QuadNode::QuadNode(AABB& wall) {
+    this->wall = wall;
 }
 
 QuadNode::~QuadNode() {

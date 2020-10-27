@@ -256,4 +256,5 @@ log_verbose = true
 headless_mode = false
 double_buffer = false
 refresh_rate = 60 ; Value in Hz
+ray_count=80
 ```

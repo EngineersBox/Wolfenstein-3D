@@ -70,7 +70,7 @@ clean_logs:
 	@echo '$(CYAN)>> $(GREEN) Removing logs in $(WHITE)[$(RED)$(BOLD)$(LOGS_DIR)/*$(RESET)$(WHITE)]'
 	@echo '--------------------------------'
 ifeq (,$(wildcard $(LOGS_DIR)/*.log))
-	@echo "$(RED)No files to remove$(RESET)"
+	@echo "$(RED)$(BOLD)No files to remove$(RESET)"
 else
 	-@rm -rvf $(LOGS_DIR)/*.log
 endif
@@ -80,7 +80,7 @@ clean_archives:
 	@echo '$(CYAN)>> $(GREEN) Removing archives in $(WHITE)[$(RED)$(BOLD)$(LOGS_DIR)/*$(RESET)$(WHITE)]'
 	@echo '--------------------------------'
 ifeq (,$(wildcard $(LOGS_DIR)/*.zip))
-	@echo "$(RED)No files to remove$(RESET)"
+	@echo "$(RED)$(BOLD)No files to remove$(RESET)"
 else
 	-@rm -rvf $(LOGS_DIR)/*.zip
 endif
@@ -96,7 +96,7 @@ archive_logs:
 	@echo '$(CYAN)>> $(GREEN) Archiving logs in $(WHITE)[$(RED)$(BOLD)$(LOGS_DIR)$(RESET)$(WHITE)]'
 	@echo '--------------------------------'
 ifeq (,$(wildcard $(LOGS_DIR)/*.log))
-	@echo "$(RED)No logs to archive$(RESET)"
+	@echo "$(RED)$(BOLD)No logs to archive$(RESET)"
 else
 	-@zip -pr logs/archive-$(DATE).zip $(LOGS_DIR)/*.log
 endif
@@ -140,7 +140,7 @@ build_tests_linux:
 	@mkdir -p out
 	@mkdir -p $(SUITES_DIR)
 	@echo "Built tests in"
-	@time ++ $(CXX_VERSION) $(CATCH_SUITES) -o $(SUITES_DIR)/testcases
+	@time g++ $(CXX_VERSION) $(CATCH_SUITES) -o $(SUITES_DIR)/testcases
 	@echo '--------------------------------'
 	@echo '$(CYAN)>> $(GREEN) Finished building$(RESET)'
 

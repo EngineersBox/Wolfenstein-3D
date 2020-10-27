@@ -84,7 +84,8 @@ RenderCfg ConfigInit::initRenderConfig() {
     return RenderCfg(
         reader.GetBoolean(RENDER_SECTION, "headless_mode", false),
         reader.GetBoolean(RENDER_SECTION, "double_buffer", false),
-        reader.GetInteger(RENDER_SECTION, "refresh_rate", 60)
+        reader.GetInteger(RENDER_SECTION, "refresh_rate", 60),
+        reader.GetInteger(RENDER_SECTION, "ray_count", 80)
     );
 }
 

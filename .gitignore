@@ -18,3 +18,6 @@ Makefile
 
 build
 build/*
+
+memory_analysis
+memory_analysis/*

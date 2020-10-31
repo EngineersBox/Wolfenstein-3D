@@ -125,7 +125,6 @@ static void reshape(int width, int height) {
     screenW = width;
     screenH = height;
     ZBuffer.resize(width);
-    return;
 }
 
 inline void drawPixel(int x, int y, PNG::ColorRGB colour) {
@@ -144,13 +143,13 @@ inline static void renderFloorCeiling() {
     Texture tex;
     string floorTexture, ceilingTexture;
     uint32_t color;
-    for (int y = screenH / 2 + 1; y < screenH; ++y) {
+    for (int y = (IDIV_2(screenH)) + 1; y < screenH; ++y) {
         rayDirX0 = player.dx - planeX;
         rayDirY0 = player.dy - planeY;
         rayDirX1 = player.dx + planeX;
         rayDirY1 = player.dy + planeY;
 
-        p = y - screenH / 2;
+        p = y - (IDIV_2(screenH));
 
         posZ = 0.5 * screenH;
 
@@ -232,21 +231,21 @@ inline static void renderWalls() {
                 mapY += stepY;
                 side = 1;
             }
-            hit = (int)(gameMap.getAt(mapX, mapY).wf_left.f_texture != "");
+            hit = gameMap.getAt(mapX, mapY).wf_left.f_texture != "";
         }
 
         if (side == 0) {
-            perpWallDist = (mapX - player.x + (1 - stepX) / 2) / rayDirX;
+            perpWallDist = (mapX - player.x + (IDIV_2((1 - stepX)))) / rayDirX;
         } else {
-            perpWallDist = (mapY - player.y + (1 - stepY) / 2) / rayDirY;
+            perpWallDist = (mapY - player.y + (IDIV_2((1 - stepY)))) / rayDirY;
         }
         lineHeight = (int)(screenH / perpWallDist);
 
-        drawStart = -lineHeight / 2 + screenH / 2;
+        drawStart = (IDIV_2(-lineHeight)) + (IDIV_2(screenH));
         if (drawStart < 0) {
             drawStart = 0;
         }
-        drawEnd = lineHeight / 2 + screenH / 2;
+        drawEnd = (IDIV_2(lineHeight)) + (IDIV_2(screenH));
         if (drawEnd >= screenH) {
             drawEnd = screenH - 1;
         }
@@ -256,11 +255,15 @@ inline static void renderWalls() {
         wallX -= floor((wallX));
 
         texX = (int)(wallX * double(TEXTURE_WIDTH));
-        if (side == 0 && rayDirX > 0) texX = TEXTURE_WIDTH - texX - 1;
-        if (side == 1 && rayDirY < 0) texX = TEXTURE_WIDTH - texX - 1;
+        if (side == 0 && rayDirX > 0) {
+            texX = TEXTURE_WIDTH - texX - 1;
+        }
+        if (side == 1 && rayDirY < 0) {
+            texX = TEXTURE_WIDTH - texX - 1;
+        }
 
         step = 1.0 * TEXTURE_HEIGHT / lineHeight;
-        texPos = (drawStart - screenH / 2 + lineHeight / 2) * step;
+        texPos = (drawStart - (IDIV_2(screenH)) + (IDIV_2(lineHeight))) * step;
         for (int y = drawStart; y < drawEnd; y++) {
             texY = (int)texPos & (TEXTURE_HEIGHT - 1);
             texPos += step;
@@ -300,40 +303,41 @@ inline static void renderSprites() {
         transformX = invDet * (player.dy * spriteX - player.dx * spriteY);
         transformY = invDet * (-planeY * spriteX + planeX * spriteY);
 
-        spriteScreenX = (int)((screenW / 2) * (1 + transformX / transformY));
+        spriteScreenX = (int)((IDIV_2(screenW)) * (1 + transformX / transformY));
 
         V_MOVEScreen = (int)(SPRITE_V_MOVE / transformY);
 
         spriteHeight = abs((int)(screenH / (transformY))) / SPRITE_V_DIV;
-        drawStartY = -spriteHeight / 2 + screenH / 2 + V_MOVEScreen;
+        drawStartY = -(IDIV_2(spriteHeight)) + (IDIV_2(screenH)) + V_MOVEScreen;
         if (drawStartY < 0) {
             drawStartY = 0;
         }
-        drawEndY = spriteHeight / 2 + screenH / 2 + V_MOVEScreen;
+        drawEndY = (IDIV_2(spriteHeight)) + (IDIV_2(screenH)) + V_MOVEScreen;
         if (drawEndY >= screenH) {
             drawEndY = screenH - 1;
         }
 
         spriteWidth = abs((int)(screenH / (transformY))) / SPRITE_U_DIV;
-        drawStartX = -spriteWidth / 2 + spriteScreenX;
+        drawStartX = (IDIV_2(-spriteWidth)) + spriteScreenX;
         if (drawStartX < 0) {
             drawStartX = 0;
         }
-        drawEndX = spriteWidth / 2 + spriteScreenX;
+        drawEndX = (IDIV_2(spriteWidth)) + spriteScreenX;
         if (drawEndX >= screenW) {
             drawEndX = screenW - 1;
         }
         textures.get(gameMap.sprites[spriteOrder[i]].texture, tex);
         for (int stripe = drawStartX; stripe < drawEndX; stripe++) {
-            texX = (int)(256 * (stripe - (-spriteWidth / 2 + spriteScreenX)) * TEXTURE_WIDTH / spriteWidth) / 256;
-            if (transformY > 0 && stripe > 0 && stripe < screenW && transformY < ZBuffer[stripe]) {
-                for (int y = drawStartY; y < drawEndY; y++) {
-                    d = (y - V_MOVEScreen) * 256 - screenH * 128 + spriteHeight * 128;
-                    texY = ((d * TEXTURE_HEIGHT) / spriteHeight) / 256;
-                    color = tex.texture[TEXTURE_WIDTH * texY + texX];
-                    if ((color & 0x00FFFFFF) != 0) {
-                        drawPixel(stripe, screenH - y, PNG::INTtoRGB(color));
-                    }
+            texX = (int)(256 * (stripe - ((IDIV_2(-spriteWidth)) + spriteScreenX)) * TEXTURE_WIDTH / spriteWidth) / 256;
+            if (!(transformY > 0 && stripe > 0 && stripe < screenW && transformY < ZBuffer[stripe])) {
+                continue;
+            }
+            for (int y = drawStartY; y < drawEndY; y++) {
+                d = (y - V_MOVEScreen) * 256 - screenH * 128 + spriteHeight * 128;
+                texY = ((d * TEXTURE_HEIGHT) / spriteHeight) / 256;
+                color = tex.texture[TEXTURE_WIDTH * texY + texX];
+                if ((color & 0x00FFFFFF) != 0) {
+                    drawPixel(stripe, screenH - y, PNG::INTtoRGB(color));
                 }
             }
         }

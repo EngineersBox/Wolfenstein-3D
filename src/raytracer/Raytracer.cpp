@@ -83,8 +83,8 @@ static void renderMap2D(int sw = screenW, int sh = screenH) {
     }
 }
 
-#define TEXTURE_WIDTH 64   // must be power of two
-#define TEXTURE_HEIGHT 64  // must be power of two
+#define TEXTURE_WIDTH 64
+#define TEXTURE_HEIGHT 64
 #define MAP_WIDTH 24
 #define MAP_HEIGHT 24
 
@@ -122,7 +122,6 @@ struct Sprite {
 
 #define SPRITE_COUNT 19
 
-//parameters for scaling and moving the sprites
 #define SPRITE_U_DIV 1
 #define SPRITE_V_DIV 1
 #define SPRITE_V_MOVE 0.0
@@ -151,28 +150,25 @@ Sprite sprite[SPRITE_COUNT] = {
 
 vector<uint32_t> texture[11];
 
-//1D Zbuffer
 vector<double> ZBuffer(screenW);
 
-//arrays used to sort the sprites
 int spriteOrder[SPRITE_COUNT];
 double spriteDistance[SPRITE_COUNT];
 
-double posX = 22.0, posY = 11.5;     //x and y start position
-double dirX = -1.0, dirY = 0.0;      //initial direction vector
-double planeX = 0.0, planeY = 0.66;  //the 2d raycaster version of camera plane
+double posX = 22.0, posY = 11.5;
+double dirX = -1.0, dirY = 0.0;
+double planeX = 0.0, planeY = 0.66;
 
-double newTime = 0;  //time of current frame
-double oldTime = 0;  //time of previous frame
+double newTime = 0;
+double oldTime = 0;
 
 double frameTime = 0;
 
-double moveSpeed = frameTime * 3.0;  //the constant value is in squares/second
-double rotSpeed = frameTime * 2.0;   //the constant value is in radians/second
+double moveSpeed = frameTime * 3.0;
+double rotSpeed = frameTime * 2.0;
 
 #define DARK_SHADER 8355711
 
-//sort the sprites based on distance
 void sortSprites(int* order, double* dist, int amount) {
     vector<pair<double, int>> sprites(amount);
     for (int i = 0; i < amount; i++) {
@@ -180,7 +176,6 @@ void sortSprites(int* order, double* dist, int amount) {
         sprites[i].second = order[i];
     }
     sort(sprites.begin(), sprites.end());
-    // restore in reverse order to go from farthest to nearest
     for (int i = 0; i < amount; i++) {
         dist[i] = sprites[amount - i - 1].first;
         order[i] = sprites[amount - i - 1].second;
@@ -211,57 +206,45 @@ inline static void renderFloorCeiling() {
     string floorTexture, ceilingTexture;
     uint32_t color;
     for (int y = screenH / 2 + 1; y < screenH; ++y) {
-        // rayDir for leftmost ray (x = 0) and rightmost ray (x = w)
         rayDirX0 = dirX - planeX;
         rayDirY0 = dirY - planeY;
         rayDirX1 = dirX + planeX;
         rayDirY1 = dirY + planeY;
 
-        // Current y position compared to the center of the screen (the horizon)
         p = y - screenH / 2;
 
-        // Vertical position of the camera.
         posZ = 0.5 * screenH;
 
-        // Horizontal distance from the camera to the floor for the current row.
-        // 0.5 is the z position exactly in the middle between floor and ceiling.
         rowDistance = posZ / p;
 
-        // calculate the real world step vector we have to add for each x (parallel to camera plane)
-        // adding step by step avoids multiplications with a weight in the inner loop
         floorStepX = rowDistance * (rayDirX1 - rayDirX0) / screenW;
         floorStepY = rowDistance * (rayDirY1 - rayDirY0) / screenW;
 
-        // real world coordinates of the leftmost column. This will be updated as we step to the right.
         floorX = posX + rowDistance * rayDirX0;
         floorY = posY + rowDistance * rayDirY0;
 
         for (int x = 0; x < screenW; ++x) {
-            // the cell coord is simply got from the integer parts of floorX and floorY
             cellX = (int)(floorX);
             cellY = (int)(floorY);
 
-            // get the texture coordinate from the fractional part
             tx = (int)(TEXTURE_WIDTH * (floorX - cellX)) & (TEXTURE_WIDTH - 1);
             ty = (int)(TEXTURE_HEIGHT * (floorY - cellY)) & (TEXTURE_HEIGHT - 1);
 
             floorX += floorStepX;
             floorY += floorStepY;
 
-            // choose texture and draw the pixel
             checkerBoardPattern = (int(cellX + cellY)) & 1;
             floorTexture = checkerBoardPattern == 0 ? "greystone" : "mossy";
             ceilingTexture = "wood";
-            // floor
+
             textures.get(floorTexture, tex);
             color = tex.texture[TEXTURE_WIDTH * ty + tx];
-            color = (color >> 1) & DARK_SHADER;  // make a bit darker
+            color = (color >> 1) & DARK_SHADER;
             drawPixel(x, screenH - y, PNG::INTtoRGB(color));
 
-            //ceiling (symmetrical, at screenH - y - 1 instead of y)
             textures.get(ceilingTexture, tex);
             color = tex.texture[TEXTURE_WIDTH * ty + tx];
-            color = (color >> 1) & DARK_SHADER;  // make a bit darker
+            color = (color >> 1) & DARK_SHADER;
             drawPixel(x, y - 1, PNG::INTtoRGB(color));
         }
     }
@@ -274,24 +257,17 @@ inline static void renderWalls() {
     uint32_t color;
     Texture tex;
     for (int x = 0; x < screenW; x++) {
-        //calculate ray position and direction
-        cameraX = 2 * x / double(screenW) - 1;  //x-coordinate in camera space
+        cameraX = 2 * x / double(screenW) - 1;
         rayDirX = dirX + planeX * cameraX;
         rayDirY = dirY + planeY * cameraX;
 
-        //which box of the map we're in
         mapX = int(posX);
         mapY = int(posY);
 
-        //length of ray from one x or y-side to next x or y-side
         deltaDistX = abs(1 / rayDirX);
         deltaDistY = abs(1 / rayDirY);
 
-        //what direction to step in x or y-direction (either +1 or -1)
-
-        hit = 0;  //was there a wall hit?
-
-        //calculate step and initial sideDist
+        hit = 0;
         if (rayDirX < 0) {
             stepX = -1;
             sideDistX = (posX - mapX) * deltaDistX;
@@ -306,9 +282,8 @@ inline static void renderWalls() {
             stepY = 1;
             sideDistY = (mapY + 1.0 - posY) * deltaDistY;
         }
-        //perform DDA
+
         while (hit == 0) {
-            //jump to next map square, OR in x-direction, OR in y-direction
             if (sideDistX < sideDistY) {
                 sideDistX += deltaDistX;
                 mapX += stepX;
@@ -318,57 +293,47 @@ inline static void renderWalls() {
                 mapY += stepY;
                 side = 1;
             }
-            //Check if ray has hit a wall
-            if (worldMap[mapX][mapY] != "none") hit = 1;
+            hit = (int)(worldMap[mapX][mapY] != "none");
         }
 
-        //Calculate distance of perpendicular ray (Euclidean distance will give fisheye effect!)
-        if (side == 0)
+        if (side == 0) {
             perpWallDist = (mapX - posX + (1 - stepX) / 2) / rayDirX;
-        else
+        } else {
             perpWallDist = (mapY - posY + (1 - stepY) / 2) / rayDirY;
-
-        //Calculate height of line to draw on screen
+        }
         lineHeight = (int)(screenH / perpWallDist);
 
-        //calculate lowest and highest pixel to fill in current stripe
         drawStart = -lineHeight / 2 + screenH / 2;
-        if (drawStart < 0) drawStart = 0;
+        if (drawStart < 0) {
+            drawStart = 0;
+        }
         drawEnd = lineHeight / 2 + screenH / 2;
-        if (drawEnd >= screenH) drawEnd = screenH - 1;
-        //texturing calculations
-        wallTex = worldMap[mapX][mapY];  //1 subtracted from it so that texture 0 can be used!
+        if (drawEnd >= screenH) {
+            drawEnd = screenH - 1;
+        }
+        wallTex = worldMap[mapX][mapY];
         
-        //calculate value of wallX
-        if (side == 0)
-            wallX = posY + perpWallDist * rayDirY;
-        else
-            wallX = posX + perpWallDist * rayDirX;
+        wallX = side == 0 ? posY + perpWallDist* rayDirY : posX + perpWallDist * rayDirX;
         wallX -= floor((wallX));
 
-        //x coordinate on the texture
-        texX = int(wallX * double(TEXTURE_WIDTH));
+        texX = (int)(wallX * double(TEXTURE_WIDTH));
         if (side == 0 && rayDirX > 0) texX = TEXTURE_WIDTH - texX - 1;
         if (side == 1 && rayDirY < 0) texX = TEXTURE_WIDTH - texX - 1;
 
-        // TODO: an integer-only bresenham or DDA like algorithm could make the texture coordinate stepping faster
-        // How much to increase the texture coordinate per screen pixel
         step = 1.0 * TEXTURE_HEIGHT / lineHeight;
-        // Starting texture coordinate
         texPos = (drawStart - screenH / 2 + lineHeight / 2) * step;
         for (int y = drawStart; y < drawEnd; y++) {
-            // Cast the texture coordinate to integer, and mask with (TEXTURE_HEIGHT - 1) in case of overflow
             texY = (int)texPos & (TEXTURE_HEIGHT - 1);
             texPos += step;
             textures.get(wallTex, tex);
             color = tex.texture[TEXTURE_HEIGHT * texY + texX];
-            //make color darker for y-sides: R, G and B byte each divided through two with a "shift" and an "and"
-            if (side == 1) color = (color >> 1) & DARK_SHADER;
+            if (side == 1) {
+                color = (color >> 1) & DARK_SHADER;
+            }
             drawPixel(x, screenH - y, PNG::INTtoRGB(color));
         }
 
-        //SET THE ZBUFFER FOR THE SPRITE CASTING
-        ZBuffer[x] = perpWallDist;  //perpendicular distance is used
+        ZBuffer[x] = perpWallDist;
     }
 }
 
@@ -377,7 +342,6 @@ inline double sqDist(double ax, double ay, double bx, double by) {
 }
 
 inline static void renderSprites() {
-    //sort sprites from far to close
     for (int i = 0; i < SPRITE_COUNT; i++) {
         spriteOrder[i] = i;
         spriteDistance[i] = sqDist(sprite[i].x, posX, sprite[i].y, posY);
@@ -388,59 +352,47 @@ inline static void renderSprites() {
     int spriteScreenX, V_MOVEScreen, spriteHeight, drawStartY, drawEndY, spriteWidth, drawStartX, drawEndX, texX, texY, d;
     Texture tex;
     uint32_t color;
-    //after sorting the sprites, do the projection and draw them
     for (int i = 0; i < SPRITE_COUNT; i++) {
-        //translate sprite position to relative to camera
         spriteX = sprite[spriteOrder[i]].x - posX;
         spriteY = sprite[spriteOrder[i]].y - posY;
 
-        //transform sprite with the inverse camera matrix
-        // [ planeX   dirX ] -1                                       [ dirY      -dirX ]
-        // [               ]       =  1/(planeX*dirY-dirX*planeY) *   [                 ]
-        // [ planeY   dirY ]                                          [ -planeY  planeX ]
-
-        invDet = 1.0 / (planeX * dirY - dirX * planeY);  //required for correct matrix multiplication
+        invDet = 1.0 / (planeX * dirY - dirX * planeY);
 
         transformX = invDet * (dirY * spriteX - dirX * spriteY);
-        transformY = invDet * (-planeY * spriteX + planeX * spriteY);  //this is actually the depth inside the screen, that what Z is in 3D, the distance of sprite to player, matching sqrt(spriteDistance[i])
+        transformY = invDet * (-planeY * spriteX + planeX * spriteY);
 
-        spriteScreenX = int((screenW / 2) * (1 + transformX / transformY));
+        spriteScreenX = (int)((screenW / 2) * (1 + transformX / transformY));
 
-        V_MOVEScreen = int(SPRITE_V_MOVE / transformY);
+        V_MOVEScreen = (int)(SPRITE_V_MOVE / transformY);
 
-        //calculate height of the sprite on screen
-        spriteHeight = abs(int(screenH / (transformY))) / SPRITE_V_DIV;  //using "transformY" instead of the real distance prevents fisheye
-        //calculate lowest and highest pixel to fill in current stripe
+        spriteHeight = abs((int)(screenH / (transformY))) / SPRITE_V_DIV;
         drawStartY = -spriteHeight / 2 + screenH / 2 + V_MOVEScreen;
-        if (drawStartY < 0) drawStartY = 0;
+        if (drawStartY < 0) {
+            drawStartY = 0;
+        }
         drawEndY = spriteHeight / 2 + screenH / 2 + V_MOVEScreen;
-        if (drawEndY >= screenH) drawEndY = screenH - 1;
+        if (drawEndY >= screenH) {
+            drawEndY = screenH - 1;
+        }
 
-        //calculate width of the sprite
-        spriteWidth = abs(int(screenH / (transformY))) / SPRITE_U_DIV;
+        spriteWidth = abs((int)(screenH / (transformY))) / SPRITE_U_DIV;
         drawStartX = -spriteWidth / 2 + spriteScreenX;
-        if (drawStartX < 0)
+        if (drawStartX < 0) {
             drawStartX = 0;
+        }
         drawEndX = spriteWidth / 2 + spriteScreenX;
-        if (drawEndX >= screenW) drawEndX = screenW - 1;
+        if (drawEndX >= screenW) {
+            drawEndX = screenW - 1;
+        }
         textures.get(sprite[spriteOrder[i]].texture, tex);
-        //loop through every vertical stripe of the sprite on screen
         for (int stripe = drawStartX; stripe < drawEndX; stripe++) {
-            texX = int(256 * (stripe - (-spriteWidth / 2 + spriteScreenX)) * TEXTURE_WIDTH / spriteWidth) / 256;
-            //the conditions in the if are:
-            //1) it's in front of camera plane so you don't see things behind you
-            //2) it's on the screen (left)
-            //3) it's on the screen (right)
-            //4) ZBuffer, with perpendicular distance
+            texX = (int)(256 * (stripe - (-spriteWidth / 2 + spriteScreenX)) * TEXTURE_WIDTH / spriteWidth) / 256;
             if (transformY > 0 && stripe > 0 && stripe < screenW && transformY < ZBuffer[stripe]) {
-                for (int y = drawStartY; y < drawEndY; y++)  //for every pixel of the current stripe
-                {
-                    d = (y - V_MOVEScreen) * 256 - screenH * 128 + spriteHeight * 128;  //256 and 128 factors to avoid floats
+                for (int y = drawStartY; y < drawEndY; y++) {
+                    d = (y - V_MOVEScreen) * 256 - screenH * 128 + spriteHeight * 128;
                     texY = ((d * TEXTURE_HEIGHT) / spriteHeight) / 256;
-                    // cout << "HERE4 " << tex.name <<  endl;
-                    color = tex.texture[TEXTURE_WIDTH * texY + texX];  //get current color from the texture
+                    color = tex.texture[TEXTURE_WIDTH * texY + texX];
                     if ((color & 0x00FFFFFF) != 0) {
-                        //paint pixel if it isn't black, black is the invisible color
                         drawPixel(stripe, screenH - y, PNG::INTtoRGB(color));
                     }
                 }
@@ -452,13 +404,12 @@ inline static void renderSprites() {
 inline static void updateTimeTick() {
     oldTime = newTime;
     newTime = glutGet(GLUT_ELAPSED_TIME);
-    frameTime = (newTime - oldTime) / 1000.0;  //frametime is the time this frame has taken, in seconds
-    // print(1.0 / frameTime);                 //FPS counter
+    frameTime = (newTime - oldTime) / 1000.0;
+    // print(1.0 / frameTime);
     // IMPL: USE https://learnopengl.com/In-Practice/Text-Rendering TO PRINT OUT THE TEXT TO SCREEN
 
-    //speed modifiers
-    moveSpeed = frameTime * 3.0;  //the constant value is in squares/second
-    rotSpeed = frameTime * 2.0;   //the constant value is in radians/second
+    moveSpeed = frameTime * 3.0;  // 3 squares per second
+    rotSpeed = frameTime * 2.0;   // 2 radians per second
 }
 
 static void display(void) {
@@ -485,16 +436,13 @@ static void keyPress(unsigned char key, int x, int y) {
         if (worldMap[int(posX)][int(posY + dirY * moveSpeed)] != "none")
             posY += dirY * moveSpeed;
     }
-    //move backwards if no wall behind you
     if (key == 's') {
         if (worldMap[int(posX - dirX * moveSpeed)][int(posY)] != "none")
             posX -= dirX * moveSpeed;
         if (worldMap[int(posX)][int(posY - dirY * moveSpeed)] != "none")
             posY -= dirY * moveSpeed;
     }
-    //rotate to the right
     if (key == 'd') {
-        //both camera direction and camera plane must be rotated
         double oldDirX = dirX;
         dirX = dirX * cos(-rotSpeed) - dirY * sin(-rotSpeed);
         dirY = oldDirX * sin(-rotSpeed) + dirY * cos(-rotSpeed);
@@ -503,9 +451,7 @@ static void keyPress(unsigned char key, int x, int y) {
         planeX = planeX * cos(-rotSpeed) - planeY * sin(-rotSpeed);
         planeY = oldPlaneX * sin(-rotSpeed) + planeY * cos(-rotSpeed);
     }
-    //rotate to the left
     if (key == 'a') {
-        //both camera direction and camera plane must be rotated
         double oldDirX = dirX;
         dirX = dirX * cos(rotSpeed) - dirY * sin(rotSpeed);
         dirY = oldDirX * sin(rotSpeed) + dirY * cos(rotSpeed);

@@ -12,6 +12,15 @@
 #define SCREEN_WIDTH glutGet(GLUT_WINDOW_WIDTH)
 #define SCREEN_HEIGHT glutGet(GLUT_WINDOW_HEIGHT)
 
+#define TEXTURE_WIDTH 64
+#define TEXTURE_HEIGHT 64
+
+#define SPRITE_U_DIV 1
+#define SPRITE_V_DIV 1
+#define SPRITE_V_MOVE 0.0
+
+#define DARK_SHADER 8355711
+
 using namespace std;
 
 // Screen
@@ -38,6 +47,22 @@ ConfigInit cfgInit;
 
 GameMap gameMap = GameMap();
 vector<Ray> rays(0);
+
+vector<double> ZBuffer(screenW);
+
+vector<int> spriteOrder;
+vector<double> spriteDistance;
+
+double planeX = 0.0, planeY = 0.66;
+
+double newTime = 0;
+double oldTime = 0;
+
+double frameTime = 0;
+
+double moveSpeed = frameTime * 3.0;
+double rotSpeed = frameTime * 2.0;
+
 ///
 /// Render the player
 ///
@@ -83,102 +108,16 @@ static void renderMap2D(int sw = screenW, int sh = screenH) {
     }
 }
 
-#define TEXTURE_WIDTH 64
-#define TEXTURE_HEIGHT 64
-#define MAP_WIDTH 24
-#define MAP_HEIGHT 24
-
-string worldMap[MAP_WIDTH][MAP_HEIGHT] = {
-    {"colorstone", "colorstone", "colorstone", "colorstone", "colorstone", "colorstone", "colorstone", "colorstone", "colorstone", "colorstone", "colorstone", "greystone", "greystone", "mossy", "greystone", "greystone", "mossy", "greystone", "mossy", "greystone", "greystone", "greystone", "mossy", "greystone"},
-    {"colorstone", "none", "none", "none", "none", "none", "none", "none", "none", "none", "colorstone", "greystone", "none", "none", "none", "none", "none", "none", "none", "none", "none", "none", "none", "greystone"},
-    {"colorstone", "none", "purplestone", "purplestone", "none", "none", "none", "none", "none", "colorstone", "colorstone", "greystone", "none", "none", "none", "none", "none", "none", "none", "none", "none", "none", "none", "mossy"},
-    {"colorstone", "none", "none", "purplestone", "none", "none", "none", "none", "none", "none", "none", "none", "none", "none", "none", "none", "none", "none", "none", "none", "none", "none", "none", "mossy"},
-    {"colorstone", "none", "purplestone", "purplestone", "none", "none", "none", "none", "none", "colorstone", "colorstone", "greystone", "none", "none", "none", "none", "none", "none", "none", "none", "none", "none", "none", "greystone"},
-    {"colorstone", "none", "none", "none", "none", "none", "none", "none", "none", "none", "colorstone", "greystone", "none", "none", "none", "none", "none", "mossy", "mossy", "mossy", "none", "mossy", "greystone", "mossy"},
-    {"colorstone", "colorstone", "colorstone", "colorstone", "none", "colorstone", "colorstone", "colorstone", "colorstone", "colorstone", "colorstone", "greystone", "greystone", "greystone", "greystone", "greystone", "greystone", "mossy", "none", "none", "none", "none", "none", "mossy"},
-    {"wood", "wood", "wood", "wood", "none", "wood", "wood", "wood", "wood", "none", "colorstone", "none", "colorstone", "none", "colorstone", "none", "colorstone", "greystone", "none", "greystone", "none", "mossy", "none", "mossy"},
-    {"wood", "wood", "none", "none", "none", "none", "none", "none", "wood", "colorstone", "none", "colorstone", "none", "colorstone", "none", "colorstone", "colorstone", "mossy", "none", "none", "none", "none", "none", "mossy"},
-    {"wood", "none", "none", "none", "none", "none", "none", "none", "none", "none", "none", "none", "none", "none", "none", "none", "colorstone", "mossy", "none", "none", "none", "none", "none", "greystone"},
-    {"wood", "none", "none", "none", "none", "none", "none", "none", "none", "none", "none", "none", "none", "none", "none", "none", "colorstone", "mossy", "none", "mossy", "none", "mossy", "none", "mossy"},
-    {"wood", "wood", "none", "none", "none", "none", "none", "none", "wood", "colorstone", "none", "colorstone", "none", "colorstone", "none", "colorstone", "colorstone", "mossy", "greystone", "mossy", "none", "mossy", "mossy", "mossy"},
-    {"wood", "wood", "wood", "wood", "none", "wood", "wood", "wood", "wood", "colorstone", "colorstone", "greystone", "none", "mossy", "colorstone", "greystone", "colorstone", "purplestone", "purplestone", "purplestone", "none", "purplestone", "purplestone", "purplestone"},
-    {"redbrick", "redbrick", "redbrick", "redbrick", "none", "redbrick", "redbrick", "redbrick", "redbrick", "greystone", "mossy", "greystone", "none", "none", "mossy", "none", "mossy", "purplestone", "none", "none", "none", "none", "none", "purplestone"},
-    {"redbrick", "redbrick", "none", "none", "none", "none", "none", "redbrick", "redbrick", "greystone", "none", "none", "none", "none", "none", "none", "greystone", "purplestone", "none", "none", "none", "none", "none", "purplestone"},
-    {"redbrick", "none", "none", "none", "none", "none", "none", "none", "redbrick", "greystone", "none", "none", "none", "none", "none", "none", "greystone", "purplestone", "none", "none", "none", "none", "none", "purplestone"},
-    {"eagle", "none", "none", "none", "none", "none", "none", "none", "eagle", "greystone", "greystone", "greystone", "greystone", "greystone", "mossy", "none", "mossy", "purplestone", "purplestone", "none", "none", "none", "purplestone", "purplestone"},
-    {"redbrick", "none", "none", "none", "none", "none", "none", "none", "redbrick", "redbrick", "redbrick", "eagle", "redbrick", "redbrick", "redbrick", "mossy", "mossy", "none", "none", "bluestone", "none", "bluestone", "none", "bluestone"},
-    {"redbrick", "redbrick", "none", "none", "none", "none", "none", "redbrick", "redbrick", "redbrick", "none", "none", "none", "redbrick", "redbrick", "none", "bluestone", "none", "bluestone", "none", "none", "none", "bluestone", "bluestone"},
-    {"redbrick", "none", "none", "none", "none", "none", "none", "none", "redbrick", "none", "none", "none", "none", "none", "redbrick", "bluestone", "none", "bluestone", "none", "bluestone", "none", "bluestone", "none", "bluestone"},
-    {"eagle", "none", "none", "none", "none", "none", "none", "none", "none", "none", "none", "none", "none", "none", "none", "none", "none", "none", "none", "none", "none", "none", "none", "bluestone"},
-    {"redbrick", "none", "none", "none", "none", "none", "none", "none", "redbrick", "none", "none", "none", "none", "none", "redbrick", "bluestone", "none", "bluestone", "none", "bluestone", "none", "bluestone", "none", "bluestone"},
-    {"redbrick", "redbrick", "none", "none", "none", "none", "none", "redbrick", "redbrick", "redbrick", "none", "none", "none", "redbrick", "redbrick", "none", "bluestone", "none", "bluestone", "none", "none", "none", "bluestone", "bluestone"},
-    {"redbrick", "redbrick", "redbrick", "redbrick", "eagle", "redbrick", "redbrick", "redbrick", "redbrick", "redbrick", "redbrick", "eagle", "redbrick", "redbrick", "redbrick", "bluestone", "bluestone", "bluestone", "bluestone", "bluestone", "bluestone", "bluestone", "bluestone", "bluestone"}};
-
-struct Sprite {
-    double x;
-    double y;
-    string texture;
-};
-
-#define SPRITE_COUNT 19
-
-#define SPRITE_U_DIV 1
-#define SPRITE_V_DIV 1
-#define SPRITE_V_MOVE 0.0
-
-Sprite sprite[SPRITE_COUNT] = {
-    {20.5, 11.5, "greenlight"},
-    {18.5, 4.5, "greenlight"},
-    {10.0, 4.5, "greenlight"},
-    {10.0, 12.5, "greenlight"},
-    {3.5, 6.5, "greenlight"},
-    {3.5, 20.5, "greenlight"},
-    {3.5, 14.5, "greenlight"},
-    {14.5, 20.5, "greenlight"},
-    {18.5, 10.5, "pillar"},
-    {18.5, 11.5, "pillar"},
-    {18.5, 12.5, "pillar"},
-    {21.5, 1.5, "barrel"},
-    {15.5, 1.5, "barrel"},
-    {16.0, 1.8, "barrel"},
-    {16.2, 1.2, "barrel"},
-    {3.5, 2.5, "barrel"},
-    {9.5, 15.5, "barrel"},
-    {10.0, 15.1, "barrel"},
-    {10.5, 15.8, "barrel"},
-};
-
-vector<uint32_t> texture[11];
-
-vector<double> ZBuffer(screenW);
-
-int spriteOrder[SPRITE_COUNT];
-double spriteDistance[SPRITE_COUNT];
-
-double posX = 22.0, posY = 11.5;
-double dirX = -1.0, dirY = 0.0;
-double planeX = 0.0, planeY = 0.66;
-
-double newTime = 0;
-double oldTime = 0;
-
-double frameTime = 0;
-
-double moveSpeed = frameTime * 3.0;
-double rotSpeed = frameTime * 2.0;
-
-#define DARK_SHADER 8355711
-
-void sortSprites(int* order, double* dist, int amount) {
+void sortSprites(int amount) {
     vector<pair<double, int>> sprites(amount);
     for (int i = 0; i < amount; i++) {
-        sprites[i].first = dist[i];
-        sprites[i].second = order[i];
+        sprites[i].first = spriteDistance[i];
+        sprites[i].second = spriteOrder[i];
     }
     sort(sprites.begin(), sprites.end());
     for (int i = 0; i < amount; i++) {
-        dist[i] = sprites[amount - i - 1].first;
-        order[i] = sprites[amount - i - 1].second;
+        spriteDistance[i] = sprites[amount - i - 1].first;
+        spriteOrder[i] = sprites[amount - i - 1].second;
     }
 }
 
@@ -206,10 +145,10 @@ inline static void renderFloorCeiling() {
     string floorTexture, ceilingTexture;
     uint32_t color;
     for (int y = screenH / 2 + 1; y < screenH; ++y) {
-        rayDirX0 = dirX - planeX;
-        rayDirY0 = dirY - planeY;
-        rayDirX1 = dirX + planeX;
-        rayDirY1 = dirY + planeY;
+        rayDirX0 = player.dx - planeX;
+        rayDirY0 = player.dy - planeY;
+        rayDirX1 = player.dx + planeX;
+        rayDirY1 = player.dy + planeY;
 
         p = y - screenH / 2;
 
@@ -220,8 +159,8 @@ inline static void renderFloorCeiling() {
         floorStepX = rowDistance * (rayDirX1 - rayDirX0) / screenW;
         floorStepY = rowDistance * (rayDirY1 - rayDirY0) / screenW;
 
-        floorX = posX + rowDistance * rayDirX0;
-        floorY = posY + rowDistance * rayDirY0;
+        floorX = player.x + rowDistance * rayDirX0;
+        floorY = player.y + rowDistance * rayDirY0;
 
         for (int x = 0; x < screenW; ++x) {
             cellX = (int)(floorX);
@@ -258,11 +197,11 @@ inline static void renderWalls() {
     Texture tex;
     for (int x = 0; x < screenW; x++) {
         cameraX = 2 * x / double(screenW) - 1;
-        rayDirX = dirX + planeX * cameraX;
-        rayDirY = dirY + planeY * cameraX;
+        rayDirX = player.dx + planeX * cameraX;
+        rayDirY = player.dy + planeY * cameraX;
 
-        mapX = int(posX);
-        mapY = int(posY);
+        mapX = (int)player.x;
+        mapY = (int)player.y;
 
         deltaDistX = abs(1 / rayDirX);
         deltaDistY = abs(1 / rayDirY);
@@ -270,17 +209,17 @@ inline static void renderWalls() {
         hit = 0;
         if (rayDirX < 0) {
             stepX = -1;
-            sideDistX = (posX - mapX) * deltaDistX;
+            sideDistX = (player.x - mapX) * deltaDistX;
         } else {
             stepX = 1;
-            sideDistX = (mapX + 1.0 - posX) * deltaDistX;
+            sideDistX = (mapX + 1.0 - player.x) * deltaDistX;
         }
         if (rayDirY < 0) {
             stepY = -1;
-            sideDistY = (posY - mapY) * deltaDistY;
+            sideDistY = (player.y - mapY) * deltaDistY;
         } else {
             stepY = 1;
-            sideDistY = (mapY + 1.0 - posY) * deltaDistY;
+            sideDistY = (mapY + 1.0 - player.y) * deltaDistY;
         }
 
         while (hit == 0) {
@@ -293,13 +232,13 @@ inline static void renderWalls() {
                 mapY += stepY;
                 side = 1;
             }
-            hit = (int)(worldMap[mapX][mapY] != "none");
+            hit = (int)(gameMap.getAt(mapX, mapY).wf_left.f_texture != "");
         }
 
         if (side == 0) {
-            perpWallDist = (mapX - posX + (1 - stepX) / 2) / rayDirX;
+            perpWallDist = (mapX - player.x + (1 - stepX) / 2) / rayDirX;
         } else {
-            perpWallDist = (mapY - posY + (1 - stepY) / 2) / rayDirY;
+            perpWallDist = (mapY - player.y + (1 - stepY) / 2) / rayDirY;
         }
         lineHeight = (int)(screenH / perpWallDist);
 
@@ -311,9 +250,9 @@ inline static void renderWalls() {
         if (drawEnd >= screenH) {
             drawEnd = screenH - 1;
         }
-        wallTex = worldMap[mapX][mapY];
-        
-        wallX = side == 0 ? posY + perpWallDist* rayDirY : posX + perpWallDist * rayDirX;
+        wallTex = gameMap.getAt(mapX, mapY).wf_left.f_texture;
+
+        wallX = side == 0 ? player.y + perpWallDist* rayDirY : player.x + perpWallDist * rayDirX;
         wallX -= floor((wallX));
 
         texX = (int)(wallX * double(TEXTURE_WIDTH));
@@ -342,23 +281,23 @@ inline double sqDist(double ax, double ay, double bx, double by) {
 }
 
 inline static void renderSprites() {
-    for (int i = 0; i < SPRITE_COUNT; i++) {
+    for (int i = 0; i < gameMap.sprites.size(); i++) {
         spriteOrder[i] = i;
-        spriteDistance[i] = sqDist(sprite[i].x, posX, sprite[i].y, posY);
+        spriteDistance[i] = sqDist(gameMap.sprites[i].x, player.x, gameMap.sprites[i].y, player.y);
     }
-    sortSprites(spriteOrder, spriteDistance, SPRITE_COUNT);
+    sortSprites(gameMap.sprites.size());
 
     double spriteX, spriteY, invDet, transformX, transformY;
     int spriteScreenX, V_MOVEScreen, spriteHeight, drawStartY, drawEndY, spriteWidth, drawStartX, drawEndX, texX, texY, d;
     Texture tex;
     uint32_t color;
-    for (int i = 0; i < SPRITE_COUNT; i++) {
-        spriteX = sprite[spriteOrder[i]].x - posX;
-        spriteY = sprite[spriteOrder[i]].y - posY;
+    for (int i = 0; i < gameMap.sprites.size(); i++) {
+        spriteX = gameMap.sprites[spriteOrder[i]].x - player.x;
+        spriteY = gameMap.sprites[spriteOrder[i]].y - player.y;
 
-        invDet = 1.0 / (planeX * dirY - dirX * planeY);
+        invDet = 1.0 / (planeX * player.dy - player.dx * planeY);
 
-        transformX = invDet * (dirY * spriteX - dirX * spriteY);
+        transformX = invDet * (player.dy * spriteX - player.dx * spriteY);
         transformY = invDet * (-planeY * spriteX + planeX * spriteY);
 
         spriteScreenX = (int)((screenW / 2) * (1 + transformX / transformY));
@@ -384,7 +323,7 @@ inline static void renderSprites() {
         if (drawEndX >= screenW) {
             drawEndX = screenW - 1;
         }
-        textures.get(sprite[spriteOrder[i]].texture, tex);
+        textures.get(gameMap.sprites[spriteOrder[i]].texture, tex);
         for (int stripe = drawStartX; stripe < drawEndX; stripe++) {
             texX = (int)(256 * (stripe - (-spriteWidth / 2 + spriteScreenX)) * TEXTURE_WIDTH / spriteWidth) / 256;
             if (transformY > 0 && stripe > 0 && stripe < screenW && transformY < ZBuffer[stripe]) {
@@ -431,30 +370,30 @@ static void idle(void) {
 
 static void keyPress(unsigned char key, int x, int y) {
     if (key == 'w') {
-        if (worldMap[int(posX + dirX * moveSpeed)][int(posY)] != "none")
-            posX += dirX * moveSpeed;
-        if (worldMap[int(posX)][int(posY + dirY * moveSpeed)] != "none")
-            posY += dirY * moveSpeed;
+        if (gameMap.getAt((int)(player.x + player.dx * moveSpeed), (int)player.y).wf_left.f_texture != "")
+            player.x += player.dx * moveSpeed;
+        if (gameMap.getAt((int)player.x, (int)(player.y + player.dy * moveSpeed)).wf_left.f_texture != "")
+            player.y += player.dy * moveSpeed;
     }
     if (key == 's') {
-        if (worldMap[int(posX - dirX * moveSpeed)][int(posY)] != "none")
-            posX -= dirX * moveSpeed;
-        if (worldMap[int(posX)][int(posY - dirY * moveSpeed)] != "none")
-            posY -= dirY * moveSpeed;
+        if (gameMap.getAt((int)(player.x - player.dx * moveSpeed), (int)player.y).wf_left.f_texture != "")
+            player.x -= player.dx * moveSpeed;
+        if (gameMap.getAt((int)player.x, (int)(player.y - player.dy * moveSpeed)).wf_left.f_texture != "")
+            player.y -= player.dy * moveSpeed;
     }
     if (key == 'd') {
-        double oldDirX = dirX;
-        dirX = dirX * cos(-rotSpeed) - dirY * sin(-rotSpeed);
-        dirY = oldDirX * sin(-rotSpeed) + dirY * cos(-rotSpeed);
+        double oldDirX = player.dx;
+        player.dx = player.dx * cos(-rotSpeed) - player.dy * sin(-rotSpeed);
+        player.dy = oldDirX * sin(-rotSpeed) + player.dy * cos(-rotSpeed);
 
         double oldPlaneX = planeX;
         planeX = planeX * cos(-rotSpeed) - planeY * sin(-rotSpeed);
         planeY = oldPlaneX * sin(-rotSpeed) + planeY * cos(-rotSpeed);
     }
     if (key == 'a') {
-        double oldDirX = dirX;
-        dirX = dirX * cos(rotSpeed) - dirY * sin(rotSpeed);
-        dirY = oldDirX * sin(rotSpeed) + dirY * cos(rotSpeed);
+        double oldDirX = player.dx;
+        player.dx = player.dx * cos(rotSpeed) - player.dy * sin(rotSpeed);
+        player.dy = oldDirX * sin(rotSpeed) + player.dy * cos(rotSpeed);
 
         double oldPlaneX = planeX;
         planeX = planeX * cos(rotSpeed) - planeY * sin(rotSpeed);
@@ -480,7 +419,10 @@ void init() {
     texLoader.loadTextures(textures);
     debugContext.logAppInfo(string("Loaded " + to_string(textures.size()) + " textures"));
 
-    gameMap.readMapFromJSON(MAPS_DIR + "map1.json");
+    gameMap.readMapFromJSON(MAPS_DIR + "map2.json");
+
+    spriteOrder.resize(gameMap.sprites.size());
+    spriteDistance.resize(gameMap.sprites.size());
 
     rays = vector<Ray>(playerCfg.fov);
 
@@ -490,16 +432,16 @@ void init() {
     mapScalingX = (minimapCfg.size / (float)mapScreenW) * gameMap.map_width;
     mapScalingY = (minimapCfg.size / (float)mapScreenH) * gameMap.map_height;
 
-    astar = AStar(gameMap);
-    path = astar.find(gameMap.start, gameMap.end);
+    // astar = AStar(gameMap);
+    // path = astar.find(gameMap.start, gameMap.end);
 
     toClearColour(bg_colour);
     gluOrtho2D(0, screenW, screenH, 0);
     player = Player(
-        gameMap.start.x * gameMap.wall_width + IDIV_2(gameMap.wall_width),
-        gameMap.start.y * gameMap.wall_height + IDIV_2(gameMap.wall_height),
-        cos(player.angle) * 5,
-        sin(player.angle) * 5,
+        gameMap.start.x,
+        gameMap.start.y,
+        -1.0,
+        0.0,
         0);
     debugContext.logAppInfo("Initialised player object");
 }

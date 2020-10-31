@@ -40,6 +40,7 @@
 #include "Globals.hpp"
 #include "Ray.hpp"
 #include "../io/PNGReader.hpp"
+#include "../sprites/Sprite.hpp"
 
 #define _USE_MATH_DEFINES
 constexpr float DR = 0.0174533f;

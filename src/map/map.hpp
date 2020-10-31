@@ -12,6 +12,7 @@
 #include "../logging/GLDebug.hpp"
 #include "../map/Coordinates.hpp"
 #include "../raytracer/Globals.hpp"
+#include "../sprites/Sprite.hpp"
 
 using namespace std;
 #define MAP_DELIM ";"
@@ -41,6 +42,7 @@ struct GameMap {
     vector<Coords> left_boundary;
     vector<Coords> right_boundary;
     vector<Coords> tree_order_walls;
+    vector<Sprite> sprites;
 };
 
 GameMap::GameMap(vector<AABB> walls, int width, int height) {
@@ -183,6 +185,18 @@ void GameMap::readMapFromJSON(string filename) {
         }
     }
     debugContext.logAppInfo("Processed " + to_string(wallarr.size()) + " AABB objects");
+    RSJarray spritearr = jsonres["Sprites"].as_array();
+    for (RSJresource spriteObj : spritearr) {
+        double x = spriteObj["x"].as<double>();
+        double y = spriteObj["y"].as<double>();
+        string texture = spriteObj["Texture"].as<string>();
+        this->sprites.push_back(Sprite{
+            x,
+            y,
+            texture
+        });
+    }
+    debugContext.logAppInfo("Processed " + to_string(spritearr.size()) + " Sprite objects");
     debugContext.logAppInfo("---- FINISHED MAP PROCESSING [" + filename + "] ----");
 };
 

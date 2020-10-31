@@ -214,6 +214,13 @@ Map files are stored in `resources/maps/`. Below is the JSON type data and struc
                 "Texture": "<string>"
             }
         }
+    ],
+    "Sprites": [
+        {
+            "x": "<double>",
+            "y": "<double>",
+            "Texture": "<string>"
+        }
     ]
 }
 ```

@@ -8,21 +8,21 @@ using namespace std;
 class Player {
     public:
         Player();
-        Player(float x, float y, float dx, float dy, float angle);
+        Player(double x, double y, double dx, double dy, double angle);
         ~Player();
         void printLocation();
         void logLocation();
 
-        float x;
-        float y;
-        float dx;
-        float dy;
-        float angle;
+        double x;
+        double y;
+        double dx;
+        double dy;
+        double angle;
 };
 
 Player::Player(){};
 
-Player::Player(float x, float y, float dx, float dy, float angle) {
+Player::Player(double x, double y, double dx, double dy, double angle) {
     this->x = x;
     this->y = y;
     this->dx = dx;

@@ -26,6 +26,11 @@ using namespace std;
 #define IMUL_64(x) (x << 6)
 #define IDIV_64(x) (x >> 6)
 
+#define IMUL_128(x) (x << 7)
+#define IDIV_128(x) (x >> 7)
+#define IMUL_256(x) (x << 8)
+#define IDIV_256(x) (x >> 8)
+
 #define radToCoord(r) IDIV_64((int) r)
 
 // ../~

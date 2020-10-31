@@ -328,13 +328,13 @@ inline static void renderSprites() {
         }
         textures.get(gameMap.sprites[spriteOrder[i]].texture, tex);
         for (int stripe = drawStartX; stripe < drawEndX; stripe++) {
-            texX = (int)(256 * (stripe - ((IDIV_2(-spriteWidth)) + spriteScreenX)) * TEXTURE_WIDTH / spriteWidth) / 256;
+            texX = (int)IDIV_256((IMUL_256((stripe - ((IDIV_2(-spriteWidth)) + spriteScreenX))) * TEXTURE_WIDTH / spriteWidth));
             if (!(transformY > 0 && stripe > 0 && stripe < screenW && transformY < ZBuffer[stripe])) {
                 continue;
             }
             for (int y = drawStartY; y < drawEndY; y++) {
-                d = (y - V_MOVEScreen) * 256 - screenH * 128 + spriteHeight * 128;
-                texY = ((d * TEXTURE_HEIGHT) / spriteHeight) / 256;
+                d = IMUL_256((y - V_MOVEScreen)) - IMUL_128(screenH) + IMUL_128(spriteHeight);
+                texY = IDIV_256((d * TEXTURE_HEIGHT) / spriteHeight);
                 color = tex.texture[TEXTURE_WIDTH * texY + texX];
                 if ((color & 0x00FFFFFF) != 0) {
                     drawPixel(stripe, screenH - y, PNG::INTtoRGB(color));

@@ -14,7 +14,8 @@
 
 #include <string>
 #include "../raytracer/Globals.hpp"
-#include "../io/BMPreader.hpp"
+#include "../io/PNGReader.hpp"
+#include "../exceptions/image/ImageFileStreamError.hpp"
 
 using namespace std;
 
@@ -29,9 +30,9 @@ class Texture {
 
         string name;
         string filename;
-        BMP texture;
-        int width;
-        int height;
+        PNGTex texture;
+        unsigned long width;
+        unsigned long height;
 };
 
 Texture::Texture() {};
@@ -39,9 +40,11 @@ Texture::Texture() {};
 Texture::Texture(string filename, string name) {
     this->name = name;
     this->filename = filename;
-    this->texture = BMP(filename.c_str());
-    this->width = this->texture.bmp_info_header.width;
-    this->height = this->texture.bmp_info_header.height;
+    unsigned long error = 0 | PNG::loadImage(this->texture, this->width, this->height, filename.c_str());
+    if (error) {
+        throw ImageFileStreamError(filename);
+    }
+    this->texture.resize(64 * 64);
 };
 
 Texture::~Texture() {};

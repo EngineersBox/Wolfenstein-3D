@@ -58,3 +58,4 @@ static RenderCfg renderCfg = RenderCfg();
 static GLDebugContext debugContext = GLDebugContext();
 
 typedef unsigned long int int_id;
+typedef vector<uint32_t> PNGTex;

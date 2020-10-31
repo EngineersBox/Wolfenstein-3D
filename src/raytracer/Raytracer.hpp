@@ -20,6 +20,7 @@
 #include <map>
 #include <string>
 #include <tuple>
+#include <vector>
 
 #include "../configuration/ConfigInit.hpp"
 #include "../drawing/DrawingUtils.hpp"
@@ -35,9 +36,10 @@
 #include "../texturing/TextureColours.hpp"
 #include "../texturing/TextureLoader.hpp"
 #include "../texturing/texture.hpp"
+#include "../world/World.hpp"
 #include "Globals.hpp"
 #include "Ray.hpp"
-#include "../world/World.hpp"
+#include "../io/PNGReader.hpp"
 
 #define _USE_MATH_DEFINES
 constexpr float DR = 0.0174533f;

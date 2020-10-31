@@ -20,27 +20,24 @@
 class TextureLoader {
     public:
         TextureLoader();
-        TextureLoader(std::vector<std::string>* filenames);
-        ~TextureLoader();
+        TextureLoader(std::vector<std::string>& filenames);
 
         void loadTextures(HashTable<Texture>& textures);
-        std::vector<std::string>* filenames;
+        std::vector<std::string> filenames;
     private:
-        std::vector<std::string>* getTextureFileNames();
+        void listFiles(const string& path, std::vector<std::string>& files);
+        void getTextureFileNames();
         bool verifyFileExistance(const std::string& filename);
         bool hasExt(const std::string& filename, const std::string& extension) const;
         std::string stripExt(const std::string& filename, const std::string& extension);
 };
 
-TextureLoader::TextureLoader(){
-    this->filenames = getTextureFileNames();
+TextureLoader::TextureLoader() {
 };
 
-TextureLoader::TextureLoader(std::vector<std::string>* filenames) {
-    this->filenames = filenames;
+TextureLoader::TextureLoader(std::vector<std::string>& filenames) {
+    this->filenames = std::vector<std::string>(filenames);
 };
-
-TextureLoader::~TextureLoader(){};
 
 bool TextureLoader::hasExt(const std::string& filename, const std::string& extension) const {
     return filename.substr(filename.find(".")) == extension;
@@ -53,41 +50,46 @@ std::string TextureLoader::stripExt(const std::string& filename, const std::stri
     return filename.substr(0, filename.find("."));
 }
 
-std::vector<std::string>* TextureLoader::getTextureFileNames() {
-    DIR* dir = opendir(std::string(TEX_DIR).c_str());
-    struct dirent* dp;
-    std::vector<std::string> files;
-    int texCount = 0;
-    while ((dp = readdir(dir)) != NULL && texCount < MAX_TEXTURE_AMOUNT) {
-        std::string cfile(dp->d_name);
-        if (cfile.size() < 3 || !hasExt(cfile, ".bmp")) {
-            continue;
+void TextureLoader::listFiles(const string& path, std::vector<std::string>& files) {
+    if (DIR* dir = opendir(path.c_str())) {
+        while (dirent* f = readdir(dir)) {
+            if (f->d_name[0] == '.') continue;
+            if (f->d_type == DT_DIR)
+                listFiles(path + f->d_name + "/", files);
+
+            if (f->d_type == DT_REG) {
+                files.push_back(path + f->d_name);
+            }
         }
-        files.push_back(dp->d_name);
-        texCount++;
+        closedir(dir);
     }
-    closedir(dir);
-    if (texCount == MAX_TEXTURE_AMOUNT) {
+}
+
+void TextureLoader::getTextureFileNames() {
+    listFiles(std::string(TEX_DIR), this->filenames);
+    if (this->filenames.size() == MAX_TEXTURE_AMOUNT) {
         throw ExceededMaxTextureImport(MAX_TEXTURE_AMOUNT);
     }
-    return new std::vector<std::string>(files);
 };
 
 void TextureLoader::loadTextures(HashTable<Texture> &textures) {
-    int textureCount = this->filenames->size();
+    getTextureFileNames();
+    int textureCount = this->filenames.size();
     for (int i = 0; i < textureCount; i++) {
-        const std::string& fname = this->filenames->at(i);
+        const std::string& fname = this->filenames.at(i);
         if (!verifyFileExistance(fname)) {
             continue;
         }
-        string stripped_fname = fname.substr(0, fname.find_first_of("."));
-        textures.insert(stripped_fname, Texture(TEX_DIR + fname, stripped_fname));
+        std::string stripped_fname = fname.substr(fname.find_last_of("/") + 1, fname.size() - 1);
+        std::string pure_fname = stripped_fname.substr(0, stripped_fname.find_first_of("."));
+        textures.insert(pure_fname, Texture(fname, pure_fname));
+        debugContext.logAppVerb("Loaded texture [" + fname + "]");
     }
 }
 
 bool TextureLoader::verifyFileExistance(const std::string& filename) {
     struct stat buffer;
-    if (stat(std::string(TEX_DIR + filename).c_str(), &buffer) != 0) {
+    if (stat(filename.c_str(), &buffer) != 0) {
         debugContext.glDebugMessageCallback(
             GL_DEBUG_SOURCE::DEBUG_SOURCE_SYSTEM,
             GL_DEBUG_TYPE::DEBUG_TYPE_ERROR,

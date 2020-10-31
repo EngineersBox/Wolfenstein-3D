@@ -103,6 +103,7 @@ bool HashTable<V>::get(const string& key, V& value) {
 
     size_t hashValue = hashFunc(key);
     HMEntry<V>* bucket = this->buckets[hashValue];
+
     while (bucket != nullptr) {
         if (bucket->key == key) {
             value = bucket->value;
@@ -139,13 +140,14 @@ void HashTable<V>::insert(const string& key, V value) {
     HMEntry<V>* bucket = this->buckets[hashValue];
 
     getSequentialNonNull(prev, bucket, key);
-
-    if (bucket != nullptr) {
+    
+    if (bucket != nullptr && bucket->key == key) {
         bucket->value = value;
         this->element_count++;
         return;
     }
 
+    prev = bucket;
     bucket = new HMEntry<V>(key, value);
     processBucketLinking(hashValue, prev, bucket);
     this->element_count++;

@@ -419,7 +419,7 @@ void init() {
     texLoader.loadTextures(textures);
     debugContext.logAppInfo(string("Loaded " + to_string(textures.size()) + " textures"));
 
-    gameMap.readMapFromJSON(MAPS_DIR + "map2.json");
+    gameMap.readMapFromJSON(MAPS_DIR + "map1.json");
 
     spriteOrder.resize(gameMap.sprites.size());
     spriteDistance.resize(gameMap.sprites.size());

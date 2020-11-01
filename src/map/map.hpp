@@ -196,7 +196,7 @@ void GameMap::readMapFromJSON(string filename) {
             texture
         ));
     }
-    debugContext.logAppInfo("Processed " + to_string(spritearr.size()) + " Sprite objects");
+    debugContext.logAppInfo("Processed " + to_string(spritearr.size()) + " Sprite entities");
     debugContext.logAppInfo("---- FINISHED MAP PROCESSING [" + filename + "] ----");
 };
 

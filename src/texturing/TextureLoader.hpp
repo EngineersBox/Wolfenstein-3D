@@ -16,7 +16,6 @@
 
 #define MAX_TEXTURE_AMOUNT 20
 
-// TODO: Change loader to iterate through all files in resources/textures/*
 class TextureLoader {
     public:
         TextureLoader();
@@ -53,10 +52,12 @@ std::string TextureLoader::stripExt(const std::string& filename, const std::stri
 void TextureLoader::listFiles(const string& path, std::vector<std::string>& files) {
     if (DIR* dir = opendir(path.c_str())) {
         while (dirent* f = readdir(dir)) {
-            if (f->d_name[0] == '.') continue;
-            if (f->d_type == DT_DIR)
+            if (f->d_name[0] == '.') {
+                continue;
+            }
+            if (f->d_type == DT_DIR) {
                 listFiles(path + f->d_name + "/", files);
-
+            }
             if (f->d_type == DT_REG) {
                 files.push_back(path + f->d_name);
             }

@@ -26,7 +26,6 @@
 #include "../drawing/DrawingUtils.hpp"
 #include "../environment/AABB.hpp"
 #include "../environment/AABBFace.hpp"
-#include "../exceptions/image/PixelColumnInvalidIndex.hpp"
 #include "../hashing/HashTable.hpp"
 #include "../map/Coordinates.hpp"
 #include "../map/map.hpp"

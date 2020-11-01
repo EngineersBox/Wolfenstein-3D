@@ -2,16 +2,6 @@
 
 #include "Raytracer.hpp"
 
-#define CEILING_COLOUR LIGHT_GREY
-#define FLOOR_COLOUR DARK_GREY
-
-#define SIGMOID(x, mult) 1 / 1 + exp(mult *x)
-#define DIST_SHADING_MULTIPLIER 0.01
-#define DIST_SHADING_THRESHOLD 1.6666666666666667
-
-#define SCREEN_WIDTH glutGet(GLUT_WINDOW_WIDTH)
-#define SCREEN_HEIGHT glutGet(GLUT_WINDOW_HEIGHT)
-
 #define TEXTURE_WIDTH 64
 #define TEXTURE_HEIGHT 64
 
@@ -35,7 +25,7 @@ vector<Coords> *path = new vector<Coords>();
 Player player;
 
 // Map
-int mapScreenW = screenW;  // x >> 1 == x / 2
+int mapScreenW = screenW;
 int mapScreenH = screenH;
 
 float mapScalingX;
@@ -52,7 +42,8 @@ vector<double> ZBuffer(screenW);
 vector<int> spriteOrder;
 vector<double> spriteDistance;
 
-double planeX = 0.0, planeY = 0.66;
+double planeX = 0.0;
+double planeY = 0.66;
 
 double newTime = 0;
 double oldTime = 0;
@@ -289,15 +280,14 @@ inline static void renderSprites() {
     }
     sortSprites(gameMap.sprites.size());
 
-    double spriteX, spriteY, invDet, transformX, transformY;
+    double spriteX, spriteY, transformX, transformY;
     int spriteScreenX, V_MOVEScreen, spriteHeight, drawStartY, drawEndY, spriteWidth, drawStartX, drawEndX, texX, texY, d;
     Texture tex;
     uint32_t color;
+    double invDet = 1.0 / (planeX * player.dy - player.dx * planeY);
     for (int i = 0; i < gameMap.sprites.size(); i++) {
         spriteX = gameMap.sprites[spriteOrder[i]].location.x - player.x;
         spriteY = gameMap.sprites[spriteOrder[i]].location.y - player.y;
-
-        invDet = 1.0 / (planeX * player.dy - player.dx * planeY);
 
         transformX = invDet * (player.dy * spriteX - player.dx * spriteY);
         transformY = invDet * (-planeY * spriteX + planeX * spriteY);

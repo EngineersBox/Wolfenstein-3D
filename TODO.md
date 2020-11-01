@@ -7,7 +7,7 @@
 * [ ] Create generic method for both `checkVertical()` and `checkHorizontal()` called `checkDir()`
 * [x] Break `renderRays2Dto3D()` method up into smaller methods and generify where possible
 * [x] Create texture hashing by string using polynomial rolling
-* [ ] *Change rendering to BMP columns* (WIP)
+* [x] *Change rendering to BMP columns* (WIP)
 * [x] Add config files and reader
 * [x] Change renderer to query wall texture
 * [x] Fix HashTable (change to hashmap K,V pairs) and fix Texture
@@ -18,8 +18,8 @@
 * [ ] Change raycasting to query against walls from results of BSP rather than raymarching
 * [x] Implement minmap and player position scaling
 * [ ] Fix ray rendering on minimap
-* [ ] Fix Linux + Windows GL window rendering (incorrect scaling)
-* [ ] Change TextureLoader to iterate through `resources/textures/*` and load all in there (verify existance and format)
+* [x] Fix Linux + Windows GL window rendering (incorrect scaling)
+* [x] Change TextureLoader to iterate through `resources/textures/*` and load all in there (verify existance and format)
 
 ## Logging
 

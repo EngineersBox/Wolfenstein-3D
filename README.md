@@ -242,20 +242,20 @@ Below is an example of a configuration file:
 [player]
 fov = 80.0
 dof = 8.0
-move_speed = 3.0 ; Squares per second
-rotation_speed = 2.0 ; Radians per second
+move_speed = 3.0
+rotation_speed = 2.0
 
 [minimap]
 enable = true
 render_rays = false ; NOT YET IMPLEMENTED
-pos = "TOP_RIGHT"
-size = "MEDIUM"
+pos = TOP_RIGHT ; NOT YET IMPLEMENTED
+size = MEDIUM
 
-[logging]
+[logging] ; NOT YET IMPLEMENTED (ALL)
 gl_debug = true
 player_pos = false
-hide_warnings = false ; NOT YET IMPLEMENTED
-hide_infos = false ; NOT YET IMPLEMENTED
+hide_warnings = false
+hide_infos = false
 tex_skip_invalid = true
 map_skip_invalid = true
 log_verbose = true
@@ -263,6 +263,9 @@ log_verbose = true
 [rendering] ; NOT YET IMPLEMENTED (ALL)
 headless_mode = false
 double_buffer = false
+render_walls = true
+render_floor_ceiling = true
+render_sprites = true
 refresh_rate = 60 ; Value in Hz
 ray_count=80
 ```

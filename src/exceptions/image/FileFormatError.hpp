@@ -31,6 +31,6 @@ class FileFormatError : virtual public exception {
             GL_DEBUG_SEVERITY::DEBUG_SEVERITY_HIGH,
             ret_val
         );
-        return ret_val.c_str();
+        return strdup(ret_val.c_str());
     };
 };

@@ -15,6 +15,6 @@ class DebugLogWriteError : virtual public exception {
         virtual ~DebugLogWriteError() throw(){};
 
         virtual const char* what() const throw() {
-            return string("Could not create new debug log: " + fname).c_str();
+            return strdup(string("Could not create new debug log: " + fname).c_str());
         };
 };

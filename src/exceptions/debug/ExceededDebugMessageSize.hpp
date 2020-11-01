@@ -21,6 +21,6 @@ class ExceededDebugMessageSize : virtual public exception {
             msg += to_string(msg_size);
             msg += " > ";
             msg += to_string(max_msg_size);
-            return msg.c_str();
+            return strdup(msg.c_str());
         };
 };

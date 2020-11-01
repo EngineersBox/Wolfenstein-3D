@@ -25,6 +25,6 @@ class InvalidKeySize : virtual public exception {
             GL_DEBUG_SEVERITY::DEBUG_SEVERITY_HIGH,
             retVal
         );
-        return retVal.c_str();
+        return strdup(retVal.c_str());
     };
 };

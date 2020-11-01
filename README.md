@@ -242,7 +242,8 @@ Below is an example of a configuration file:
 [player]
 fov = 80.0
 dof = 8.0
-sensitivity = 2.0
+move_speed = 3.0 ; Squares per second
+rotation_speed = 2.0 ; Radians per second
 
 [minimap]
 enable = true

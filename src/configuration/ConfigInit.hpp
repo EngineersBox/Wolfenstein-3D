@@ -56,7 +56,8 @@ PlayerCfg ConfigInit::initPlayerConfig() {
     return PlayerCfg(
         reader.GetFloat(PLAYER_SECTION, "fov", 70.0f),
         reader.GetFloat(PLAYER_SECTION, "dof", 8.0f),
-        reader.GetFloat(PLAYER_SECTION, "sensitivity", 2.0f)
+        reader.GetFloat(PLAYER_SECTION, "move_speed", 3.0f),
+        reader.GetFloat(PLAYER_SECTION, "rotation_speed", 2.0f)
     );
 };
 

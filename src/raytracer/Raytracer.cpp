@@ -59,8 +59,8 @@ double oldTime = 0;
 
 double frameTime = 0;
 
-double moveSpeed = frameTime * 3.0;
-double rotSpeed = frameTime * 2.0;
+double moveSpeed;
+double rotSpeed;
 
 ///
 /// Render the player
@@ -350,8 +350,8 @@ inline static void updateTimeTick() {
     // print(1.0 / frameTime);
     // IMPL: USE https://learnopengl.com/In-Practice/Text-Rendering TO PRINT OUT THE TEXT TO SCREEN
 
-    moveSpeed = frameTime * 3.0;  // 3 squares per second
-    rotSpeed = frameTime * 2.0;   // 2 radians per second
+    moveSpeed = frameTime * playerCfg.move_speed;
+    rotSpeed = frameTime * playerCfg.rotation_speed;
 }
 
 static void display(void) {
@@ -437,6 +437,9 @@ void init() {
 
     // astar = AStar(gameMap);
     // path = astar.find(gameMap.start, gameMap.end);
+
+    moveSpeed = frameTime * playerCfg.move_speed;
+    rotSpeed = frameTime * playerCfg.rotation_speed;
 
     toClearColour(bg_colour);
     gluOrtho2D(0, screenW, screenH, 0);

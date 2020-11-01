@@ -11,6 +11,23 @@
 #include <string>
 #include <vector>
 
+#include "../exceptions/image/PNGBitPointerOutsideMemory.hpp"
+#include "../exceptions/image/PNGExceededCodeCount.hpp"
+#include "../exceptions/image/PNGHeaderError.hpp"
+#include "../exceptions/image/PNGInvalidBitType.hpp"
+#include "../exceptions/image/PNGInvalidDataBuffer.hpp"
+#include "../exceptions/image/PNGInvalidDistCode.hpp"
+#include "../exceptions/image/PNGInvalidFCHECK.hpp"
+#include "../exceptions/image/PNGInvalidFilterType.hpp"
+#include "../exceptions/image/PNGInvalidInterlaceMethod.hpp"
+#include "../exceptions/image/PNGInvalidNLEN.hpp"
+#include "../exceptions/image/PNGNoEndCode.hpp"
+#include "../exceptions/image/PNGNonExistantCodeReached.hpp"
+#include "../exceptions/image/PNGOutsideCodeTree.hpp"
+#include "../exceptions/image/PNGPaletteError.hpp"
+#include "../exceptions/image/PNGUnsupportedCompressionMethod.hpp"
+#include "../exceptions/image/PNGzLibDataSize.hpp"
+#include "../exceptions/image/PNGzLibInvalidFlags.hpp"
 #include "../raytracer/Globals.hpp"
 
 namespace PNG {
@@ -496,7 +513,10 @@ int decodePNG(std::vector<unsigned char>& out_image, unsigned long& image_width,
             }
             int decode(bool& decoded, unsigned long& result, size_t& treepos, unsigned long bit) const {  //Decodes a symbol from the tree
                 unsigned long numcodes = (unsigned long)tree2d.size() / 2;
-                if (treepos >= numcodes) return 11;  //error: you appeared outside the codetree
+                if (treepos >= numcodes) {
+                    throw PNGOutsideCodeTree(treepos, numcodes);
+                    return 11;  //error: you appeared outside the codetree
+                }
                 result = tree2d[2 * treepos + bit];
                 decoded = (result < numcodes);
                 treepos = decoded ? 0 : result - numcodes;
@@ -512,6 +532,7 @@ int decodePNG(std::vector<unsigned char>& out_image, unsigned long& image_width,
                 unsigned long BFINAL = 0;
                 while (!BFINAL && !error) {
                     if (bp >> 3 >= in.size()) {
+                        throw new PNGBitPointerOutsideMemory(bp >> 3);
                         error = 52;
                         return;
                     }  //error, bit pointer will jump past memory
@@ -519,6 +540,7 @@ int decodePNG(std::vector<unsigned char>& out_image, unsigned long& image_width,
                     unsigned long BTYPE = readBitFromStream(bp, &in[inpos]);
                     BTYPE += 2 * readBitFromStream(bp, &in[inpos]);
                     if (BTYPE == 3) {
+                        throw new PNGInvalidBitType(BTYPE);
                         error = 20;
                         return;
                     }  //error: invalid BTYPE
@@ -555,6 +577,7 @@ int decodePNG(std::vector<unsigned char>& out_image, unsigned long& image_width,
             void getTreeInflateDynamic(HuffmanTree& tree, HuffmanTree& treeD, const unsigned char* in, size_t& bp, size_t inlength) {  //get the tree of a deflated block with dynamic tree, the tree itself is also Huffman compressed with a known tree
                 std::vector<unsigned long> bitlen(288, 0), bitlenD(32, 0);
                 if (bp >> 3 >= inlength - 2) {
+                    throw new PNGNoEndCode(bp >> 3);
                     error = 49;
                     return;
                 }                                                   //the bit pointer is or will go past the memory
@@ -578,6 +601,7 @@ int decodePNG(std::vector<unsigned char>& out_image, unsigned long& image_width,
                     else if (code == 16)  //repeat previous
                     {
                         if (bp >> 3 >= inlength) {
+                            throw new PNGBitPointerOutsideMemory(bp >> 3);
                             error = 50;
                             return;
                         }  //error, bit pointer jumps past memory
@@ -590,6 +614,7 @@ int decodePNG(std::vector<unsigned char>& out_image, unsigned long& image_width,
                         for (size_t n = 0; n < replength; n++)  //repeat this value in the next lengths
                         {
                             if (i >= HLIT + HDIST) {
+                                throw new PNGExceededCodeCount(i);
                                 error = 13;
                                 return;
                             }  //error: i is larger than the amount of codes
@@ -601,6 +626,7 @@ int decodePNG(std::vector<unsigned char>& out_image, unsigned long& image_width,
                     } else if (code == 17)  //repeat "0" 3-10 times
                     {
                         if (bp >> 3 >= inlength) {
+                            throw new PNGBitPointerOutsideMemory(bp >> 3);
                             error = 50;
                             return;
                         }  //error, bit pointer jumps past memory
@@ -608,6 +634,7 @@ int decodePNG(std::vector<unsigned char>& out_image, unsigned long& image_width,
                         for (size_t n = 0; n < replength; n++)  //repeat this value in the next lengths
                         {
                             if (i >= HLIT + HDIST) {
+                                throw new PNGExceededCodeCount(i);
                                 error = 14;
                                 return;
                             }  //error: i is larger than the amount of codes
@@ -619,6 +646,7 @@ int decodePNG(std::vector<unsigned char>& out_image, unsigned long& image_width,
                     } else if (code == 18)  //repeat "0" 11-138 times
                     {
                         if (bp >> 3 >= inlength) {
+                            throw new PNGBitPointerOutsideMemory(bp >> 3);
                             error = 50;
                             return;
                         }  //error, bit pointer jumps past memory
@@ -626,6 +654,7 @@ int decodePNG(std::vector<unsigned char>& out_image, unsigned long& image_width,
                         for (size_t n = 0; n < replength; n++)  //repeat this value in the next lengths
                         {
                             if (i >= HLIT + HDIST) {
+                                throw new PNGExceededCodeCount(i);
                                 error = 15;
                                 return;
                             }  //error: i is larger than the amount of codes
@@ -635,11 +664,13 @@ int decodePNG(std::vector<unsigned char>& out_image, unsigned long& image_width,
                                 bitlenD[i++ - HLIT] = 0;
                         }
                     } else {
+                        throw new PNGNonExistantCodeReached();
                         error = 16;
                         return;
                     }  //error: somehow an unexisting code appeared. This can never happen.
                 }
                 if (bitlen[256] == 0) {
+                    throw new PNGNoEndCode(0);
                     error = 64;
                     return;
                 }  //the length of the end code 256 must be larger than 0
@@ -668,6 +699,7 @@ int decodePNG(std::vector<unsigned char>& out_image, unsigned long& image_width,
                     {
                         size_t length = LENBASE[code - 257], numextrabits = LENEXTRA[code - 257];
                         if ((bp >> 3) >= inlength) {
+                            throw new PNGBitPointerOutsideMemory(bp >> 3);
                             error = 51;
                             return;
                         }  //error, bit pointer will jump past memory
@@ -675,11 +707,13 @@ int decodePNG(std::vector<unsigned char>& out_image, unsigned long& image_width,
                         unsigned long codeD = huffmanDecodeSymbol(in, bp, codetreeD, inlength);
                         if (error) return;
                         if (codeD > 29) {
+                            throw new PNGInvalidDistCode(codeD);
                             error = 18;
                             return;
                         }  //error: invalid dist code (30-31 are never used)
                         unsigned long dist = DISTBASE[codeD], numextrabitsD = DISTEXTRA[codeD];
                         if ((bp >> 3) >= inlength) {
+                            throw new PNGBitPointerOutsideMemory(bp >> 3);
                             error = 51;
                             return;
                         }  //error, bit pointer will jump past memory
@@ -697,12 +731,14 @@ int decodePNG(std::vector<unsigned char>& out_image, unsigned long& image_width,
                 while ((bp & 0x7) != 0) bp++;  //go to first boundary of byte
                 size_t p = bp / 8;
                 if (p >= inlength - 4) {
+                    throw new PNGBitPointerOutsideMemory(p);
                     error = 52;
                     return;
                 }  //error, bit pointer will jump past memory
                 unsigned long LEN = in[p] + 256 * in[p + 1], NLEN = in[p + 2] + 256 * in[p + 3];
                 p += 4;
                 if (LEN + NLEN != 65535) {
+                    throw new PNGInvalidNLEN(NLEN, LEN);
                     error = 21;
                     return;
                 }  //error: NLEN is not one's complement of LEN
@@ -719,16 +755,20 @@ int decodePNG(std::vector<unsigned char>& out_image, unsigned long& image_width,
         {
             Inflator inflator;
             if (in.size() < 2) {
+                throw new PNGzLibDataSize(in.size());
                 return 53;
             }  //error, size of zlib data too small
             if ((in[0] * 256 + in[1]) % 31 != 0) {
+                throw new PNGInvalidFCHECK(in[0], in[1]);
                 return 24;
             }  //error: 256 * in[0] + in[1] must be a multiple of 31, the FCHECK value is supposed to be made that way
             unsigned long CM = in[0] & 15, CINFO = (in[0] >> 4) & 15, FDICT = (in[1] >> 5) & 1;
             if (CM != 8 || CINFO > 7) {
+                throw new PNGUnsupportedCompressionMethod(CM);
                 return 25;
             }  //error: only compression method 8: inflate with sliding window of 32k is supported by the PNG spec
             if (FDICT != 0) {
+                throw new PNGzLibInvalidFlags(FDICT);
                 return 26;
             }  //error: the specification of PNG says about the zlib stream: "The additional flags shall not specify a preset dictionary."
             inflator.inflate(out, in, 2);
@@ -746,6 +786,7 @@ int decodePNG(std::vector<unsigned char>& out_image, unsigned long& image_width,
         void decode(std::vector<unsigned char>& out, const unsigned char* in, size_t size, bool convert_to_rgba32) {
             error = 0;
             if (size == 0 || in == 0) {
+                throw new PNGInvalidDataBuffer("Empty data buffer: ", 0);
                 error = 48;
                 return;
             }  //the given data is empty
@@ -758,19 +799,22 @@ int decodePNG(std::vector<unsigned char>& out_image, unsigned long& image_width,
             while (!IEND)  //loop through the chunks, ignoring unknown chunks and stopping at IEND chunk. IDAT data is put at the start of the in buffer
             {
                 if (pos + 8 >= size) {
+                    throw new PNGInvalidDataBuffer("Buffer too small to contain next chunk", pos + 8);
                     error = 30;
                     return;
                 }  //error: size of the in buffer too small to contain next chunk
                 size_t chunkLength = read32bitInt(&in[pos]);
                 pos += 4;
                 if (chunkLength > 2147483647) {
+                    throw new PNGInvalidDataBuffer("Maximum chunk length [2147483647] exceeded: ", chunkLength);
                     error = 63;
                     return;
                 }
                 if (pos + chunkLength >= size) {
+                    throw new PNGInvalidDataBuffer("Size of the in buffer too small to contain next chunk: ", pos + chunkLength);
                     error = 35;
                     return;
-                }                                                                                          //error: size of the in buffer too small to contain next chunk
+                }//error: size of the in buffer too small to contain next chunk
                 if (in[pos + 0] == 'I' && in[pos + 1] == 'D' && in[pos + 2] == 'A' && in[pos + 3] == 'T')  //IDAT chunk, containing compressed image data
                 {
                     idat.insert(idat.end(), &in[pos + 4], &in[pos + 4 + chunkLength]);
@@ -783,6 +827,7 @@ int decodePNG(std::vector<unsigned char>& out_image, unsigned long& image_width,
                     pos += 4;  //go after the 4 letters
                     info.palette.resize(4 * (chunkLength / 3));
                     if (info.palette.size() > (4 * 256)) {
+                        throw new PNGPaletteError("Palette too big: ", info.palette.size());
                         error = 38;
                         return;
                     }  //error: palette too big
@@ -795,12 +840,14 @@ int decodePNG(std::vector<unsigned char>& out_image, unsigned long& image_width,
                     pos += 4;  //go after the 4 letters
                     if (info.colorType == 3) {
                         if (4 * chunkLength > info.palette.size()) {
+                            throw new PNGPaletteError("More alpha value count exceeds palette entries: ", 4 * chunkLength);
                             error = 39;
                             return;
                         }  //error: more alpha values given than there are palette entries
                         for (size_t i = 0; i < chunkLength; i++) info.palette[4 * i + 3] = in[pos++];
                     } else if (info.colorType == 0) {
                         if (chunkLength != 2) {
+                            throw new PNGPaletteError("Chunk must be 2 bytes for greyscale image: ", chunkLength);
                             error = 40;
                             return;
                         }  //error: this chunk must be 2 bytes for greyscale image
@@ -809,6 +856,7 @@ int decodePNG(std::vector<unsigned char>& out_image, unsigned long& image_width,
                         pos += 2;
                     } else if (info.colorType == 2) {
                         if (chunkLength != 6) {
+                            throw new PNGPaletteError("Chunk must be 6 bytes for RGB image: ", chunkLength);
                             error = 41;
                             return;
                         }  //error: this chunk must be 6 bytes for RGB image
@@ -820,6 +868,7 @@ int decodePNG(std::vector<unsigned char>& out_image, unsigned long& image_width,
                         info.key_b = 256 * in[pos] + in[pos + 1];
                         pos += 2;
                     } else {
+                        throw new PNGPaletteError("tRNS chunk not allowed for other color models: ", -1);
                         error = 42;
                         return;
                     }   //error: tRNS chunk not allowed for other color models
@@ -885,14 +934,21 @@ int decodePNG(std::vector<unsigned char>& out_image, unsigned long& image_width,
         void readPngHeader(const unsigned char* in, size_t inlength)  //read the information from the header and store it in the Info
         {
             if (inlength < 29) {
+                throw new PNGHeaderError("Data length is smaller than header: ", inlength);
                 error = 27;
                 return;
             }  //error: the data length is smaller than the length of the header
             if (in[0] != 137 || in[1] != 80 || in[2] != 78 || in[3] != 71 || in[4] != 13 || in[5] != 10 || in[6] != 26 || in[7] != 10) {
+                throw new PNGHeaderError("Non-existant PNG signature. Err: ", 28);
                 error = 28;
                 return;
             }  //no PNG signature
             if (in[12] != 'I' || in[13] != 'H' || in[14] != 'D' || in[15] != 'R') {
+                size_t block = in[12];
+                block = (block << 4) & in[13];
+                block = (block << 4) & in[14];
+                block = (block << 4) & in[15];
+                throw new PNGHeaderError("Does not start with IHDR chunk!", block);
                 error = 29;
                 return;
             }  //error: it doesn't start with a IHDR chunk!
@@ -902,18 +958,20 @@ int decodePNG(std::vector<unsigned char>& out_image, unsigned long& image_width,
             info.colorType = in[25];
             info.compressionMethod = in[26];
             if (in[26] != 0) {
+                throw new PNGUnsupportedCompressionMethod(in[26]);
                 error = 32;
                 return;
             }  //error: only compression method 0 is allowed in the specification
             info.filterMethod = in[27];
             if (in[27] != 0) {
+                throw new PNGInvalidFilterType(in[27]);
                 error = 33;
                 return;
             }  //error: only filter method 0 is allowed in the specification
             info.interlaceMethod = in[28];
             if (in[28] > 1) {
                 error = 34;
-                return;
+                throw PNGInvalidInterlaceMethod(in[28]);
             }  //error: only interlace methods 0 and 1 exist in the specification
             error = checkColorValidity(info.colorType, info.bitDepth);
         }
@@ -952,6 +1010,7 @@ int decodePNG(std::vector<unsigned char>& out_image, unsigned long& image_width,
                     break;
                 default:
                     error = 36;
+                    throw PNGInvalidFilterType(filterType);
                     return;  //error: unexisting filter type given
             }
         }

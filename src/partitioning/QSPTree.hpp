@@ -86,7 +86,7 @@ void QSPTree::findMiddle() {
     double current_min_dist = numeric_limits<double>::max();
     int current_wall_idx;
     for (int i = walls->size() - 1; i != -1; i--) {
-        Coords loc = Coords(walls->at(i).posX, walls->at(i).posY);
+        Coords loc = Coords(walls->at(i).location.x, walls->at(i).location.y);
         int dist = sqDist(cMid, loc);
         if (dist < current_min_dist) {
             current_mid = walls->at(i);
@@ -96,7 +96,7 @@ void QSPTree::findMiddle() {
     }
     this->walls->erase(this->walls->begin() + current_wall_idx);
     this->mid = current_mid;
-    debugContext.logAppInfo("Closest AABB to actuall map centre at: (" + to_string(current_mid.posX) + "," + to_string(current_mid.posY) + ")");
+    debugContext.logAppInfo("Closest AABB to actuall map centre at: (" + to_string(current_mid.location.x) + "," + to_string(current_mid.location.y) + ")");
     this->root = new QuadNode(current_mid);
 };
 
@@ -127,7 +127,7 @@ inline QuadNode* QSPTree::insertRelative(QuadNode* dir_node, QuadNode* node) {
 };
 
 QuadNode* QSPTree::insertNode(QuadNode* root, QuadNode* node) {
-    RelativePosition relPos = position(Coords(root->wall.posX, root->wall.posY), Coords(node->wall.posX, node->wall.posY));
+    RelativePosition relPos = position(Coords(root->wall.location.x, root->wall.location.y), Coords(node->wall.location.x, node->wall.location.y));
     switch (relPos) {
         case RelativePosition::REL_UP:
             root->U = insertRelative(root->U, node);
@@ -200,7 +200,7 @@ void QSPTree::queryWalls(Coords origin, float player_angle, vector<Ray>& rays, v
     stack<TraversalRecord> nodesVisited;
     TraversalRecord currTraversal(this->root, vector<RelativePosition>());
     QuadNode* currNode = this->root;
-    Coords cPos = Coords(radToCoord(currNode->wall.posX) + 0.5, radToCoord(currNode->wall.posY) + 0.5);
+    Coords cPos = Coords(radToCoord(currNode->wall.location.x) + 0.5, radToCoord(currNode->wall.location.y) + 0.5);
     RelativePosition currBranch = position(cPos, origin);
     int raysQueried = 0;
     debugContext.logAppVerb("Querying " + to_string(rays.size()) + " rays in QSP tree [" + ADDR_OF(*this) + "]");
@@ -212,7 +212,7 @@ void QSPTree::queryWalls(Coords origin, float player_angle, vector<Ray>& rays, v
             continue;
         }
 
-        cPos = Coords(radToCoord(currNode->wall.posX) + 0.5, radToCoord(currNode->wall.posY) + 0.5);
+        cPos = Coords(radToCoord(currNode->wall.location.x) + 0.5, radToCoord(currNode->wall.location.y) + 0.5);
         currBranch = position(cPos, origin);
 
         vector<Ray> newRays;
@@ -246,7 +246,7 @@ void QSPTree::printPreorder(QuadNode* node) {
     if (node == nullptr) {
         return;
     }
-    cout << "(" + to_string(node->wall.posX) + "," + to_string(node->wall.posY) + ")";
+    cout << "(" + to_string(node->wall.location.x) + "," + to_string(node->wall.location.y) + ")";
     printPreorder(node->U);
     printPreorder(node->D);
     printPreorder(node->L);

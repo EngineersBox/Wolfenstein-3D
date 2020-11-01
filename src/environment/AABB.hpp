@@ -7,6 +7,7 @@
 #include "../texturing/texture.hpp"
 #include "AABBFace.hpp"
 #include "../raytracer/Ray.hpp"
+#include "../objects/IObjectBase.hpp"
 
 using namespace std;
 
@@ -24,7 +25,7 @@ static const string NormalDirLUT[] = {
     "DOWN"
 };
 
-class AABB {
+class AABB : public IObjectBase<int, Coordinates> {
    public:
     AABB(int x, int y, Colour colour, string texture);
     AABB(int x, int y, Colour colour);
@@ -39,8 +40,6 @@ class AABB {
     AABBFace getFace(int x, int y);
     bool intersect(const Ray& ray, Coords& intersect_point);
 
-    int posX;
-    int posY;
     Colour texColour;
     string texture_name;
 
@@ -60,16 +59,22 @@ class AABB {
 ///
 /// @returns AABB
 ///
-AABB::AABB(int x, int y, Colour colour, string texture) {
-    this->posX = x;
-    this->posY = y;
+AABB::AABB(int x, int y, Colour colour, string texture):
+    IObjectBase<int, Coordinates>(
+        Coordinates<int>(x,y),
+        INTERACTION_TYPE::BLOCK_ALL
+    )
+{
     this->texColour = colour;
     this->texture_name = texture;
 }
 
-AABB::AABB(int x, int y, Colour colour, AABBFace wf_left, AABBFace wf_right, AABBFace wf_up, AABBFace wf_down) {
-    this->posX = x;
-    this->posY = y;
+AABB::AABB(int x, int y, Colour colour, AABBFace wf_left, AABBFace wf_right, AABBFace wf_up, AABBFace wf_down):
+    IObjectBase<int, Coordinates>(
+        Coordinates<int>(x,y),
+        INTERACTION_TYPE::BLOCK_ALL
+    )
+{
     this->texColour = colour;
     this->wf_left = wf_left;
     this->wf_right = wf_right;
@@ -84,29 +89,29 @@ AABB::AABB(int x, int y, string texture) : AABB(x, y, NONE, texture) {};
 AABB::AABB(int x, int y, Colour colour) : AABB(x, y, colour, "") {};
 
 bool AABB::operator==(AABB& other) {
-    return (this->posX == other.posX)
-        && (this->posY == other.posY)
+    return (this->location.x == other.location.x)
+        && (this->location.y == other.location.y)
         && (this->texColour == other.texColour)
         && (this->texture_name == other.texture_name);
 };
 
 bool AABB::operator!=(AABB& other) {
-    return (this->posX != other.posX)
-        && (this->posY != other.posY)
+    return (this->location.x != other.location.x)
+        && (this->location.y != other.location.y)
         && (this->texColour != other.texColour)
         && (this->texture_name != other.texture_name);
 };
 
 NormalDir AABB::getNormDir(int x, int y) {
     // cout << to_string(x) << " " << to_string(y) << endl;
-    // cout << to_string(posX) << " " << to_string(posY) << endl;
-    if ((x == posX || x == posX + 1) && y == posY) {
+    // cout << to_string(this->location.x) << " " << to_string(this->location.y) << endl;
+    if ((x == this->location.x || x == this->location.x + 1) && y == this->location.y) {
         return NormalDir::DOWN;
-    } else if ((x == posX || x == posX + 1) && y == posY + 1) {
+    } else if ((x == this->location.x || x == this->location.x + 1) && y == this->location.y + 1) {
         return NormalDir::UP;
-    } else if ((y == posY || y == posY + 1) && x == posX) {
+    } else if ((y == this->location.y || y == this->location.y + 1) && x == this->location.x) {
         return NormalDir::LEFT;
-    } else if ((y == posY || y == posY + 1) && x == posX + 1) {
+    } else if ((y == this->location.y || y == this->location.y + 1) && x == this->location.x + 1) {
         return NormalDir::RIGHT;
     }
     return NormalDir::LEFT;
@@ -136,14 +141,14 @@ AABBFace AABB::getFace(int x, int y) {
 };
 
 bool AABB::intersect(const Ray& ray, Coords& intersect_point) {
-    double tx1 = (posX - ray.ax) * ray.bx;
-    double tx2 = (posX + 64 - ray.ax) * ray.bx;
+    double tx1 = (this->location.x - ray.ax) * ray.bx;
+    double tx2 = (this->location.x + 64 - ray.ax) * ray.bx;
 
     double tmin = min(tx1, tx2);
     double tmax = max(tx1, tx2);
 
-    double ty1 = (posY - ray.ay) * ray.by;
-    double ty2 = (posY + 64 - ray.ay) * ray.by;
+    double ty1 = (this->location.y - ray.ay) * ray.by;
+    double ty2 = (this->location.y + 64 - ray.ay) * ray.by;
 
     tmin = max(tmin, min(ty1, ty2));
     tmax = min(tmax, max(ty1, ty2));

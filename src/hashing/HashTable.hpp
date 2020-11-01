@@ -143,7 +143,6 @@ void HashTable<V>::insert(const string& key, V value) {
     
     if (bucket != nullptr && bucket->key == key) {
         bucket->value = value;
-        this->element_count++;
         return;
     }
 

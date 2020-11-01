@@ -190,11 +190,11 @@ void GameMap::readMapFromJSON(string filename) {
         double x = spriteObj["x"].as<double>();
         double y = spriteObj["y"].as<double>();
         string texture = spriteObj["Texture"].as<string>();
-        this->sprites.push_back(Sprite{
+        this->sprites.push_back(Sprite(
             x,
             y,
             texture
-        });
+        ));
     }
     debugContext.logAppInfo("Processed " + to_string(spritearr.size()) + " Sprite objects");
     debugContext.logAppInfo("---- FINISHED MAP PROCESSING [" + filename + "] ----");

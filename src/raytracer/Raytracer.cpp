@@ -24,8 +24,7 @@
 using namespace std;
 
 // Screen
-int screenW = 1024;
-int screenH = 512;
+int screenW = 1024, screenH = 512;
 Colour bg_colour = {0.3, 0.3, 0.3, 0.0};
 
 TextureLoader texLoader;
@@ -286,7 +285,7 @@ inline double sqDist(double ax, double ay, double bx, double by) {
 inline static void renderSprites() {
     for (int i = 0; i < gameMap.sprites.size(); i++) {
         spriteOrder[i] = i;
-        spriteDistance[i] = sqDist(gameMap.sprites[i].x, player.x, gameMap.sprites[i].y, player.y);
+        spriteDistance[i] = sqDist(gameMap.sprites[i].location.x, player.x, gameMap.sprites[i].location.y, player.y);
     }
     sortSprites(gameMap.sprites.size());
 
@@ -295,8 +294,8 @@ inline static void renderSprites() {
     Texture tex;
     uint32_t color;
     for (int i = 0; i < gameMap.sprites.size(); i++) {
-        spriteX = gameMap.sprites[spriteOrder[i]].x - player.x;
-        spriteY = gameMap.sprites[spriteOrder[i]].y - player.y;
+        spriteX = gameMap.sprites[spriteOrder[i]].location.x - player.x;
+        spriteY = gameMap.sprites[spriteOrder[i]].location.y - player.y;
 
         invDet = 1.0 / (planeX * player.dy - player.dx * planeY);
 

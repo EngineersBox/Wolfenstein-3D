@@ -64,7 +64,7 @@ PlayerCfg ConfigInit::initPlayerConfig() {
 MinimapCfg ConfigInit::initMinimapConfig() {
     return MinimapCfg(
         reader.GetBoolean(MINIMAP_SECTION, "enable", false),
-        reader.GetBoolean(MINIMAP_SECTION, "render_rays", true),
+        reader.GetBoolean(MINIMAP_SECTION, "render_rays", false),
         parseMinimapPos(reader.Get(MINIMAP_SECTION, "pos", "TOP_RIGHT")),
         parseMinimapSize(reader.Get(MINIMAP_SECTION, "size", "MEDIUM")));
 };
@@ -85,9 +85,11 @@ RenderCfg ConfigInit::initRenderConfig() {
     return RenderCfg(
         reader.GetBoolean(RENDER_SECTION, "headless_mode", false),
         reader.GetBoolean(RENDER_SECTION, "double_buffer", false),
+        reader.GetBoolean(RENDER_SECTION, "render_walls", true),
+        reader.GetBoolean(RENDER_SECTION, "render_floor_ceiling", true),
+        reader.GetBoolean(RENDER_SECTION, "render_sprites", true),
         reader.GetInteger(RENDER_SECTION, "refresh_rate", 60),
-        reader.GetInteger(RENDER_SECTION, "ray_count", 80)
-    );
+        reader.GetInteger(RENDER_SECTION, "ray_count", 80));
 }
 
 void ConfigInit::initAll(PlayerCfg& p_cfg, MinimapCfg& m_cfg, LoggingCfg& l_cfg, RenderCfg& r_cfg) {

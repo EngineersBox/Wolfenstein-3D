@@ -345,11 +345,20 @@ inline static void updateTimeTick() {
 }
 
 static void display(void) {
+    if (renderCfg.headless_mode) {
+        return;
+    }
     glEnable(GL_SCISSOR_TEST);
 
-    renderFloorCeiling();
-    renderWalls();
-    renderSprites();
+    if (renderCfg.render_floor_ceiling) {
+        renderFloorCeiling();
+    }
+    if (renderCfg.render_walls) {
+        renderWalls();
+    }
+    if (renderCfg.render_sprites) {
+        renderSprites();
+    }
 
     glDisable(GL_SCISSOR_TEST);
     updateTimeTick();
@@ -367,14 +376,12 @@ static void keyPress(unsigned char key, int x, int y) {
             player.x += player.dx * moveSpeed;
         if (gameMap.getAt((int)player.x, (int)(player.y + player.dy * moveSpeed)).wf_left.f_texture != "")
             player.y += player.dy * moveSpeed;
-    }
-    if (key == 's') {
+    } else if (key == 's') {
         if (gameMap.getAt((int)(player.x - player.dx * moveSpeed), (int)player.y).wf_left.f_texture != "")
             player.x -= player.dx * moveSpeed;
         if (gameMap.getAt((int)player.x, (int)(player.y - player.dy * moveSpeed)).wf_left.f_texture != "")
             player.y -= player.dy * moveSpeed;
-    }
-    if (key == 'd') {
+    } else if (key == 'd') {
         double oldDirX = player.dx;
         player.dx = player.dx * cos(-rotSpeed) - player.dy * sin(-rotSpeed);
         player.dy = oldDirX * sin(-rotSpeed) + player.dy * cos(-rotSpeed);
@@ -382,8 +389,7 @@ static void keyPress(unsigned char key, int x, int y) {
         double oldPlaneX = planeX;
         planeX = planeX * cos(-rotSpeed) - planeY * sin(-rotSpeed);
         planeY = oldPlaneX * sin(-rotSpeed) + planeY * cos(-rotSpeed);
-    }
-    if (key == 'a') {
+    } else if (key == 'a') {
         double oldDirX = player.dx;
         player.dx = player.dx * cos(rotSpeed) - player.dy * sin(rotSpeed);
         player.dy = oldDirX * sin(rotSpeed) + player.dy * cos(rotSpeed);

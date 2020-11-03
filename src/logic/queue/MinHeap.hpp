@@ -24,7 +24,7 @@ class MinHeap {
         void pop();
 
         inline bool isEmpty() const noexcept;
-        void clear() noexcept;
+        inline void clear() noexcept;
     private:
         void heapifyUp(int idx);
         void heapifyDown(int idx);
@@ -58,16 +58,13 @@ void MinHeap<K,V>::heapifyDown(int idx) {
     int leftIdx = IMUL_2(idx) + 1;
     int rightIdx = IMUL_2(idx) + 2;
 
-    if (leftIdx < size && queue[idx].key > queue[leftIdx].key) {
-        min = leftIdx;
-    }
-
-    if (rightIdx < size && queue[(min == -1 ? idx : min)].key > queue[rightIdx].key) {
+    if (rightIdx < size && queue[idx].key > queue[rightIdx].key) {
         min = rightIdx;
-    }
-
-    if (min == -1)
+    } else if (leftIdx < size && queue[idx].key > queue[leftIdx].key) {
+        min = leftIdx;
+    } else {
         return;
+    }
 
     iter_swap(this->queue.begin() + idx, this->queue.begin() + min);
     heapifyDown(min);

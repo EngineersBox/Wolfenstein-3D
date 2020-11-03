@@ -13,6 +13,7 @@
 #include "../map/Coordinates.hpp"
 #include "../../rendering/Globals.hpp"
 #include "../constructs/sprites/Sprite.hpp"
+#include "../../rendering/colour/Colours.hpp"
 
 using namespace std;
 #define MAP_DELIM ";"
@@ -22,7 +23,6 @@ struct GameMap {
     GameMap();
 
     void fromArray(AABB walls[], int width, int height);
-    void readMapFromFile(string filename);
     void readMapFromJSON(string filename);
     AABB getAt(int x, int y);
     AABB getAtPure(int loc);
@@ -81,43 +81,6 @@ vector<string> splitString(string s, int substring_count, string delimiter) {
     return ss;
 }
 
-void GameMap::readMapFromFile(string filename) {
-    ifstream inFile(filename);
-    int mapFormat;
-    inFile >> this->map_width >> this->map_height >> mapFormat;
-    if (mapFormat != 0 && mapFormat != 1) {
-        MapFormatError err(mapFormat);
-        if (debugContext.l_cfg->map_skip_invalid) {
-            debugContext.glDebugMessageCallback(
-                GL_DEBUG_SOURCE::DEBUG_SOURCE_API,
-                GL_DEBUG_TYPE::DEBUG_TYPE_ERROR,
-                GL_DEBUG_SEVERITY::DEBUG_SEVERITY_LOW,
-                string(err.what())
-            );
-        } else {
-            throw err;
-        }
-    }
-    debugContext.logAppInfo("Map format specfied as: " + to_string(mapFormat));
-    this->walls = vector<AABB>(this->map_width * this->map_height);
-
-    for (int y = 0; y < this->map_height; y++) {
-        string currentEntry;
-        inFile >> currentEntry;
-        vector<string> s = splitString(currentEntry, this->map_width, MAP_DELIM);
-        for (int x = 0; x < this->map_width; x++) {
-            string cToken = s.at(x);
-            if (mapFormat == 1) {
-                this->walls.at((y * this->map_width) + x) = AABB(x, y, toTexColour(cToken));
-                continue;
-            }
-            this->walls.at((y * this->map_width) + x) = AABB(x, y, cToken == "NONE" ? NONE : WHITE, cToken);
-        }
-    }
-    this->size = this->map_width * this->map_height;
-    inFile.close();
-};
-
 void GameMap::readMapFromJSON(string filename) {
     RSJresource jsonres;
     filebuf fileBuffer;
@@ -153,21 +116,21 @@ void GameMap::readMapFromJSON(string filename) {
         RSJobject down = wallObj["Down"].as<RSJobject>();
         this->walls.push_back(AABB(
                 x, y,
-                toTexColour(left["Colour"].as<string>()),
+                Colour::STRtoRGB(left["Colour"].as<string>()),
                 AABBFace(
-                    toTexColour(left["Colour"].as<string>()),
+                    Colour::STRtoRGB(left["Colour"].as<string>()),
                     left["Texture"].as<string>()
                 ),
                 AABBFace(
-                    toTexColour(right["Colour"].as<string>()),
+                    Colour::STRtoRGB(right["Colour"].as<string>()),
                     right["Texture"].as<string>()
                 ),
                 AABBFace(
-                    toTexColour(up["Colour"].as<string>()),
+                    Colour::STRtoRGB(up["Colour"].as<string>()),
                     up["Texture"].as<string>()
                 ),
                 AABBFace(
-                    toTexColour(down["Colour"].as<string>()),
+                    Colour::STRtoRGB(down["Colour"].as<string>()),
                     down["Texture"].as<string>()
                 )
             )

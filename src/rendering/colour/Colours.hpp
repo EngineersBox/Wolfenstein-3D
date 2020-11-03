@@ -13,6 +13,8 @@
 
 using namespace std;
 
+namespace Colour {
+
 struct ColorRGB8bit;
 // a color with 3 components: r, g and b
 struct ColorRGB {
@@ -459,4 +461,12 @@ ColorRGB INTtoRGB(uint32_t colorINT) {
     colorRGB.g = (colorINT / 256) % 256;
     colorRGB.b = colorINT % 256;
     return colorRGB;
+}
+
+ColorRGB STRtoRGB(const string& colorSTR) {
+    if (colorSTR == "") {
+        return RGB_None;
+    }
+    return INTtoRGB(static_cast<uint32_t>(stoul(colorSTR, nullptr, 16)));
+}
 }

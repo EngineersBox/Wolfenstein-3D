@@ -62,7 +62,7 @@ inline static void renderPlayerPos(int sw = screenW, int sh = screenH) {
     int xOffset = minimapCfg.isLeft() ? 0 : sw - (gameMap.map_width * minimapCfg.size);
     int yOffset = minimapCfg.isTop() ? 0 : sh - (gameMap.map_height * minimapCfg.size);
 
-    toColour(RED);
+    Colour::RGB_Red.toColour4d();
     glPointSize(8);
 
     // Draw player point
@@ -77,7 +77,7 @@ inline static void renderPlayerPos(int sw = screenW, int sh = screenH) {
         yOffset + (player.y * mapScalingY),
         xOffset + ((player.x + player.dx * 5) * mapScalingX),
         yOffset + ((player.y + player.dy * 5) * mapScalingY),
-        3, RED);
+        3, Colour::RGB_Red);
 }
 
 ///
@@ -92,7 +92,7 @@ static void renderMap2D(int sw = screenW, int sh = screenH) {
     for (y = 0; y < gameMap.map_height; y++) {
         for (x = 0; x < gameMap.map_width; x++) {
             // Change to colour coresponding to map location
-            toColour(gameMap.getAt(x, y).wf_left.f_colour);
+            gameMap.getAt(x, y).wf_left.f_colour.toColour4d();
             drawRectangle(xOffset + x * minimapCfg.size, yOffset + y * minimapCfg.size, minimapCfg.size, minimapCfg.size);
         }
     }
@@ -104,7 +104,7 @@ static void reshape(int width, int height) {
     ZBuffer.resize(width);
 }
 
-inline void drawPixel(int x, int y, PNG::ColorRGB colour) {
+inline void drawPixel(int x, int y, Colour::ColorRGB colour) {
     glScissor(x, y, 1, 1);
     glClearColor(
         colour.r / 255.0,
@@ -155,12 +155,12 @@ inline static void renderFloorCeiling() {
             textures.get(floorTexture, tex);
             color = tex.texture[TEXTURE_WIDTH * ty + tx];
             color = (color >> 1) & DARK_SHADER;
-            drawPixel(x, screenH - y, PNG::INTtoRGB(color));
+            drawPixel(x, screenH - y, Colour::INTtoRGB(color));
 
             textures.get(ceilingTexture, tex);
             color = tex.texture[TEXTURE_WIDTH * ty + tx];
             color = (color >> 1) & DARK_SHADER;
-            drawPixel(x, y - 1, PNG::INTtoRGB(color));
+            drawPixel(x, y - 1, Colour::INTtoRGB(color));
         }
     }
 }
@@ -249,7 +249,7 @@ inline static void renderWalls() {
             if (side == 1) {
                 color = (color >> 1) & DARK_SHADER;
             }
-            drawPixel(x, screenH - y, PNG::INTtoRGB(color));
+            drawPixel(x, screenH - y, Colour::INTtoRGB(color));
         }
 
         ZBuffer[x] = perpWallDist;
@@ -323,7 +323,7 @@ inline static void renderSprites() {
                 texY = IDIV_256((d * TEXTURE_HEIGHT) / spriteHeight);
                 color = tex.texture[TEXTURE_WIDTH * texY + texX];
                 if ((color & 0x00FFFFFF) != 0) {
-                    drawPixel(stripe, screenH - y, PNG::INTtoRGB(color));
+                    drawPixel(stripe, screenH - y, Colour::INTtoRGB(color));
                 }
             }
         }

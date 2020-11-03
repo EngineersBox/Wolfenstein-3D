@@ -10,7 +10,7 @@
 #include "../../exceptions/pathfinding/InvalidPathTargets.hpp"
 #include "../../rendering/Globals.hpp"
 #include "../../rendering/drawing/DrawingUtils.hpp"
-#include "../../rendering/texturing/TextureColours.hpp"
+#include "../../rendering/colour/Colours.hpp"
 #include "GraphNode.hpp"
 #include "../queue/MinHeap.hpp"
 
@@ -24,7 +24,7 @@ class AStar {
 
         vector<Coords>* rebuildPath(unordered_map<GraphNode, GraphNode>& traversals, GraphNode start, GraphNode goal);
         vector<Coords>* find(Coords start_loc, Coords end_loc);
-        void renderPath(vector<Coords>* path, Colour path_colour, int sw, int sh, float scalingX, float scalingY);
+        void renderPath(vector<Coords>* path, Colour::ColorRGB path_colour, int sw, int sh, float scalingX, float scalingY);
 
        private:
         inline int heuristic(GraphNode next, GraphNode goal);
@@ -60,13 +60,13 @@ vector<GraphNode> AStar::neighbors(GraphNode node) {
     for (int i = 0; i < 4; i++) {
         int cx{loc_to_check[i][0].x}, cy{loc_to_check[i][0].y};
         bool cInMap = inMap(Coords(node.x + cx, node.y + cy));
-        bool cIsWall = !cInMap ? false : map.getAt(node.x + cx, node.y + cy).wf_left.f_colour != NONE;
+        bool cIsWall = !cInMap ? false : map.getAt(node.x + cx, node.y + cy).wf_left.f_texture != "";
         int cx1{loc_to_check[i][1].x}, cy1{loc_to_check[i][1].y};
         bool c1InMap = inMap(Coords(node.x + cx1, node.y + cy1));
-        bool c1IsWall = !c1InMap ? false : map.getAt(node.x + cx1, node.y + cy1).wf_left.f_colour != NONE;
+        bool c1IsWall = !c1InMap ? false : map.getAt(node.x + cx1, node.y + cy1).wf_left.f_texture != "";
         int cx2{loc_to_check[i][1].x}, cy2{loc_to_check[i][1].y};
         bool c2InMap = inMap(Coords(node.x + cx2, node.y + cy2));
-        bool c2IsWall = !c2InMap ? false : map.getAt(node.x + cx2, node.y + cy2).wf_left.f_colour != NONE;
+        bool c2IsWall = !c2InMap ? false : map.getAt(node.x + cx2, node.y + cy2).wf_left.f_texture != "";
         if (cInMap) {
             if (cIsWall) {
                 if (c1InMap && !c1IsWall) {
@@ -176,7 +176,7 @@ vector<Coords>* AStar::find(Coords start_loc, Coords end_loc) {
     return rebuildPath(traversals, start, goal);
 };
 
-void AStar::renderPath(vector<Coords>* path, Colour path_colour, int sw, int sh, float scalingX, float scalingY) {
+void AStar::renderPath(vector<Coords>* path, Colour::ColorRGB path_colour, int sw, int sh, float scalingX, float scalingY) {
     if (path->size() < 2) {
         return;
     }

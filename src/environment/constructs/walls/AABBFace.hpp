@@ -2,7 +2,7 @@
 
 #include <string>
 
-#include "../../../rendering/texturing/TextureColours.hpp"
+#include "../../../rendering/colour/Colours.hpp"
 #include "../../../rendering/texturing/texture.hpp"
 
 using namespace std;
@@ -10,19 +10,19 @@ using namespace std;
 class AABBFace {
     public:
         AABBFace();
-        AABBFace(Colour colour, string tex);
+        AABBFace(Colour::ColorRGB colour, string tex);
         ~AABBFace();
 
-        Colour f_colour;
+        Colour::ColorRGB f_colour;
         string f_texture;
 };
 
 AABBFace::AABBFace() {
-    this->f_colour = NONE;
+    this->f_colour = Colour::RGB_None;
     this->f_texture = "";
 }
 
-AABBFace::AABBFace(Colour colour, string tex) {
+AABBFace::AABBFace(Colour::ColorRGB colour, string tex) {
     this->f_colour = colour;
     this->f_texture = tex;
 };

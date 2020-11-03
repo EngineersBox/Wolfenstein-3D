@@ -12,7 +12,7 @@
     #include <GL/glut.h>
 #endif
 
-#include "../texturing/TextureColours.hpp"
+#include "../colour/Colours.hpp"
 
 using namespace std;
 
@@ -67,8 +67,8 @@ inline static void drawSquare(float x, float y, float sidelength, bool beginEnd 
 ///
 /// @return void
 ///
-inline static void renderRay(float ax, float ay, float bx, float by, int line_width, Colour ray_colour = WHITE) {
-    toColour(ray_colour);
+inline static void renderRay(float ax, float ay, float bx, float by, int line_width, Colour::ColorRGB ray_colour) {
+    ray_colour.toColour4d();
     glLineWidth((float)line_width);
 
     glBegin(GL_LINES);

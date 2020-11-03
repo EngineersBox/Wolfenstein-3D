@@ -34,7 +34,7 @@
 #include "../partitioning/QSPTree.hpp"
 #include "../../logic/pathfinding/AStar.hpp"
 #include "../../environment/player/Player.hpp"
-#include "../texturing/TextureColours.hpp"
+#include "../colour/Colours.hpp"
 #include "../../io/resource_management/TextureLoader.hpp"
 #include "../texturing/texture.hpp"
 #include "../../environment/world/World.hpp"

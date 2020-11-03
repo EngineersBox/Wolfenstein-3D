@@ -9,6 +9,8 @@
     #include <GL/glut.h>
 #endif
 
+#define _USE_MATH_DEFINES
+
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -40,6 +42,3 @@
 #include "Ray.hpp"
 #include "../../io/resource_management/PNGReader.hpp"
 #include "../../environment/constructs/sprites/Sprite.hpp"
-
-#define _USE_MATH_DEFINES
-constexpr float DR = 0.0174533f;

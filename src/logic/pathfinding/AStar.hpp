@@ -2,7 +2,6 @@
 
 #include <algorithm>
 #include <iostream>
-#include <queue>
 #include <unordered_map>
 #include <vector>
 
@@ -13,6 +12,7 @@
 #include "../../rendering/drawing/DrawingUtils.hpp"
 #include "../../rendering/texturing/TextureColours.hpp"
 #include "GraphNode.hpp"
+#include "../queue/MinHeap.hpp"
 
 using namespace std;
 
@@ -141,9 +141,7 @@ vector<Coords>* AStar::find(Coords start_loc, Coords end_loc) {
     GraphNode start(start_loc);
     GraphNode goal(end_loc);
 
-    // By default, std::priority_queue implements<T,E,F> a min-heap when using F = std::greater<T>
-    typedef pair<int, GraphNode> QueueEntry;
-    priority_queue<QueueEntry, vector<QueueEntry>, greater<QueueEntry>> min_heap;
+    MinHeap<int, GraphNode> min_heap;
     min_heap.emplace(0, start);
 
     unordered_map<GraphNode, GraphNode> traversals;
@@ -153,8 +151,8 @@ vector<Coords>* AStar::find(Coords start_loc, Coords end_loc) {
     traversals[start] = start;
     cost[start] = 0;
 
-    while (!min_heap.empty()) {
-        GraphNode current = min_heap.top().second;
+    while (!min_heap.isEmpty()) {
+        GraphNode current = min_heap.top();
         min_heap.pop();
 
         if (current == goal) {

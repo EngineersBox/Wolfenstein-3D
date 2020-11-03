@@ -12,24 +12,24 @@
 
 using namespace std;
 
-#define IMUL_2(x) (x << 1)
-#define IDIV_2(x) (x >> 1)
-#define IMUL_4(x) (x << 2)
-#define IDIV_4(x) (x >> 2)
-#define IMUL_8(x) (x << 3)
-#define IDIV_8(x) (x >> 3)
+#define IMUL_2(x) ((x) << 1)
+#define IDIV_2(x) ((x) >> 1)
+#define IMUL_4(x) ((x) << 2)
+#define IDIV_4(x) ((x) >> 2)
+#define IMUL_8(x) ((x) << 3)
+#define IDIV_8(x) ((x) >> 3)
 
-#define IMUL_16(x) (x << 4)
-#define IDIV_16(x) (x >> 4)
-#define IMUL_32(x) (x << 5)
-#define IDIV_32(x) (x >> 5)
-#define IMUL_64(x) (x << 6)
-#define IDIV_64(x) (x >> 6)
+#define IMUL_16(x) ((x) << 4)
+#define IDIV_16(x) ((x) >> 4)
+#define IMUL_32(x) ((x) << 5)
+#define IDIV_32(x) ((x) >> 5)
+#define IMUL_64(x) ((x) << 6)
+#define IDIV_64(x) ((x) >> 6)
 
-#define IMUL_128(x) (x << 7)
-#define IDIV_128(x) (x >> 7)
-#define IMUL_256(x) (x << 8)
-#define IDIV_256(x) (x >> 8)
+#define IMUL_128(x) ((x) << 7)
+#define IDIV_128(x) ((x) >> 7)
+#define IMUL_256(x) ((x) << 8)
+#define IDIV_256(x) ((x) >> 8)
 
 #define radToCoord(r) IDIV_64((int) r)
 

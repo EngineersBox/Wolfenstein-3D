@@ -14,8 +14,8 @@
 using namespace std;
 
 // Screen
-int screenW = 1024, screenH = 512;
-Colour bg_colour = {0.3, 0.3, 0.3, 0.0};
+int screenW = 1024;
+int screenH = 512;
 
 TextureLoader texLoader;
 HashTable<Texture> textures;
@@ -98,15 +98,6 @@ static void renderMap2D(int sw = screenW, int sh = screenH) {
     }
 }
 
-void sortSprites(int amount) {
-    vector<pair<double, int>> sprites(amount);
-    for (int i = 0; i < amount; i++) {
-        sprites[i].first = spriteDistance[i];
-        sprites[i].second = spriteOrder[i];
-    }
-    sort(sprites.begin(), sprites.end());
-}
-
 static void reshape(int width, int height) {
     screenW = width;
     screenH = height;
@@ -129,7 +120,7 @@ inline static void renderFloorCeiling() {
     Texture tex;
     string floorTexture, ceilingTexture;
     uint32_t color;
-    for (int y = IDIV_2(screenH) + 1; y < screenH; ++y) {
+    for (int y = screenH - 1; y >= IDIV_2(screenH) + 1; --y) {
         rayDirX0 = player.dx - planeX;
         rayDirY0 = player.dy - planeY;
         rayDirX1 = player.dx + planeX;
@@ -147,7 +138,7 @@ inline static void renderFloorCeiling() {
         floorX = player.x + rowDistance * rayDirX0;
         floorY = player.y + rowDistance * rayDirY0;
 
-        for (int x = 0; x < screenW; ++x) {
+        for (int x = screenW - 1; x >= 0; --x) {
             cellX = (int)(floorX);
             cellY = (int)(floorY);
 
@@ -180,7 +171,7 @@ inline static void renderWalls() {
     string wallTex;
     uint32_t color;
     Texture tex;
-    for (int x = 0; x < screenW; x++) {
+    for (int x = screenW - 1; x >= 0; x--) {
         cameraX = 2 * x / double(screenW) - 1;
         rayDirX = player.dx + planeX * cameraX;
         rayDirY = player.dy + planeY * cameraX;
@@ -269,19 +260,29 @@ inline double sqDist(double ax, double ay, double bx, double by) {
     return pow(bx - ax, 2) + pow(by - ay, 2);
 }
 
-inline static void renderSprites() {
-    for (int i = 0; i < gameMap.sprites.size(); i++) {
-        spriteOrder[i] = i;
-        spriteDistance[i] = sqDist(gameMap.sprites[i].location.x, player.x, gameMap.sprites[i].location.y, player.y);
+inline void sortSprites() {
+    int amount = gameMap.sprites.size();
+    vector<pair<double, int>> sprites(amount);
+    for (int i = amount - 1; i >= 0; i--) {
+        sprites[i].first = sqDist(gameMap.sprites[i].location.x, player.x, gameMap.sprites[i].location.y, player.y);
+        sprites[i].second = i;
     }
-    sortSprites(gameMap.sprites.size());
+    sort(sprites.begin(), sprites.end());
+    for (int i = amount - 1; i >= 0; i--) {
+        spriteDistance[i] = sprites[amount - i - 1].first;
+        spriteOrder[i] = sprites[amount - i - 1].second;
+    }
+}
+
+inline static void renderSprites() {
+    sortSprites();
 
     double spriteX, spriteY, transformX, transformY;
     int spriteScreenX, V_MOVEScreen, spriteHeight, drawStartY, drawEndY, spriteWidth, drawStartX, drawEndX, texX, texY, d;
     Texture tex;
     uint32_t color;
     double invDet = 1.0 / (planeX * player.dy - player.dx * planeY);
-    for (int i = 0; i < gameMap.sprites.size(); i++) {
+    for (int i = gameMap.sprites.size() - 1; i >= 0; i--) {
         spriteX = gameMap.sprites[spriteOrder[i]].location.x - player.x;
         spriteY = gameMap.sprites[spriteOrder[i]].location.y - player.y;
 
@@ -433,7 +434,7 @@ void init() {
     moveSpeed = frameTime * playerCfg.move_speed;
     rotSpeed = frameTime * playerCfg.rotation_speed;
 
-    toClearColour(bg_colour);
+    // toClearColour(bg_colour);
     gluOrtho2D(0, screenW, screenH, 0);
     player = Player(
         gameMap.start.x,

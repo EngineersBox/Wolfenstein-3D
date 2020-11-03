@@ -19,14 +19,14 @@ using namespace std;
 #define MAP_DELIM ";"
 
 struct GameMap {
-    GameMap(vector<AABB> walls, int width, int height);
+    GameMap(vector<Constructs::AABB> walls, int width, int height);
     GameMap();
 
-    void fromArray(AABB walls[], int width, int height);
+    void fromArray(Constructs::AABB walls[], int width, int height);
     void readMapFromJSON(string filename);
-    AABB getAt(int x, int y);
-    AABB getAtPure(int loc);
-    
+    Constructs::AABB getAt(int x, int y);
+    Constructs::AABB getAtPure(int loc);
+
     int map_width;
     int map_height;
     int size;
@@ -36,16 +36,16 @@ struct GameMap {
     Coords start;
     Coords end;
 
-    vector<AABB> walls;
+    vector<Constructs::AABB> walls;
     vector<Coords> up_boundary;
     vector<Coords> down_boundary;
     vector<Coords> left_boundary;
     vector<Coords> right_boundary;
     vector<Coords> tree_order_walls;
-    vector<Sprite> sprites;
+    vector<Constructs::Sprite> sprites;
 };
 
-GameMap::GameMap(vector<AABB> walls, int width, int height) {
+GameMap::GameMap(vector<Constructs::AABB> walls, int width, int height) {
     this->map_width = width;
     this->map_width = height;
     this->walls = walls;
@@ -53,13 +53,13 @@ GameMap::GameMap(vector<AABB> walls, int width, int height) {
 }
 
 GameMap::GameMap(){
-    this->walls = vector<AABB>(0);
+    this->walls = vector<Constructs::AABB>(0);
     this->map_width = 0;
     this->map_height = 0;
     this->size = 0;
 };
 
-void GameMap::fromArray(AABB walls[], int width, int height) {
+void GameMap::fromArray(Constructs::AABB walls[], int width, int height) {
     this->map_width = width;
     this->map_width = height;
     for (int i = 0; i < width * height; i++) {
@@ -82,11 +82,11 @@ vector<string> splitString(string s, int substring_count, string delimiter) {
 }
 
 void GameMap::readMapFromJSON(string filename) {
-    RSJresource jsonres;
+    ResourceManager::RSJresource jsonres;
     filebuf fileBuffer;
     if (fileBuffer.open(filename.c_str(), ios::in)) {
         istream is(&fileBuffer);
-        jsonres = RSJresource(is);
+        jsonres = ResourceManager::RSJresource(is);
         fileBuffer.close();
     } else {
         debugContext.glDebugMessageCallback(
@@ -106,35 +106,29 @@ void GameMap::readMapFromJSON(string filename) {
     this->end = Coords(jsonres["Params"]["End"]["x"].as<int>(),jsonres["Params"]["End"]["y"].as<int>());
     debugContext.logAppInfo("Map start location: " + this->start.asString());
     debugContext.logAppInfo("Map end location: " + this->end.asString());
-    RSJarray wallarr = jsonres["Walls"].as_array();
-    for (RSJresource wallObj : wallarr) {
+    ResourceManager::RSJarray wallarr = jsonres["Walls"].as_array();
+    for (ResourceManager::RSJresource wallObj : wallarr) {
         int x = wallObj["x"].as<int>();
         int y = wallObj["y"].as<int>();
-        RSJobject left = wallObj["Left"].as<RSJobject>();
-        RSJobject right = wallObj["Right"].as<RSJobject>();
-        RSJobject up = wallObj["Up"].as<RSJobject>();
-        RSJobject down = wallObj["Down"].as<RSJobject>();
-        this->walls.push_back(AABB(
-                x, y,
+        ResourceManager::RSJobject left = wallObj["Left"].as<ResourceManager::RSJobject>();
+        ResourceManager::RSJobject right = wallObj["Right"].as<ResourceManager::RSJobject>();
+        ResourceManager::RSJobject up = wallObj["Up"].as<ResourceManager::RSJobject>();
+        ResourceManager::RSJobject down = wallObj["Down"].as<ResourceManager::RSJobject>();
+        this->walls.push_back(Constructs::AABB(
+            x, y,
+            Colour::STRtoRGB(left["Colour"].as<string>()),
+            Constructs::AABBFace(
                 Colour::STRtoRGB(left["Colour"].as<string>()),
-                AABBFace(
-                    Colour::STRtoRGB(left["Colour"].as<string>()),
-                    left["Texture"].as<string>()
-                ),
-                AABBFace(
-                    Colour::STRtoRGB(right["Colour"].as<string>()),
-                    right["Texture"].as<string>()
-                ),
-                AABBFace(
-                    Colour::STRtoRGB(up["Colour"].as<string>()),
-                    up["Texture"].as<string>()
-                ),
-                AABBFace(
-                    Colour::STRtoRGB(down["Colour"].as<string>()),
-                    down["Texture"].as<string>()
-                )
-            )
-        );
+                left["Texture"].as<string>()),
+            Constructs::AABBFace(
+                Colour::STRtoRGB(right["Colour"].as<string>()),
+                right["Texture"].as<string>()),
+            Constructs::AABBFace(
+                Colour::STRtoRGB(up["Colour"].as<string>()),
+                up["Texture"].as<string>()),
+            Constructs::AABBFace(
+                Colour::STRtoRGB(down["Colour"].as<string>()),
+                down["Texture"].as<string>())));
         if (x == 0) {
             this->left_boundary.push_back(Coords(x,y));
         } else if (x == this->map_width - 1) {
@@ -148,25 +142,24 @@ void GameMap::readMapFromJSON(string filename) {
         }
     }
     debugContext.logAppInfo("Processed " + to_string(wallarr.size()) + " AABB objects");
-    RSJarray spritearr = jsonres["Sprites"].as_array();
-    for (RSJresource spriteObj : spritearr) {
+    ResourceManager::RSJarray spritearr = jsonres["Sprites"].as_array();
+    for (ResourceManager::RSJresource spriteObj : spritearr) {
         double x = spriteObj["x"].as<double>();
         double y = spriteObj["y"].as<double>();
         string texture = spriteObj["Texture"].as<string>();
-        this->sprites.push_back(Sprite(
+        this->sprites.push_back(Constructs::Sprite(
             x,
             y,
-            texture
-        ));
+            texture));
     }
     debugContext.logAppInfo("Processed " + to_string(spritearr.size()) + " Sprite entities");
     debugContext.logAppInfo("---- FINISHED MAP PROCESSING [" + filename + "] ----");
 };
 
-AABB GameMap::getAt(int x, int y) {
+Constructs::AABB GameMap::getAt(int x, int y) {
     return this->walls.at((y * this->map_width) + x);
 };
 
-AABB GameMap::getAtPure(int loc) {
+Constructs::AABB GameMap::getAtPure(int loc) {
     return this->walls.at(loc);
 };

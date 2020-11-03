@@ -17,7 +17,7 @@ using namespace std;
 int screenW = 1024;
 int screenH = 512;
 
-TextureLoader texLoader;
+ResourceManager::TextureLoader texLoader;
 HashTable<Texture> textures;
 AStar astar;
 vector<Coords> *path = new vector<Coords>();
@@ -32,7 +32,7 @@ float mapScalingX;
 float mapScalingY;
 
 // Configs
-ConfigInit cfgInit;
+ResourceManager::ConfigInit cfgInit;
 
 GameMap gameMap = GameMap();
 vector<Ray> rays(0);
@@ -92,7 +92,7 @@ static void renderMap2D(int sw = screenW, int sh = screenH) {
     for (y = 0; y < gameMap.map_height; y++) {
         for (x = 0; x < gameMap.map_width; x++) {
             // Change to colour coresponding to map location
-            gameMap.getAt(x, y).wf_left.f_colour.toColour4d();
+            gameMap.getAt(x, y).wf_left.colour.toColour4d();
             drawRectangle(xOffset + x * minimapCfg.size, yOffset + y * minimapCfg.size, minimapCfg.size, minimapCfg.size);
         }
     }
@@ -202,7 +202,7 @@ inline static void renderWalls() {
                 mapY += stepY;
                 side = 1;
             }
-            hit = gameMap.getAt(mapX, mapY).wf_left.f_texture != "";
+            hit = gameMap.getAt(mapX, mapY).wf_left.texture != "";
         }
 
         if (side == 0) {
@@ -220,7 +220,7 @@ inline static void renderWalls() {
         if (drawEnd >= screenH) {
             drawEnd = screenH - 1;
         }
-        wallTex = gameMap.getAt(mapX, mapY).wf_left.f_texture;
+        wallTex = gameMap.getAt(mapX, mapY).wf_left.texture;
 
         wallX = side == 0 ? player.y + perpWallDist* rayDirY : player.x + perpWallDist * rayDirX;
         wallX -= floor((wallX));
@@ -359,14 +359,14 @@ static void display(void) {
 
 static void __KEY_HANDLER(unsigned char key, int x, int y) {
     if (key == 'w') {
-        if (gameMap.getAt((int)(player.x + player.dx * moveSpeed), (int)player.y).wf_left.f_texture == "")
+        if (gameMap.getAt((int)(player.x + player.dx * moveSpeed), (int)player.y).wf_left.texture == "")
             player.x += player.dx * moveSpeed;
-        if (gameMap.getAt((int)player.x, (int)(player.y + player.dy * moveSpeed)).wf_left.f_texture == "")
+        if (gameMap.getAt((int)player.x, (int)(player.y + player.dy * moveSpeed)).wf_left.texture == "")
             player.y += player.dy * moveSpeed;
     } else if (key == 's') {
-        if (gameMap.getAt((int)(player.x - player.dx * moveSpeed), (int)player.y).wf_left.f_texture == "")
+        if (gameMap.getAt((int)(player.x - player.dx * moveSpeed), (int)player.y).wf_left.texture == "")
             player.x -= player.dx * moveSpeed;
-        if (gameMap.getAt((int)player.x, (int)(player.y - player.dy * moveSpeed)).wf_left.f_texture == "")
+        if (gameMap.getAt((int)player.x, (int)(player.y - player.dy * moveSpeed)).wf_left.texture == "")
             player.y -= player.dy * moveSpeed;
     } else if (key == 'd') {
         double oldDirX = player.dx;
@@ -401,7 +401,7 @@ void __INIT() {
     debugContext = GLDebugContext(&loggingCfg);
     debugContext.logAppInfo("Loaded debug context");
 
-    texLoader = TextureLoader();
+    texLoader = ResourceManager::TextureLoader();
     texLoader.loadTextures(textures);
     debugContext.logAppInfo(string("Loaded " + to_string(textures.size()) + " textures"));
 

@@ -18,14 +18,14 @@ struct World {
     World(GameMap map);
     ~World();
 
-    bool addEntity(IEntityBase<> entity);
-    bool removeEntity(IEntityBase<> entity);
-    bool addObject(IObjectBase<> object);
-    bool removeObject(IObjectBase<> object);
+    bool addEntity(BaseInterface::IEntityBase<> entity);
+    bool removeEntity(BaseInterface::IEntityBase<> entity);
+    bool addObject(BaseInterface::IObjectBase<> object);
+    bool removeObject(BaseInterface::IObjectBase<> object);
 
     GameMap map;
-    vector<IEntityBase<>> entities;
-    vector<IObjectBase<>> objects;
+    vector<BaseInterface::IEntityBase<>> entities;
+    vector<BaseInterface::IObjectBase<>> objects;
 
     template <typename T>
     inline bool searchEraseVector(vector<T> &vec, T element);
@@ -51,7 +51,7 @@ inline bool World::searchEraseVector(vector<T> &vec, T element) {
     return false;
 }
 
-bool World::addEntity(IEntityBase<> entity) {
+bool World::addEntity(BaseInterface::IEntityBase<> entity) {
     if (this->entities.size() == WORLD_MAX_ENTITY_COUNT) {
         return false;
     }
@@ -59,14 +59,14 @@ bool World::addEntity(IEntityBase<> entity) {
     return true;
 };
 
-bool World::removeEntity(IEntityBase<> entity) {
+bool World::removeEntity(BaseInterface::IEntityBase<> entity) {
     if (this->entities.size() < 1) {
         return false;
     }
-    return searchEraseVector<IEntityBase<>>(this->entities, entity);
+    return searchEraseVector<BaseInterface::IEntityBase<>>(this->entities, entity);
 };
 
-bool World::addObject(IObjectBase<> object) {
+bool World::addObject(BaseInterface::IObjectBase<> object) {
     if (this->objects.size() == WORLD_MAX_OBJECT_COUNT) {
         return false;
     }
@@ -74,9 +74,9 @@ bool World::addObject(IObjectBase<> object) {
     return true;
 };
 
-bool World::removeObject(IObjectBase<> object) {
+bool World::removeObject(BaseInterface::IObjectBase<> object) {
     if (this->objects.size() < 1) {
         return false;
     }
-    return searchEraseVector<IObjectBase<>>(this->objects, object);
+    return searchEraseVector<BaseInterface::IObjectBase<>>(this->objects, object);
 };

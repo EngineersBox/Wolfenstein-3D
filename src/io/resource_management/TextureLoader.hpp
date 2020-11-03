@@ -14,6 +14,8 @@
 #include "../../logic/hashing/HashTable.hpp"
 #include "../../rendering/Globals.hpp"
 
+namespace ResourceManager {
+
 #define MAX_TEXTURE_AMOUNT 20
 
 class TextureLoader {
@@ -100,4 +102,5 @@ bool TextureLoader::verifyFileExistance(const std::string& filename) {
         return false;
     }
     return true;
+}
 }

@@ -2,7 +2,7 @@
 
 #include <string>
 
-#include "INIReader.hpp"
+#include "../resource_management/INIReader.hpp"
 #include "../../exceptions/config/INIReadError.hpp"
 #include "sections/MinimapCfg.hpp"
 #include "sections/LoggingCfg.hpp"
@@ -10,6 +10,8 @@
 #include "sections/RenderCfg.hpp"
 
 using namespace std;
+
+namespace ResourceManager {
 
 #define RES_DIR string("resources/")
 #define CFG_DIR RES_DIR + "configs/"
@@ -99,4 +101,5 @@ void ConfigInit::initAll(PlayerCfg& p_cfg, MinimapCfg& m_cfg, LoggingCfg& l_cfg,
     m_cfg = initMinimapConfig();
     l_cfg = initLoggingConfig();
     r_cfg = initRenderConfig();
+}
 }

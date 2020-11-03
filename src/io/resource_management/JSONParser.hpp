@@ -35,6 +35,8 @@
 #include <utility>
 #include <vector>
 
+namespace ResourceManager {
+
 static char const* RSJobjectbrackets = "{}";
 static char const* RSJarraybrackets = "[]";
 static char RSJobjectassignment = ':';
@@ -752,5 +754,5 @@ inline bool RSJresource::as<bool>(const bool& def) {
 
 // ------------------------------------
 // Other types
-
+}
 #endif

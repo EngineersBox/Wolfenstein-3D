@@ -31,6 +31,7 @@
 #include "../../rendering/Globals.hpp"
 #include "../../rendering/colour/Colours.hpp"
 
+namespace ResourceManager {
 namespace PNG {
 
 void loadFile(std::vector<unsigned char>& buffer, const std::string& filename) {
@@ -788,5 +789,6 @@ int loadImage(PNGTex& out, unsigned long& w, unsigned long& h, const std::string
     }
 
     return 0;
+}
 }
 }

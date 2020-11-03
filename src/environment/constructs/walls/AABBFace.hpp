@@ -7,24 +7,27 @@
 
 using namespace std;
 
+namespace Constructs {
+
 class AABBFace {
     public:
         AABBFace();
         AABBFace(Colour::ColorRGB colour, string tex);
         ~AABBFace();
 
-        Colour::ColorRGB f_colour;
-        string f_texture;
+        Colour::ColorRGB colour;
+        string texture;
 };
 
 AABBFace::AABBFace() {
-    this->f_colour = Colour::RGB_None;
-    this->f_texture = "";
+    this->colour = Colour::RGB_None;
+    this->texture = "";
 }
 
 AABBFace::AABBFace(Colour::ColorRGB colour, string tex) {
-    this->f_colour = colour;
-    this->f_texture = tex;
+    this->colour = colour;
+    this->texture = tex;
 };
 
 AABBFace::~AABBFace(){};
+}

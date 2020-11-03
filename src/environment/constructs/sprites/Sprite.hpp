@@ -6,7 +6,9 @@
 
 using namespace std;
 
-struct Sprite : public IEntityBase<double, Coordinates> {
+namespace Constructs {
+
+struct Sprite : public BaseInterface::IEntityBase<double, Coordinates> {
     Sprite();
     Sprite(double xloc, double yloc, string tex);
     bool operator==(Sprite& other);
@@ -33,4 +35,5 @@ bool Sprite::operator==(Sprite& other) {
     return (this->location == other.location
         &&  this->texture == other.texture
         &&  this->interaction_type == other.interaction_type);
+}
 }

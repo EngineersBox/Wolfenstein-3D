@@ -60,13 +60,13 @@ vector<GraphNode> AStar::neighbors(GraphNode node) {
     for (int i = 0; i < 4; i++) {
         int cx{loc_to_check[i][0].x}, cy{loc_to_check[i][0].y};
         bool cInMap = inMap(Coords(node.x + cx, node.y + cy));
-        bool cIsWall = !cInMap ? false : map.getAt(node.x + cx, node.y + cy).wf_left.f_texture != "";
+        bool cIsWall = !cInMap ? false : map.getAt(node.x + cx, node.y + cy).wf_left.texture != "";
         int cx1{loc_to_check[i][1].x}, cy1{loc_to_check[i][1].y};
         bool c1InMap = inMap(Coords(node.x + cx1, node.y + cy1));
-        bool c1IsWall = !c1InMap ? false : map.getAt(node.x + cx1, node.y + cy1).wf_left.f_texture != "";
+        bool c1IsWall = !c1InMap ? false : map.getAt(node.x + cx1, node.y + cy1).wf_left.texture != "";
         int cx2{loc_to_check[i][1].x}, cy2{loc_to_check[i][1].y};
         bool c2InMap = inMap(Coords(node.x + cx2, node.y + cy2));
-        bool c2IsWall = !c2InMap ? false : map.getAt(node.x + cx2, node.y + cy2).wf_left.f_texture != "";
+        bool c2IsWall = !c2InMap ? false : map.getAt(node.x + cx2, node.y + cy2).wf_left.texture != "";
         if (cInMap) {
             if (cIsWall) {
                 if (c1InMap && !c1IsWall) {
@@ -109,7 +109,7 @@ vector<Coords>* AStar::rebuildPath(unordered_map<GraphNode, GraphNode>& traversa
     return new vector<Coords>(path);
 };
 
-void inline AStar::initCosts(unordered_map<GraphNode, int>& cost) {
+inline void AStar::initCosts(unordered_map<GraphNode, int>& cost) {
     for (int x = map.map_width - 1; x != -1; x--) {
         for (int y = map.map_height - 1; y != -1; y--) {
             cost.emplace(GraphNode(x, y), numeric_limits<int>::max());

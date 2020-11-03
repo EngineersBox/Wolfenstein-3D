@@ -32,7 +32,7 @@ struct TraversalRecord {
 class QSPTree {
     public:
         QSPTree();
-        QSPTree(GameMap map, vector<AABB>* ordered_walls, vector<AABB>* u_bound, vector<AABB>* d_bound, vector<AABB>* l_bound, vector<AABB>* r_bound);
+        QSPTree(GameMap map, vector<Constructs::AABB>* ordered_walls, vector<Constructs::AABB>* u_bound, vector<Constructs::AABB>* d_bound, vector<Constructs::AABB>* l_bound, vector<Constructs::AABB>* r_bound);
         ~QSPTree();
 
         void buildTree();
@@ -49,18 +49,18 @@ class QSPTree {
         inline void traverseNext(RelativePosition& currBranch, QuadNode* currNode, TraversalRecord& currTraversal, stack<TraversalRecord>& nodesVisited);
 
         GameMap map;
-        vector<AABB>* walls;
-        vector<AABB>* up_boundary;
-        vector<AABB>* down_boundary;
-        vector<AABB>* left_boundary;
-        vector<AABB>* right_boundary;
-        AABB mid;
+        vector<Constructs::AABB>* walls;
+        vector<Constructs::AABB>* up_boundary;
+        vector<Constructs::AABB>* down_boundary;
+        vector<Constructs::AABB>* left_boundary;
+        vector<Constructs::AABB>* right_boundary;
+        Constructs::AABB mid;
         QuadNode* root;
 };
 
 QSPTree::QSPTree(){};
 
-QSPTree::QSPTree(GameMap map, vector<AABB>* ordered_walls, vector<AABB>* u_bound, vector<AABB>* d_bound, vector<AABB>* l_bound, vector<AABB>* r_bound) {
+QSPTree::QSPTree(GameMap map, vector<Constructs::AABB>* ordered_walls, vector<Constructs::AABB>* u_bound, vector<Constructs::AABB>* d_bound, vector<Constructs::AABB>* l_bound, vector<Constructs::AABB>* r_bound) {
     this->map = map;
     this->walls = ordered_walls;
     findMiddle();
@@ -81,7 +81,7 @@ double QSPTree::sqDist(Coords a, Coords b) {
 };
 
 void QSPTree::findMiddle() {
-    AABB current_mid;
+    Constructs::AABB current_mid;
     Coords cMid = Coords((int)floor(map.map_width), (int)floor(map.map_height));
     double current_min_dist = numeric_limits<double>::max();
     int current_wall_idx;
@@ -146,25 +146,25 @@ QuadNode* QSPTree::insertNode(QuadNode* root, QuadNode* node) {
 
 void QSPTree::buildTree() {
     debugContext.logAppInfo("---- STARTED BUILDING QSP TREE ----");
-    for (AABB AABB : *this->walls) {
-        this->root = insertNode(this->root, new QuadNode(AABB));
+    for (Constructs::AABB wall : *this->walls) {
+        this->root = insertNode(this->root, new QuadNode(wall));
     }
     debugContext.logAppInfo("Inserted " + to_string(this->walls->size()) + " AABB nodes");
     // Inserting boundaries last will garuantee them as leaf nodes
-    for (AABB AABB : *this->up_boundary) {
-        this->root->U = insertNode(this->root->U, new QuadNode(AABB));
+    for (Constructs::AABB wall : *this->up_boundary) {
+        this->root->U = insertNode(this->root->U, new QuadNode(wall));
     }
     debugContext.logAppInfo("Inserted " + to_string(this->up_boundary->size()) + " 'TOP' boundary leaves");
-    for (AABB AABB : *this->down_boundary) {
-        this->root->D = insertNode(this->root->D, new QuadNode(AABB));
+    for (Constructs::AABB wall : *this->down_boundary) {
+        this->root->D = insertNode(this->root->D, new QuadNode(wall));
     }
     debugContext.logAppInfo("Inserted " + to_string(this->down_boundary->size()) + " 'DOWN' boundary leaves");
-    for (AABB AABB : *this->left_boundary) {
-        this->root->L = insertNode(this->root->L, new QuadNode(AABB));
+    for (Constructs::AABB wall : *this->left_boundary) {
+        this->root->L = insertNode(this->root->L, new QuadNode(wall));
     }
     debugContext.logAppInfo("Inserted " + to_string(this->left_boundary->size()) + " 'LEFT' boundary leaves");
-    for (AABB AABB : *this->right_boundary) {
-        this->root->R = insertNode(this->root->R, new QuadNode(AABB));
+    for (Constructs::AABB wall : *this->right_boundary) {
+        this->root->R = insertNode(this->root->R, new QuadNode(wall));
     }
     debugContext.logAppInfo("Inserted " + to_string(this->right_boundary->size()) + " 'RIGHT' boundary leaves");
     debugContext.logAppInfo("---- FINISHED BUILDING QSP TREE [" + string(ADDR_OF(*this)) + "] ----");

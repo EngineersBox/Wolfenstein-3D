@@ -6,6 +6,8 @@
 
 using namespace std;
 
+namespace BaseInterface {
+
 template <typename T = int, template <typename> class C = Coordinates>
 struct IObjectBase {
     IObjectBase(C<T> eloc, INTERACTION_TYPE itype);
@@ -26,3 +28,4 @@ IObjectBase<T,C>::IObjectBase(C<T> eloc, INTERACTION_TYPE itype):
     location(eloc),
     interaction_type(itype)
 {};
+}

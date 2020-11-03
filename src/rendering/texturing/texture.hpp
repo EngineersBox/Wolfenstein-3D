@@ -38,7 +38,7 @@ Texture::Texture() {};
 Texture::Texture(string filename, string name) {
     this->name = name;
     this->filename = filename;
-    unsigned long error = 0 | PNG::loadImage(this->texture, this->width, this->height, filename.c_str());
+    unsigned long error = 0 | ResourceManager::PNG::loadImage(this->texture, this->width, this->height, filename.c_str());
     if (error) {
         throw ImageFileStreamError(filename);
     }

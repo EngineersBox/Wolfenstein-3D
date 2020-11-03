@@ -12,6 +12,8 @@
 
 using namespace std;
 
+namespace Constructs {
+
 enum NormalDir {
     LEFT,
     RIGHT,
@@ -26,7 +28,7 @@ static const string NormalDirLUT[] = {
     "DOWN"
 };
 
-class AABB : public IObjectBase<int, Coordinates> {
+class AABB : public BaseInterface::IObjectBase<int, Coordinates> {
    public:
     AABB(int x, int y, Colour::ColorRGB colour, string texture);
     AABB(int x, int y, Colour::ColorRGB colour);
@@ -157,3 +159,4 @@ bool AABB::intersect(const Ray& ray, Coords& intersect_point) {
     intersect_point = Coords(tmax * ray.bx + ray.ay, tmax * ray.by + ray.ay);
     return tmax >= tmin;
 };
+}

@@ -42,8 +42,8 @@ vector<double> ZBuffer(screenW);
 vector<int> spriteOrder;
 vector<double> spriteDistance;
 
-double planeX = 0.0;
-double planeY = 0.66;
+double clipPlaneX = 0.0;
+double clipPlaneY = 0.66;
 
 double newTime = 0;
 double oldTime = 0;
@@ -98,12 +98,6 @@ static void renderMap2D(int sw = screenW, int sh = screenH) {
     }
 }
 
-static void reshape(int width, int height) {
-    screenW = width;
-    screenH = height;
-    ZBuffer.resize(width);
-}
-
 inline void drawPixel(int x, int y, Colour::ColorRGB colour) {
     glScissor(x, y, 1, 1);
     glClearColor(
@@ -121,10 +115,10 @@ inline static void renderFloorCeiling() {
     string floorTexture, ceilingTexture;
     uint32_t color;
     for (int y = screenH - 1; y >= IDIV_2(screenH) + 1; --y) {
-        rayDirX0 = player.dx - planeX;
-        rayDirY0 = player.dy - planeY;
-        rayDirX1 = player.dx + planeX;
-        rayDirY1 = player.dy + planeY;
+        rayDirX0 = player.dx - clipPlaneX;
+        rayDirY0 = player.dy - clipPlaneY;
+        rayDirX1 = player.dx + clipPlaneX;
+        rayDirY1 = player.dy + clipPlaneY;
 
         p = y - IDIV_2(screenH);
 
@@ -173,8 +167,8 @@ inline static void renderWalls() {
     Texture tex;
     for (int x = screenW - 1; x >= 0; x--) {
         cameraX = 2 * x / double(screenW) - 1;
-        rayDirX = player.dx + planeX * cameraX;
-        rayDirY = player.dy + planeY * cameraX;
+        rayDirX = player.dx + clipPlaneX * cameraX;
+        rayDirY = player.dy + clipPlaneY * cameraX;
 
         mapX = (int)player.x;
         mapY = (int)player.y;
@@ -281,13 +275,13 @@ inline static void renderSprites() {
     int spriteScreenX, V_MOVEScreen, spriteHeight, drawStartY, drawEndY, spriteWidth, drawStartX, drawEndX, texX, texY, d;
     Texture tex;
     uint32_t color;
-    double invDet = 1.0 / (planeX * player.dy - player.dx * planeY);
+    double invDet = 1.0 / (clipPlaneX * player.dy - player.dx * clipPlaneY);
     for (int i = gameMap.sprites.size() - 1; i >= 0; i--) {
         spriteX = gameMap.sprites[spriteOrder[i]].location.x - player.x;
         spriteY = gameMap.sprites[spriteOrder[i]].location.y - player.y;
 
         transformX = invDet * (player.dy * spriteX - player.dx * spriteY);
-        transformY = invDet * (-planeY * spriteX + planeX * spriteY);
+        transformY = invDet * (-clipPlaneY * spriteX + clipPlaneX * spriteY);
 
         spriteScreenX = (int)(IDIV_2(screenW) * (1 + transformX / transformY));
 
@@ -363,11 +357,7 @@ static void display(void) {
     glutSwapBuffers();
 }
 
-static void idle(void) {
-    glutPostRedisplay();
-}
-
-static void keyPress(unsigned char key, int x, int y) {
+static void __KEY_HANDLER(unsigned char key, int x, int y) {
     if (key == 'w') {
         if (gameMap.getAt((int)(player.x + player.dx * moveSpeed), (int)player.y).wf_left.f_texture == "")
             player.x += player.dx * moveSpeed;
@@ -383,17 +373,17 @@ static void keyPress(unsigned char key, int x, int y) {
         player.dx = player.dx * cos(-rotSpeed) - player.dy * sin(-rotSpeed);
         player.dy = oldDirX * sin(-rotSpeed) + player.dy * cos(-rotSpeed);
 
-        double oldPlaneX = planeX;
-        planeX = planeX * cos(-rotSpeed) - planeY * sin(-rotSpeed);
-        planeY = oldPlaneX * sin(-rotSpeed) + planeY * cos(-rotSpeed);
+        double oldPlaneX = clipPlaneX;
+        clipPlaneX = clipPlaneX * cos(-rotSpeed) - clipPlaneY * sin(-rotSpeed);
+        clipPlaneY = oldPlaneX * sin(-rotSpeed) + clipPlaneY * cos(-rotSpeed);
     } else if (key == 'a') {
         double oldDirX = player.dx;
         player.dx = player.dx * cos(rotSpeed) - player.dy * sin(rotSpeed);
         player.dy = oldDirX * sin(rotSpeed) + player.dy * cos(rotSpeed);
 
-        double oldPlaneX = planeX;
-        planeX = planeX * cos(rotSpeed) - planeY * sin(rotSpeed);
-        planeY = oldPlaneX * sin(rotSpeed) + planeY * cos(rotSpeed);
+        double oldPlaneX = clipPlaneX;
+        clipPlaneX = clipPlaneX * cos(rotSpeed) - clipPlaneY * sin(rotSpeed);
+        clipPlaneY = oldPlaneX * sin(rotSpeed) + clipPlaneY * cos(rotSpeed);
     }
     glutPostRedisplay();
 }
@@ -403,7 +393,7 @@ static void keyPress(unsigned char key, int x, int y) {
 ///
 /// @return void
 ///
-void init() {
+void __INIT() {
     cfgInit.initAll(playerCfg, minimapCfg, loggingCfg, renderCfg);
     if (minimapCfg.enable) {
         mapScreenW = IDIV_2(mapScreenW);
@@ -445,6 +435,16 @@ void init() {
     debugContext.logAppInfo("Initialised player object");
 }
 
+static void __WINDOW_RESHAPE(int width, int height) {
+    screenW = width;
+    screenH = height;
+    ZBuffer.resize(width);
+}
+
+static void __GLUT_IDLE(void) {
+    glutPostRedisplay();
+}
+
 ///
 /// Main execution
 ///
@@ -459,17 +459,17 @@ int main(int argc, char* argv[]) {
     glutInitWindowSize(screenW, screenH);
     glutCreateWindow("Ray Caster");
 
-    init();
+    __INIT();
     debugContext.logAppInfo("---- COMPLETED APPLICATION INIT PHASE ----");
 
     glutDisplayFunc(display);
-    debugContext.logApiInfo("Initialised glutDisplayFunc at: " + ADDR_OF(display));
-    glutReshapeFunc(reshape);
-    debugContext.logApiInfo("Initialised glutReshapeFunc at: " + ADDR_OF(reshape));
-    glutKeyboardFunc(keyPress);
-    debugContext.logApiInfo("Initialised glutKeyboardFunc at: " + ADDR_OF(keyPress));
-    glutIdleFunc(idle);
-    debugContext.logApiInfo("Initialised glutIdleFunc at: " + ADDR_OF(idle));
+    debugContext.logApiInfo("Initialised glutDisplayFunc [display] at: " + ADDR_OF(display));
+    glutReshapeFunc(__WINDOW_RESHAPE);
+    debugContext.logApiInfo("Initialised glutReshapeFunc [__WINDOW_RESHAPE] at: " + ADDR_OF(__WINDOW_RESHAPE));
+    glutKeyboardFunc(__KEY_HANDLER);
+    debugContext.logApiInfo("Initialised glutKeyboardFunc [__KEY_HANDLER] at: " + ADDR_OF(__KEY_HANDLER));
+    glutIdleFunc(__GLUT_IDLE);
+    debugContext.logApiInfo("Initialised glutIdleFunc [__GLUT_IDLE] at: " + ADDR_OF(__GLUT_IDLE));
     glutPostRedisplay();
     debugContext.logApiInfo("---- COMPLETED OpenGL/GLUT INIT PHASE ----");
     debugContext.logApiInfo("Started glutMainLoop()");

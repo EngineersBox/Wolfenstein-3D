@@ -14,7 +14,7 @@
 using namespace std;
 
 struct ColorRGB8bit;
-//a color with 3 components: r, g and b
+// a color with 3 components: r, g and b
 struct ColorRGB {
     int r;
     int g;
@@ -55,7 +55,7 @@ static const ColorRGB RGB_Purple(128, 0, 128);
 static const ColorRGB RGB_Olive(128, 128, 0);
 static const ColorRGB RGB_None(-1,-1,-1);
 
-//a color with 3 components: r, g and b
+// a color with 3 components: r, g and b
 struct ColorRGB8bit {
     uint8_t r;
     uint8_t g;
@@ -66,7 +66,7 @@ struct ColorRGB8bit {
     ColorRGB8bit();
 };
 
-//a color with 3 components: h, s and l
+// a color with 3 components: h, s and l
 struct ColorHSL {
     int h;
     int s;
@@ -76,7 +76,7 @@ struct ColorHSL {
     ColorHSL();
 };
 
-//a color with 3 components: h, s and v
+// a color with 3 components: h, s and v
 struct ColorHSV {
     int h;
     int s;
@@ -87,7 +87,7 @@ struct ColorHSV {
 };
 
 ////////////////////////////////////////////////////////////////////////////////
-//COLOR STRUCTS/////////////////////////////////////////////////////////////////
+// COLOR STRUCTS////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 ColorRGB::ColorRGB(uint8_t r, uint8_t g, uint8_t b) {
     this->r = r;
@@ -120,7 +120,7 @@ ColorRGB8bit::ColorRGB8bit() {
     this->b = 0;
 }
 
-//Add two colors
+// Add two colors
 ColorRGB operator+(const ColorRGB& color, const ColorRGB& color2) {
     ColorRGB c;
     c.r = color.r + color2.r;
@@ -129,7 +129,7 @@ ColorRGB operator+(const ColorRGB& color, const ColorRGB& color2) {
     return c;
 }
 
-//Subtract two colors
+// Subtract two colors
 ColorRGB operator-(const ColorRGB& color, const ColorRGB& color2) {
     ColorRGB c;
     c.r = color.r - color2.r;
@@ -138,7 +138,7 @@ ColorRGB operator-(const ColorRGB& color, const ColorRGB& color2) {
     return c;
 }
 
-//Multiplies a color with an integer
+// Multiplies a color with an integer
 ColorRGB operator*(const ColorRGB& color, int a) {
     ColorRGB c;
     c.r = color.r * a;
@@ -147,7 +147,7 @@ ColorRGB operator*(const ColorRGB& color, int a) {
     return c;
 }
 
-//Multiplies a color with an integer
+// Multiplies a color with an integer
 ColorRGB operator*(int a, const ColorRGB& color) {
     ColorRGB c;
     c.r = color.r * a;
@@ -156,7 +156,7 @@ ColorRGB operator*(int a, const ColorRGB& color) {
     return c;
 }
 
-//Divides a color through an integer
+// Divides a color through an integer
 ColorRGB operator/(const ColorRGB& color, int a) {
     if (a == 0) return color;
     ColorRGB c;
@@ -166,12 +166,12 @@ ColorRGB operator/(const ColorRGB& color, int a) {
     return c;
 }
 
-//Are both colors equal?
+// Are both colors equal?
 bool operator==(const ColorRGB& color, const ColorRGB& color2) {
     return (color.r == color2.r && color.g == color2.g && color.b == color2.b);
 }
 
-//Are both colors not equal?
+// Are both colors not equal?
 bool operator!=(const ColorRGB& color, const ColorRGB& color2) {
     return (!(color.r == color2.r && color.g == color2.g && color.b == color2.b));
 }
@@ -242,7 +242,7 @@ void ColorRGB::toClearColour() const {
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-//COLOR CONVERSIONS/////////////////////////////////////////////////////////////
+// COLOR CONVERSIONS////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
 /*
@@ -254,7 +254,7 @@ color components used in the calculations are normalized between 0.0-1.0
 
 //Converts an RGB color to HSL color
 ColorHSL RGBtoHSL(const ColorRGB& colorRGB) {
-    float r, g, b, h = 0, s = 0, l;  //this function works with floats between 0 and 1
+    float r, g, b, h = 0, s = 0, l;  // this function works with floats between 0 and 1
     r = colorRGB.r / 256.0;
     g = colorRGB.g / 256.0;
     b = colorRGB.b / 256.0;
@@ -262,11 +262,11 @@ ColorHSL RGBtoHSL(const ColorRGB& colorRGB) {
     float maxColor = std::max(r, std::max(g, b));
     float minColor = std::min(r, std::min(g, b));
 
-    if (minColor == maxColor)  //R = G = B, so it's a shade of grey
+    if (minColor == maxColor)  // R = G = B, so it's a shade of grey
     {
-        h = 0;  //it doesn't matter what value it has
+        h = 0;  // it doesn't matter what value it has
         s = 0;
-        l = r;  //doesn't matter if you pick r, g, or b
+        l = r;  // doesn't matter if you pick r, g, or b
     } else {
         l = (minColor + maxColor) / 2;
 
@@ -277,7 +277,7 @@ ColorHSL RGBtoHSL(const ColorRGB& colorRGB) {
         if (g == maxColor) h = 2.0 + (b - r) / (maxColor - minColor);
         if (b == maxColor) h = 4.0 + (r - g) / (maxColor - minColor);
 
-        h /= 6;  //to bring it to a number between 0 and 1
+        h /= 6;  // to bring it to a number between 0 and 1
         if (h < 0) h += 1;
     }
 
@@ -288,19 +288,19 @@ ColorHSL RGBtoHSL(const ColorRGB& colorRGB) {
     return colorHSL;
 }
 
-//Converts an HSL color to RGB color
+// Converts an HSL color to RGB color
 ColorRGB HSLtoRGB(const ColorHSL& colorHSL) {
-    float r, g, b, h, s, l;  //this function works with floats between 0 and 1
+    float r, g, b, h, s, l;  // this function works with floats between 0 and 1
     float temp1, temp2, tempr, tempg, tempb;
     h = colorHSL.h / 256.0;
     s = colorHSL.s / 256.0;
     l = colorHSL.l / 256.0;
 
-    //If saturation is 0, the color is a shade of grey
+    // If saturation is 0, the color is a shade of grey
     if (s == 0) r = g = b = l;
-    //If saturation > 0, more complex calculations are needed
+    // If saturation > 0, more complex calculations are needed
     else {
-        //set the temporary values
+        // set the temporary values
         if (l < 0.5)
             temp2 = l * (1 + s);
         else
@@ -312,7 +312,7 @@ ColorRGB HSLtoRGB(const ColorHSL& colorHSL) {
         tempb = h - 1.0 / 3.0;
         if (tempb < 0.0) tempb++;
 
-        //red
+        // red
         if (tempr < 1.0 / 6.0)
             r = temp1 + (temp2 - temp1) * 6.0 * tempr;
         else if (tempr < 0.5)
@@ -322,7 +322,7 @@ ColorRGB HSLtoRGB(const ColorHSL& colorHSL) {
         else
             r = temp1;
 
-        //green
+        // green
         if (tempg < 1.0 / 6.0)
             g = temp1 + (temp2 - temp1) * 6.0 * tempg;
         else if (tempg < 0.5)
@@ -332,7 +332,7 @@ ColorRGB HSLtoRGB(const ColorHSL& colorHSL) {
         else
             g = temp1;
 
-        //blue
+        // blue
         if (tempb < 1.0 / 6.0)
             b = temp1 + (temp2 - temp1) * 6.0 * tempb;
         else if (tempb < 0.5)
@@ -352,7 +352,7 @@ ColorRGB HSLtoRGB(const ColorHSL& colorHSL) {
 
 //Converts an RGB color to HSV color
 ColorHSV RGBtoHSV(const ColorRGB& colorRGB) {
-    float r, g, b, h = 0.0, s = 0.0, v;  //this function works with floats between 0 and 1
+    float r, g, b, h = 0.0, s = 0.0, v;  // this function works with floats between 0 and 1
     r = colorRGB.r / 256.0;
     g = colorRGB.g / 256.0;
     b = colorRGB.b / 256.0;
@@ -362,19 +362,19 @@ ColorHSV RGBtoHSV(const ColorRGB& colorRGB) {
 
     v = maxColor;
 
-    if (maxColor != 0.0)  //avoid division by zero when the color is black
+    if (maxColor != 0.0)  // avoid division by zero when the color is black
     {
         s = (maxColor - minColor) / maxColor;
     }
 
     if (s == 0.0) {
-        h = 0.0;  //it doesn't matter what value it has
+        h = 0.0;  // it doesn't matter what value it has
     } else {
         if (r == maxColor) h = (g - b) / (maxColor - minColor);
         if (g == maxColor) h = 2.0 + (b - r) / (maxColor - minColor);
         if (b == maxColor) h = 4.0 + (r - g) / (maxColor - minColor);
 
-        h /= 6.0;  //to bring it to a number between 0 and 1
+        h /= 6.0;  // to bring it to a number between 0 and 1
         if (h < 0.0) h++;
     }
 
@@ -385,22 +385,22 @@ ColorHSV RGBtoHSV(const ColorRGB& colorRGB) {
     return colorHSV;
 }
 
-//Converts an HSV color to RGB color
+// Converts an HSV color to RGB color
 ColorRGB HSVtoRGB(const ColorHSV& colorHSV) {
-    float r, g, b, h, s, v;  //this function works with floats between 0 and 1
+    float r, g, b, h, s, v;  // this function works with floats between 0 and 1
     h = colorHSV.h / 256.0;
     s = colorHSV.s / 256.0;
     v = colorHSV.v / 256.0;
 
-    //if saturation is 0, the color is a shade of grey
+    // if saturation is 0, the color is a shade of grey
     if (s == 0.0) r = g = b = v;
-    //if saturation > 0, more complex calculations are needed
+    // if saturation > 0, more complex calculations are needed
     else {
         float f, p, q, t;
         int i;
-        h *= 6.0;           //to bring hue to a number between 0 and 6, better for the calculations
-        i = int(floor(h));  //e.g. 2.7 becomes 2 and 3.01 becomes 3 or 4.9999 becomes 4
-        f = h - i;          //the fractional part of h
+        h *= 6.0;           // to bring hue to a number between 0 and 6, better for the calculations
+        i = int(floor(h));  // e.g. 2.7 becomes 2 and 3.01 becomes 3 or 4.9999 becomes 4
+        f = h - i;          // the fractional part of h
 
         p = v * (1.0 - s);
         q = v * (1.0 - (s * f));

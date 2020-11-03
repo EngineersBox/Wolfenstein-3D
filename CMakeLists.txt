@@ -14,7 +14,7 @@ find_package(GLUT REQUIRED)
 include_directories(${OPENGL_INCLUDE_DIRS}  ${GLUT_INCLUDE_DIRS})
 
 # SET THE SOURCE FILE
-set(SOURCES "src/raytracer/Raytracer.cpp")
+set(SOURCES "src/rendering/raycaster/Raytracer.cpp")
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY out)
 FILE(GLOB logs_contents "logs/*.log")

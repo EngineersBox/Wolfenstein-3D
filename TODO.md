@@ -20,6 +20,7 @@
 * [ ] Fix ray rendering on minimap
 * [x] Fix Linux + Windows GL window rendering (incorrect scaling)
 * [x] Change TextureLoader to iterate through `resources/textures/*` and load all in there (verify existance and format)
+* [x] Fix sprite rendering order, currently far sprites render on top of near, this should be inverted
 
 ## Logging
 

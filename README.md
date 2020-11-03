@@ -171,10 +171,11 @@ Reducing the overhead of texture references is done with custom texture hashing.
 
 ### Map
 
-A map is described by a JSON object contain information about the map parameters and walls. There are two main sections:
+A map is described by a JSON object contain information about the map parameters and walls. There are three main sections:
 
-* `Params`
-* `Walls`
+* `Params`: Map specific configuration
+* `Walls`: The layout of the map and how it renders
+* `Sprites`: Positions of 2D sprites in the map
 
 Map files are stored in `resources/maps/`. Below is the JSON type data and structure of the file:
 
@@ -198,19 +199,15 @@ Map files are stored in `resources/maps/`. Below is the JSON type data and struc
             "x": "<int>",
             "y": "<int>",
             "Left": {
-                "Colour": "<colour>",
                 "Texture": "<string>"
             },
             "Right": {
-                "Colour": "<colour>",
                 "Texture": "<string>"
             },
             "Up": {
-                "Colour": "<colour>",
                 "Texture": "<string>"
             },
             "Down": {
-                "Colour": "<colour>",
                 "Texture": "<string>"
             }
         }
@@ -269,3 +266,54 @@ render_sprites = true
 refresh_rate = 60 ; Value in Hz
 ray_count=80
 ```
+
+## File system tree
+
+In order to make it easier to traverse the file system, here is a tree depicting how the nestings of directies is layed out:
+
+* resources
+  * configs
+  * maps
+  * textures
+* src
+  * environment
+    * base
+      * entity
+      * object
+    * constructs
+      * doors
+      * sprites
+      * walls
+    * map
+    * player
+    * world
+  * exceptions
+    * configuration
+    * debug
+    * hashing
+    * image
+    * map
+    * pathfinding
+    * textures
+  * io
+    * configuration
+      * sections
+    * logging
+    * resource_management
+  * logic
+    * pathfinding
+    * hashing
+  * physics
+  * rendering
+    * colour
+    * drawing
+    * partitioning
+    * raycaster
+    * texturing
+* test
+  * asset_loading
+  * framework
+  * hashing
+  * io
+  * pathfinding
+  * resources

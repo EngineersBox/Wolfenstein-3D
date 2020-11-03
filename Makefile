@@ -259,32 +259,32 @@ clean_out/fast:
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/clean_out.dir/build.make CMakeFiles/clean_out.dir/build
 .PHONY : clean_out/fast
 
-src/raytracer/Raytracer.o: src/raytracer/Raytracer.cpp.o
+src/rendering/raycaster/Raytracer.o: src/rendering/raycaster/Raytracer.cpp.o
 
-.PHONY : src/raytracer/Raytracer.o
+.PHONY : src/rendering/raycaster/Raytracer.o
 
 # target to build an object file
-src/raytracer/Raytracer.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/QSP.dir/build.make CMakeFiles/QSP.dir/src/raytracer/Raytracer.cpp.o
-.PHONY : src/raytracer/Raytracer.cpp.o
+src/rendering/raycaster/Raytracer.cpp.o:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/QSP.dir/build.make CMakeFiles/QSP.dir/src/rendering/raycaster/Raytracer.cpp.o
+.PHONY : src/rendering/raycaster/Raytracer.cpp.o
 
-src/raytracer/Raytracer.i: src/raytracer/Raytracer.cpp.i
+src/rendering/raycaster/Raytracer.i: src/rendering/raycaster/Raytracer.cpp.i
 
-.PHONY : src/raytracer/Raytracer.i
+.PHONY : src/rendering/raycaster/Raytracer.i
 
 # target to preprocess a source file
-src/raytracer/Raytracer.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/QSP.dir/build.make CMakeFiles/QSP.dir/src/raytracer/Raytracer.cpp.i
-.PHONY : src/raytracer/Raytracer.cpp.i
+src/rendering/raycaster/Raytracer.cpp.i:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/QSP.dir/build.make CMakeFiles/QSP.dir/src/rendering/raycaster/Raytracer.cpp.i
+.PHONY : src/rendering/raycaster/Raytracer.cpp.i
 
-src/raytracer/Raytracer.s: src/raytracer/Raytracer.cpp.s
+src/rendering/raycaster/Raytracer.s: src/rendering/raycaster/Raytracer.cpp.s
 
-.PHONY : src/raytracer/Raytracer.s
+.PHONY : src/rendering/raycaster/Raytracer.s
 
 # target to generate assembly for a file
-src/raytracer/Raytracer.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/QSP.dir/build.make CMakeFiles/QSP.dir/src/raytracer/Raytracer.cpp.s
-.PHONY : src/raytracer/Raytracer.cpp.s
+src/rendering/raycaster/Raytracer.cpp.s:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/QSP.dir/build.make CMakeFiles/QSP.dir/src/rendering/raycaster/Raytracer.cpp.s
+.PHONY : src/rendering/raycaster/Raytracer.cpp.s
 
 # Help Target
 help:
@@ -304,9 +304,9 @@ help:
 	@echo "... run_tests"
 	@echo "... run_tests_wo"
 	@echo "... QSP"
-	@echo "... src/raytracer/Raytracer.o"
-	@echo "... src/raytracer/Raytracer.i"
-	@echo "... src/raytracer/Raytracer.s"
+	@echo "... src/rendering/raycaster/Raytracer.o"
+	@echo "... src/rendering/raycaster/Raytracer.i"
+	@echo "... src/rendering/raycaster/Raytracer.s"
 .PHONY : help
 
 

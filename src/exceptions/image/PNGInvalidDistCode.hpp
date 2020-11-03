@@ -3,7 +3,7 @@
 #include <exception>
 #include <string>
 
-#include "../../raytracer/Globals.hpp"
+#include "../../rendering/Globals.hpp"
 
 using namespace std;
 

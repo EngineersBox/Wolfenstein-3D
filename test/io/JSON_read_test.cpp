@@ -6,7 +6,7 @@
 #include <vector>
 
 #include "../framework/catch.hpp"
-#include "../../src/io/JSONParser.hpp"
+#include "../../src/io/resource_management/JSONParser.hpp"
 
 #define DIR_PREFIX string("test/resources/")
 #define VALID_JSON DIR_PREFIX + string("valid_test.json")

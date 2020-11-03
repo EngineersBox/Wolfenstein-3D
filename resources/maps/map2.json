@@ -8,103 +8,103 @@
             "y": 22
         },
         "End": {
-            "x": 6,
-            "y": 1
+            "x": 21,
+            "y": 22
         }
     },
     "Sprites": [{
-            "x": 20.5,
-            "y": 11.5,
-            "Texture": "greenlight"
-        },
-        {
-            "x": 18.5,
-            "y": 4.5,
-            "Texture": "greenlight"
-        },
-        {
-            "x": 20.0,
-            "y": 4.5,
-            "Texture": "greenlight"
-        },
-        {
-            "x": 10.0,
-            "y": 21.5,
-            "Texture": "greenlight"
-        },
-        {
-            "x": 3.5,
-            "y": 6.5,
-            "Texture": "greenlight"
-        },
-        {
-            "x": 3.5,
             "y": 20.5,
+            "x": 11.5,
             "Texture": "greenlight"
         },
         {
-            "x": 3.5,
-            "y": 14.5,
+            "y": 18.5,
+            "x": 4.5,
             "Texture": "greenlight"
         },
         {
-            "x": 14.5,
-            "y": 20.5,
+            "y": 20.0,
+            "x": 4.5,
             "Texture": "greenlight"
         },
         {
-            "x": 18.5,
-            "y": 10.5,
-            "Texture": "pillar"
-        },
-        {
-            "x": 18.5,
-            "y": 11.5,
-            "Texture": "pillar"
-        },
-        {
-            "x": 18.5,
-            "y": 12.5,
-            "Texture": "pillar"
-        },
-        {
+            "y": 10.0,
             "x": 21.5,
-            "y": 1.5,
-            "Texture": "barrel"
+            "Texture": "greenlight"
         },
         {
-            "x": 15.5,
-            "y": 1.5,
-            "Texture": "barrel"
+            "y": 3.5,
+            "x": 6.5,
+            "Texture": "greenlight"
         },
         {
-            "x": 16.0,
-            "y": 1.8,
-            "Texture": "barrel"
+            "y": 3.5,
+            "x": 20.5,
+            "Texture": "greenlight"
         },
         {
-            "x": 16.2,
-            "y": 1.2,
-            "Texture": "barrel"
+            "y": 3.5,
+            "x": 14.5,
+            "Texture": "greenlight"
         },
         {
-            "x": 3.5,
-            "y": 2.5,
-            "Texture": "barrel"
+            "y": 14.5,
+            "x": 20.5,
+            "Texture": "greenlight"
         },
         {
-            "x": 9.5,
-            "y": 15.5,
-            "Texture": "barrel"
-        },
-        {
-            "x": 10.0,
-            "y": 15.1,
-            "Texture": "barrel"
-        },
-        {
+            "y": 18.5,
             "x": 10.5,
-            "y": 15.8,
+            "Texture": "pillar"
+        },
+        {
+            "y": 18.5,
+            "x": 11.5,
+            "Texture": "pillar"
+        },
+        {
+            "y": 18.5,
+            "x": 12.5,
+            "Texture": "pillar"
+        },
+        {
+            "y": 21.5,
+            "x": 1.5,
+            "Texture": "barrel"
+        },
+        {
+            "y": 15.5,
+            "x": 1.5,
+            "Texture": "barrel"
+        },
+        {
+            "y": 16.0,
+            "x": 1.8,
+            "Texture": "barrel"
+        },
+        {
+            "y": 16.2,
+            "x": 1.2,
+            "Texture": "barrel"
+        },
+        {
+            "y": 3.5,
+            "x": 2.5,
+            "Texture": "barrel"
+        },
+        {
+            "y": 9.5,
+            "x": 15.5,
+            "Texture": "barrel"
+        },
+        {
+            "y": 10.0,
+            "x": 15.1,
+            "Texture": "barrel"
+        },
+        {
+            "y": 10.5,
+            "x": 15.8,
             "Texture": "barrel"
         }
     ],

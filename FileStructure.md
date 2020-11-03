@@ -1,0 +1,48 @@
+# New File Structure
+
+* resources
+  * configs
+  * maps
+  * textures
+* src
+  * environment
+    * base
+      * entity
+      * object
+    * constructs
+      * doors
+      * sprites
+      * walls
+    * map
+    * player
+    * world
+  * exceptions
+    * configuration
+    * debug
+    * hashing
+    * image
+    * map
+    * pathfinding
+    * textures
+  * io
+    * configuration
+      * sections
+    * logging
+    * resource_management
+  * logic
+    * pathfinding
+    * hashing
+  * physics
+  * rendering
+    * colour
+    * drawing
+    * partitioning
+    * raycaster
+    * texturing
+* test
+  * asset_loading
+  * framework
+  * hashing
+  * io
+  * pathfinding
+  * resources

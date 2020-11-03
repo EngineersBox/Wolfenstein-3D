@@ -2,7 +2,7 @@
 
 #include <string>
 
-#include "../../src/io/INIReader.hpp"
+#include "../../src/io/configuration/INIReader.hpp"
 #include "../framework/catch.hpp"
 
 #define DIR_PREFIX string("test/resources/")

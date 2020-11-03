@@ -12,7 +12,7 @@ ULINE:=$(call tput smul)
 
 RESET := $(shell tput sgr0)
 
-SRC:=src/raytracer/Raytracer.cpp
+SRC:=src/rendering/raycaster/Raytracer.cpp
 OUT:=out/QSP
 LOGS_DIR=logs
 

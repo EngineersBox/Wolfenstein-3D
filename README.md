@@ -32,7 +32,7 @@ Below is a full list of commands and their usages:
 |`make clean_archives`| Remove all archives from `logs/`|
 |`make build_tests`| Build the test cases to `out/tests`|
 |`make run_tests`| Run the test cases with assertion fails only|
-|`make run_tests`| Run the test cases with output for all assertions|
+|`make run_tests_wo`| Run the test cases with output for all assertions|
 
 ### Using alternate makefile
 

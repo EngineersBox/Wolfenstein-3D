@@ -60,7 +60,7 @@ void PBO::init() {
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, this->width, this->height, 0, GL_RGB, GL_UNSIGNED_BYTE, this->buffer.data());
-    debugContext.logApiInfo("Allocated PBO texture to from:" + ADDR_OF(*this->buffer.data()));
+    debugContext.logApiInfo("Allocated PBO texture to from: " + ADDR_OF(*this->buffer.data()));
 };
 
 inline void PBO::pushBufferToGPU() {

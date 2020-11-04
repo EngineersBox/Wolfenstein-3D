@@ -39,27 +39,14 @@ MinimapSize parseMinimapSize(const string& pos_str) {
     return MinimapSize::MEDIUM;
 }
 
-class MinimapCfg {
-    public:
-        MinimapCfg();
-        MinimapCfg(bool enable, bool render_rays, MinimapPos pos, MinimapSize size);
+struct MinimapCfg {
+    inline bool isTop();
+    inline bool isLeft();
 
-        inline bool isTop();
-        inline bool isLeft();
-
-        bool enable;
-        bool render_rays;
-        MinimapPos pos;
-        MinimapSize size;
-};
-
-MinimapCfg::MinimapCfg() {};
-
-MinimapCfg::MinimapCfg(bool enable, bool render_rays, MinimapPos pos, MinimapSize size) {
-    this->enable = enable;
-    this->render_rays = render_rays;
-    this->pos = pos;
-    this->size = size;
+    bool enable;
+    bool render_rays;
+    MinimapPos pos;
+    MinimapSize size;
 };
 
 inline bool MinimapCfg::isTop() {

@@ -2,9 +2,6 @@
 
 #include "Raytracer.hpp"
 
-#define TEXTURE_WIDTH 64
-#define TEXTURE_HEIGHT 64
-
 #define SPRITE_U_DIV 1
 #define SPRITE_V_DIV 1
 #define SPRITE_V_MOVE 0.0
@@ -35,23 +32,19 @@ float mapScalingY;
 ResourceManager::ConfigInit cfgInit;
 
 GameMap gameMap = GameMap();
-vector<Ray> rays(0);
-
-vector<double> ZBuffer(screenW);
 
 vector<int> spriteOrder;
 vector<double> spriteDistance;
-
-double clipPlaneX = 0.0;
-double clipPlaneY = 0.66;
 
 double newTime = 0;
 double oldTime = 0;
 
 double frameTime = 0;
 
-double moveSpeed;
-double rotSpeed;
+Rendering::PBO pixel_buffer_obj;
+Rendering::RayBuffer rays;
+Rendering::ZBuffer zBuf;
+GLuint texid;
 
 ///
 /// Render the player
@@ -99,13 +92,10 @@ static void renderMap2D(int sw = screenW, int sh = screenH) {
 }
 
 inline void drawPixel(int x, int y, Colour::ColorRGB colour) {
-    glScissor(x, y, 1, 1);
-    glClearColor(
-        colour.r / 255.0,
-        colour.g / 255.0,
-        colour.g / 255.0,
-        0);
-    glClear(GL_COLOR_BUFFER_BIT);
+    int idx = y * screenW + x;
+    pixel_buffer_obj[3 * idx + 0] = colour.r;
+    pixel_buffer_obj[3 * idx + 1] = colour.g;
+    pixel_buffer_obj[3 * idx + 2] = colour.b;
 }
 
 inline static void renderFloorCeiling() {
@@ -115,10 +105,10 @@ inline static void renderFloorCeiling() {
     string floorTexture, ceilingTexture;
     uint32_t color;
     for (int y = screenH - 1; y >= IDIV_2(screenH) + 1; --y) {
-        rayDirX0 = player.dx - clipPlaneX;
-        rayDirY0 = player.dy - clipPlaneY;
-        rayDirX1 = player.dx + clipPlaneX;
-        rayDirY1 = player.dy + clipPlaneY;
+        rayDirX0 = player.dx - player.camera.clip_plane_x;
+        rayDirY0 = player.dy - player.camera.clip_plane_y;
+        rayDirX1 = player.dx + player.camera.clip_plane_x;
+        rayDirY1 = player.dy + player.camera.clip_plane_y;
 
         p = y - IDIV_2(screenH);
 
@@ -136,23 +126,19 @@ inline static void renderFloorCeiling() {
             cellX = (int)(floorX);
             cellY = (int)(floorY);
 
-            tx = (int)(TEXTURE_WIDTH * (floorX - cellX)) & (TEXTURE_WIDTH - 1);
-            ty = (int)(TEXTURE_HEIGHT * (floorY - cellY)) & (TEXTURE_HEIGHT - 1);
+            tx = (int)(renderCfg.texture_width * (floorX - cellX)) & (renderCfg.texture_width - 1);
+            ty = (int)(renderCfg.texture_height * (floorY - cellY)) & (renderCfg.texture_height - 1);
 
             floorX += floorStepX;
             floorY += floorStepY;
 
-            checkerBoardPattern = (int(cellX + cellY)) & 1;
-            floorTexture = checkerBoardPattern == 0 ? "greystone" : "mossy";
-            ceilingTexture = "wood";
-
-            textures.get(floorTexture, tex);
-            color = tex.texture[TEXTURE_WIDTH * ty + tx];
+            textures.get(gameMap.floor_texture, tex);
+            color = tex.texture[renderCfg.texture_width * ty + tx];
             color = (color >> 1) & DARK_SHADER;
             drawPixel(x, screenH - y, Colour::INTtoRGB(color));
 
-            textures.get(ceilingTexture, tex);
-            color = tex.texture[TEXTURE_WIDTH * ty + tx];
+            textures.get(gameMap.ceiling_texture, tex);
+            color = tex.texture[renderCfg.texture_width * ty + tx];
             color = (color >> 1) & DARK_SHADER;
             drawPixel(x, y - 1, Colour::INTtoRGB(color));
         }
@@ -160,15 +146,15 @@ inline static void renderFloorCeiling() {
 }
 
 inline static void renderWalls() {
-    double cameraX, rayDirX, rayDirY, sideDistX, sideDistY, deltaDistX, deltaDistY, perpWallDist, wallX, step, texPos;
+    double rayDirX, rayDirY, sideDistX, sideDistY, deltaDistX, deltaDistY, perpWallDist, wallX, step, texPos;
     int mapX, mapY, stepX, stepY, hit, side, lineHeight, drawStart, drawEnd, texX, texY;
     string wallTex;
     uint32_t color;
     Texture tex;
     for (int x = screenW - 1; x >= 0; x--) {
-        cameraX = 2 * x / double(screenW) - 1;
-        rayDirX = player.dx + clipPlaneX * cameraX;
-        rayDirY = player.dy + clipPlaneY * cameraX;
+        player.camera.x = 2 * x / double(screenW) - 1;
+        rayDirX = player.dx + player.camera.clip_plane_x * player.camera.x;
+        rayDirY = player.dy + player.camera.clip_plane_y * player.camera.x;
 
         mapX = (int)player.x;
         mapY = (int)player.y;
@@ -225,28 +211,28 @@ inline static void renderWalls() {
         wallX = side == 0 ? player.y + perpWallDist* rayDirY : player.x + perpWallDist * rayDirX;
         wallX -= floor((wallX));
 
-        texX = (int)(wallX * double(TEXTURE_WIDTH));
+        texX = (int)(wallX * double(renderCfg.texture_width));
         if (side == 0 && rayDirX > 0) {
-            texX = TEXTURE_WIDTH - texX - 1;
+            texX = renderCfg.texture_width - texX - 1;
         }
         if (side == 1 && rayDirY < 0) {
-            texX = TEXTURE_WIDTH - texX - 1;
+            texX = renderCfg.texture_width - texX - 1;
         }
 
-        step = 1.0 * TEXTURE_HEIGHT / lineHeight;
+        step = 1.0 * renderCfg.texture_height / lineHeight;
         texPos = (drawStart - IDIV_2(screenH) + IDIV_2(lineHeight)) * step;
         for (int y = drawStart; y < drawEnd; y++) {
-            texY = (int)texPos & (TEXTURE_HEIGHT - 1);
+            texY = (int)texPos & (renderCfg.texture_height - 1);
             texPos += step;
             textures.get(wallTex, tex);
-            color = tex.texture[TEXTURE_HEIGHT * texY + texX];
+            color = tex.texture[renderCfg.texture_height * texY + texX];
             if (side == 1) {
                 color = (color >> 1) & DARK_SHADER;
             }
             drawPixel(x, screenH - y, Colour::INTtoRGB(color));
         }
 
-        ZBuffer[x] = perpWallDist;
+        zBuf[x] = perpWallDist;
     }
 }
 
@@ -275,13 +261,13 @@ inline static void renderSprites() {
     int spriteScreenX, V_MOVEScreen, spriteHeight, drawStartY, drawEndY, spriteWidth, drawStartX, drawEndX, texX, texY, d;
     Texture tex;
     uint32_t color;
-    double invDet = 1.0 / (clipPlaneX * player.dy - player.dx * clipPlaneY);
+    double invDet = 1.0 / (player.camera.clip_plane_x * player.dy - player.dx * player.camera.clip_plane_y);
     for (int i = gameMap.sprites.size() - 1; i >= 0; i--) {
         spriteX = gameMap.sprites[spriteOrder[i]].location.x - player.x;
         spriteY = gameMap.sprites[spriteOrder[i]].location.y - player.y;
 
         transformX = invDet * (player.dy * spriteX - player.dx * spriteY);
-        transformY = invDet * (-clipPlaneY * spriteX + clipPlaneX * spriteY);
+        transformY = invDet * (-player.camera.clip_plane_y * spriteX + player.camera.clip_plane_x * spriteY);
 
         spriteScreenX = (int)(IDIV_2(screenW) * (1 + transformX / transformY));
 
@@ -308,14 +294,14 @@ inline static void renderSprites() {
         }
         textures.get(gameMap.sprites[spriteOrder[i]].texture, tex);
         for (int stripe = drawStartX; stripe < drawEndX; stripe++) {
-            texX = (int)IDIV_256((IMUL_256((stripe - (IDIV_2(-spriteWidth) + spriteScreenX))) * TEXTURE_WIDTH / spriteWidth));
-            if (!(transformY > 0 && stripe > 0 && stripe < screenW && transformY < ZBuffer[stripe])) {
+            texX = (int)IDIV_256((IMUL_256((stripe - (IDIV_2(-spriteWidth) + spriteScreenX))) * renderCfg.texture_width / spriteWidth));
+            if (!(transformY > 0 && stripe > 0 && stripe < screenW && transformY < zBuf[stripe])) {
                 continue;
             }
             for (int y = drawStartY; y < drawEndY; y++) {
                 d = IMUL_256((y - V_MOVEScreen)) - IMUL_128(screenH) + IMUL_128(spriteHeight);
-                texY = IDIV_256((d * TEXTURE_HEIGHT) / spriteHeight);
-                color = tex.texture[TEXTURE_WIDTH * texY + texX];
+                texY = IDIV_256((d * renderCfg.texture_height) / spriteHeight);
+                color = tex.texture[renderCfg.texture_width * texY + texX];
                 if ((color & 0x00FFFFFF) != 0) {
                     drawPixel(stripe, screenH - y, Colour::INTtoRGB(color));
                 }
@@ -328,18 +314,17 @@ inline static void updateTimeTick() {
     oldTime = newTime;
     newTime = glutGet(GLUT_ELAPSED_TIME);
     frameTime = (newTime - oldTime) / 1000.0;
-    // print(1.0 / frameTime);
+    displayText(10, 10, Colour::RGB_Yellow, to_string(1.0 / frameTime).c_str());
     // IMPL: USE https://learnopengl.com/In-Practice/Text-Rendering TO PRINT OUT THE TEXT TO SCREEN
 
-    moveSpeed = frameTime * playerCfg.move_speed;
-    rotSpeed = frameTime * playerCfg.rotation_speed;
+    player.moveSpeed = frameTime * playerCfg.move_speed;
+    player.rotSpeed = frameTime * playerCfg.rotation_speed;
 }
 
 static void display(void) {
     if (renderCfg.headless_mode) {
         return;
     }
-    glEnable(GL_SCISSOR_TEST);
 
     if (renderCfg.render_floor_ceiling) {
         renderFloorCeiling();
@@ -351,39 +336,51 @@ static void display(void) {
         renderSprites();
     }
 
-    glDisable(GL_SCISSOR_TEST);
-    updateTimeTick();
+    glEnable(GL_TEXTURE_2D);
+    glClear(GL_COLOR_BUFFER_BIT);
 
+    glTexSubImage2D(GL_TEXTURE_2D,
+        0, 0, 0, screenW,screenH,
+        GL_RGB, GL_UNSIGNED_BYTE,
+        pixel_buffer_obj.data());
+
+    glBegin(GL_QUADS);
+        glTexCoord2d(1,1); glVertex2d(0, 0);
+        glTexCoord2d(0,1); glVertex2d(screenW, 0);
+        glTexCoord2d(0,0); glVertex2d(screenW, screenH);
+        glTexCoord2d(1,0); glVertex2d(0, screenH);
+    glEnd();
+    glDisable(GL_TEXTURE_2D);
     glutSwapBuffers();
 }
 
 static void __KEY_HANDLER(unsigned char key, int x, int y) {
     if (key == 'w') {
-        if (gameMap.getAt((int)(player.x + player.dx * moveSpeed), (int)player.y).wf_left.texture == "")
-            player.x += player.dx * moveSpeed;
-        if (gameMap.getAt((int)player.x, (int)(player.y + player.dy * moveSpeed)).wf_left.texture == "")
-            player.y += player.dy * moveSpeed;
+        if (gameMap.getAt((int)(player.x + player.dx * player.moveSpeed), (int)player.y).wf_left.texture == "")
+            player.x += player.dx * player.moveSpeed;
+        if (gameMap.getAt((int)player.x, (int)(player.y + player.dy * player.moveSpeed)).wf_left.texture == "")
+            player.y += player.dy * player.moveSpeed;
     } else if (key == 's') {
-        if (gameMap.getAt((int)(player.x - player.dx * moveSpeed), (int)player.y).wf_left.texture == "")
-            player.x -= player.dx * moveSpeed;
-        if (gameMap.getAt((int)player.x, (int)(player.y - player.dy * moveSpeed)).wf_left.texture == "")
-            player.y -= player.dy * moveSpeed;
-    } else if (key == 'd') {
-        double oldDirX = player.dx;
-        player.dx = player.dx * cos(-rotSpeed) - player.dy * sin(-rotSpeed);
-        player.dy = oldDirX * sin(-rotSpeed) + player.dy * cos(-rotSpeed);
-
-        double oldPlaneX = clipPlaneX;
-        clipPlaneX = clipPlaneX * cos(-rotSpeed) - clipPlaneY * sin(-rotSpeed);
-        clipPlaneY = oldPlaneX * sin(-rotSpeed) + clipPlaneY * cos(-rotSpeed);
+        if (gameMap.getAt((int)(player.x - player.dx * player.moveSpeed), (int)player.y).wf_left.texture == "")
+            player.x -= player.dx * player.moveSpeed;
+        if (gameMap.getAt((int)player.x, (int)(player.y - player.dy * player.moveSpeed)).wf_left.texture == "")
+            player.y -= player.dy * player.moveSpeed;
     } else if (key == 'a') {
         double oldDirX = player.dx;
-        player.dx = player.dx * cos(rotSpeed) - player.dy * sin(rotSpeed);
-        player.dy = oldDirX * sin(rotSpeed) + player.dy * cos(rotSpeed);
+        player.dx = player.dx * cos(-player.rotSpeed) - player.dy * sin(-player.rotSpeed);
+        player.dy = oldDirX * sin(-player.rotSpeed) + player.dy * cos(-player.rotSpeed);
 
-        double oldPlaneX = clipPlaneX;
-        clipPlaneX = clipPlaneX * cos(rotSpeed) - clipPlaneY * sin(rotSpeed);
-        clipPlaneY = oldPlaneX * sin(rotSpeed) + clipPlaneY * cos(rotSpeed);
+        double oldPlaneX = player.camera.clip_plane_x;
+        player.camera.clip_plane_x = player.camera.clip_plane_x * cos(-player.rotSpeed) - player.camera.clip_plane_y * sin(-player.rotSpeed);
+        player.camera.clip_plane_y = oldPlaneX * sin(-player.rotSpeed) + player.camera.clip_plane_y * cos(-player.rotSpeed);
+    } else if (key == 'd') {
+        double oldDirX = player.dx;
+        player.dx = player.dx * cos(player.rotSpeed) - player.dy * sin(player.rotSpeed);
+        player.dy = oldDirX * sin(player.rotSpeed) + player.dy * cos(player.rotSpeed);
+
+        double oldPlaneX = player.camera.clip_plane_x;
+        player.camera.clip_plane_x = player.camera.clip_plane_x * cos(player.rotSpeed) - player.camera.clip_plane_y * sin(player.rotSpeed);
+        player.camera.clip_plane_y = oldPlaneX * sin(player.rotSpeed) + player.camera.clip_plane_y * cos(player.rotSpeed);
     }
     glutPostRedisplay();
 }
@@ -410,7 +407,8 @@ void __INIT() {
     spriteOrder.resize(gameMap.sprites.size());
     spriteDistance.resize(gameMap.sprites.size());
 
-    rays = vector<Ray>(playerCfg.fov);
+    rays = Rendering::RayBuffer(playerCfg.fov);
+    zBuf = Rendering::ZBuffer(screenW);
 
     gameMap.wall_width = mapScreenW / gameMap.map_width;
     gameMap.wall_height = mapScreenH / gameMap.map_height;
@@ -421,8 +419,8 @@ void __INIT() {
     astar = AStar(gameMap);
     path = astar.find(gameMap.start, gameMap.end);
 
-    moveSpeed = frameTime * playerCfg.move_speed;
-    rotSpeed = frameTime * playerCfg.rotation_speed;
+    player.moveSpeed = frameTime * playerCfg.move_speed;
+    player.rotSpeed = frameTime * playerCfg.rotation_speed;
 
     // toClearColour(bg_colour);
     gluOrtho2D(0, screenW, screenH, 0);
@@ -432,13 +430,26 @@ void __INIT() {
         -1.0,
         0.0,
         0);
+
     debugContext.logAppInfo("Initialised player object");
+
+    pixel_buffer_obj = Rendering::PBO(screenW * screenH * 3);
+    debugContext.logApiInfo("Initialised new PBO of size " + to_string(screenW * screenH * 4) + " [" + to_string(screenW) + "*" + to_string(screenH) + "*3" + "]");
+
+    glGenTextures(1, &texid);
+    glBindTexture(GL_TEXTURE_2D, texid);
+    debugContext.logApiInfo("Bound PBO texture to id: " + to_string(texid));
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, screenW, screenH, 0, GL_RGB, GL_UNSIGNED_BYTE, pixel_buffer_obj.data());
+    debugContext.logApiInfo("Allocated PBO texture to from:" + ADDR_OF(*pixel_buffer_obj.data()));
 }
 
 static void __WINDOW_RESHAPE(int width, int height) {
     screenW = width;
     screenH = height;
-    ZBuffer.resize(width);
+    zBuf.resize(width);
+    pixel_buffer_obj.resize(width * height * 3);
 }
 
 static void __GLUT_IDLE(void) {
@@ -455,7 +466,7 @@ static void __GLUT_IDLE(void) {
 ///
 int main(int argc, char* argv[]) {
     glutInit(&argc, argv);
-    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
+    glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
     glutInitWindowSize(screenW, screenH);
     glutCreateWindow("Ray Caster");
 

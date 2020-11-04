@@ -43,6 +43,9 @@ struct GameMap {
     vector<Coords> right_boundary;
     vector<Coords> tree_order_walls;
     vector<Constructs::Sprite> sprites;
+
+    string ceiling_texture;
+    string floor_texture;
 };
 
 GameMap::GameMap(vector<Constructs::AABB> walls, int width, int height) {
@@ -153,6 +156,10 @@ void GameMap::readMapFromJSON(string filename) {
             texture));
     }
     debugContext.logAppInfo("Processed " + to_string(spritearr.size()) + " Sprite entities");
+    this->ceiling_texture = jsonres["Ceiling"].as<string>();
+    debugContext.logAppInfo("Loaded ceiling texture [" + this->ceiling_texture + "]");
+    this->floor_texture = jsonres["Floor"].as<string>();
+    debugContext.logAppInfo("Loaded floor texture [" + this->floor_texture + "]");
     debugContext.logAppInfo("---- FINISHED MAP PROCESSING [" + filename + "] ----");
 };
 

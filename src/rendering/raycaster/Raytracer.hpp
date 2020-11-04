@@ -26,6 +26,7 @@
 
 #include "../../io/configuration/ConfigInit.hpp"
 #include "../drawing/DrawingUtils.hpp"
+#include "../drawing/RasterText.hpp"
 #include "../../environment/constructs/walls/AABB.hpp"
 #include "../../environment/constructs/walls/AABBFace.hpp"
 #include "../../logic/hashing/HashTable.hpp"
@@ -33,7 +34,7 @@
 #include "../../environment/map/map.hpp"
 #include "../partitioning/QSPTree.hpp"
 #include "../../logic/pathfinding/AStar.hpp"
-#include "../../environment/player/Player.hpp"
+#include "../player/Player.hpp"
 #include "../colour/Colours.hpp"
 #include "../../io/resource_management/TextureLoader.hpp"
 #include "../texturing/texture.hpp"

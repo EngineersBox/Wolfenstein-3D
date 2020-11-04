@@ -174,6 +174,8 @@ Reducing the overhead of texture references is done with custom texture hashing.
 A map is described by a JSON object contain information about the map parameters and walls. There are three main sections:
 
 * `Params`: Map specific configuration
+* `Ceiling`: Specifying the ceiling texture
+* `Floor`: Specifying the floor texture
 * `Walls`: The layout of the map and how it renders
 * `Sprites`: Positions of 2D sprites in the map
 
@@ -194,6 +196,8 @@ Map files are stored in `resources/maps/`. Below is the JSON type data and struc
             "y": "<int>"
         }
     },
+    "Ceiling": "<string>",
+    "Floor": "<string>",
     "Walls": [
         {
             "x": "<int>",
@@ -264,7 +268,9 @@ render_walls = true
 render_floor_ceiling = true
 render_sprites = true
 refresh_rate = 60 ; Value in Hz
-ray_count=80
+ray_count = 80
+texture_width = 64
+texture_height = 64
 ```
 
 ## File system tree
@@ -285,7 +291,6 @@ In order to make it easier to traverse the file system, here is a tree depicting
       * sprites
       * walls
     * map
-    * player
     * world
   * exceptions
     * configuration
@@ -305,9 +310,11 @@ In order to make it easier to traverse the file system, here is a tree depicting
     * hashing
   * physics
   * rendering
+    * camera
     * colour
     * drawing
     * partitioning
+    * player
     * raycaster
     * texturing
 * test

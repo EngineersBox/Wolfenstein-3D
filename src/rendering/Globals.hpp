@@ -9,6 +9,7 @@
 #include "../io/configuration/sections/RenderCfg.hpp"
 #include "../io/logging/GLDebug.hpp"
 #include "../environment/map/Coordinates.hpp"
+#include "raycaster/Ray.hpp"
 
 using namespace std;
 
@@ -64,3 +65,9 @@ static GLDebugContext debugContext = GLDebugContext();
 
 typedef unsigned long int int_id;
 typedef vector<uint32_t> PNGTex;
+
+namespace Rendering {
+    typedef vector<GLubyte> PBO;
+    typedef vector<Ray> RayBuffer;
+    typedef vector<double> ZBuffer;
+}

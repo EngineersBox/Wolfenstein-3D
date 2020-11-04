@@ -55,24 +55,25 @@ void ConfigInit::processCfg() {
 }
 
 PlayerCfg ConfigInit::initPlayerConfig() {
-    return PlayerCfg(
+    return PlayerCfg{
         reader.GetFloat(PLAYER_SECTION, "fov", 70.0f),
         reader.GetFloat(PLAYER_SECTION, "dof", 8.0f),
         reader.GetFloat(PLAYER_SECTION, "move_speed", 3.0f),
         reader.GetFloat(PLAYER_SECTION, "rotation_speed", 2.0f)
-    );
+    };
 };
 
 MinimapCfg ConfigInit::initMinimapConfig() {
-    return MinimapCfg(
+    return MinimapCfg{
         reader.GetBoolean(MINIMAP_SECTION, "enable", false),
         reader.GetBoolean(MINIMAP_SECTION, "render_rays", false),
         parseMinimapPos(reader.Get(MINIMAP_SECTION, "pos", "TOP_RIGHT")),
-        parseMinimapSize(reader.Get(MINIMAP_SECTION, "size", "MEDIUM")));
+        parseMinimapSize(reader.Get(MINIMAP_SECTION, "size", "MEDIUM"))
+    };
 };
 
 LoggingCfg ConfigInit::initLoggingConfig() {
-    return LoggingCfg(
+    return LoggingCfg{
         reader.GetBoolean(LOGGING_SECTION, "gl_debug", false),
         reader.GetBoolean(LOGGING_SECTION, "player_pos", false),
         reader.GetBoolean(LOGGING_SECTION, "tex_skip_invalid", false),
@@ -80,20 +81,22 @@ LoggingCfg ConfigInit::initLoggingConfig() {
         reader.GetBoolean(LOGGING_SECTION, "hide_warnings", false),
         reader.GetBoolean(LOGGING_SECTION, "hide_infos", false),
         reader.GetBoolean(LOGGING_SECTION, "log_verbose", false)
-    );
+    };
 };
 
 RenderCfg ConfigInit::initRenderConfig() {
-    return RenderCfg(
+    return RenderCfg{
         reader.GetBoolean(RENDER_SECTION, "headless_mode", false),
         reader.GetBoolean(RENDER_SECTION, "double_buffer", false),
         reader.GetBoolean(RENDER_SECTION, "render_walls", true),
         reader.GetBoolean(RENDER_SECTION, "render_floor_ceiling", true),
         reader.GetBoolean(RENDER_SECTION, "render_sprites", true),
-        reader.GetInteger(RENDER_SECTION, "refresh_rate", 60),
-        reader.GetInteger(RENDER_SECTION, "ray_count", 80),
-        reader.GetInteger(RENDER_SECTION, "render_distance", 10)
-    );
+        static_cast<int>(reader.GetInteger(RENDER_SECTION, "refresh_rate", 60)),
+        static_cast<int>(reader.GetInteger(RENDER_SECTION, "ray_count", 80)),
+        static_cast<int>(reader.GetInteger(RENDER_SECTION, "render_distance", 10)),
+        static_cast<int>(reader.GetInteger(RENDER_SECTION, "texture_width", 64)),
+        static_cast<int>(reader.GetInteger(RENDER_SECTION, "texture_height", 64))
+    };
 }
 
 void ConfigInit::initAll(PlayerCfg& p_cfg, MinimapCfg& m_cfg, LoggingCfg& l_cfg, RenderCfg& r_cfg) {

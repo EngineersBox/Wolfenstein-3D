@@ -4,7 +4,7 @@
 
 ## Raycaster
 
-* [ ] Create generic method for both `checkVertical()` and `checkHorizontal()` called `checkDir()`
+* [x] Create generic method for both `checkVertical()` and `checkHorizontal()` called `checkDir()`
 * [x] Break `renderRays2Dto3D()` method up into smaller methods and generify where possible
 * [x] Create texture hashing by string using polynomial rolling
 * [x] *Change rendering to BMP columns* (WIP)

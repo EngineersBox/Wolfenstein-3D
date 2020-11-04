@@ -12,6 +12,8 @@
             "y": 22
         }
     },
+    "Ceiling": "wood",
+    "Floor": "greystone",
     "Sprites": [{
             "y": 20.5,
             "x": 11.5,

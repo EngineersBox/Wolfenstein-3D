@@ -2,22 +2,25 @@
 
 #include "../../io/logging/GLDebug.hpp"
 #include "../../rendering/Globals.hpp"
+#include "../camera/Camera.hpp"
 
 using namespace std;
 
-class Player {
-    public:
-        Player();
-        Player(double x, double y, double dx, double dy, double angle);
-        ~Player();
-        void printLocation();
-        void logLocation();
+struct Player {
+    Player();
+    Player(double x, double y, double dx, double dy, double angle);
+    void printLocation();
+    void logLocation();
 
-        double x;
-        double y;
-        double dx;
-        double dy;
-        double angle;
+    double x;
+    double y;
+    double dx;
+    double dy;
+    double angle;
+    double moveSpeed;
+    double rotSpeed;
+
+    Camera camera{0,0,0,0.66};
 };
 
 Player::Player(){};
@@ -29,8 +32,6 @@ Player::Player(double x, double y, double dx, double dy, double angle) {
     this->dy = dy;
     this->angle = angle;
 };
-
-Player::~Player() {};
 
 void Player::printLocation() {
     cout << "Player Position: (" << to_string(this->x) << "," << to_string(this->y) << ")" << endl;

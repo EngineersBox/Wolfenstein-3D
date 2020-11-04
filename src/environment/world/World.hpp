@@ -5,7 +5,7 @@
 #include "../base/entity/IEntityBase.hpp"
 #include "../base/object/IObjectBase.hpp"
 #include "../map/map.hpp"
-#include "../player/Player.hpp"
+#include "../../rendering/player/Player.hpp"
 #include "../../rendering/Globals.hpp"
 
 using namespace std;

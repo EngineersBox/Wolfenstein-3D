@@ -9,15 +9,15 @@
     #include <GL/glut.h>
 #endif
 
-#include "../texturing/TextureColours.hpp"
+#include "../colour/Colours.hpp"
 #include <string>
 
 using namespace std;
 
-void displayText(float x, float y, Colour text_colour, const char *string) {
-    toColour(text_colour);
+void displayText(float x, float y, Colour::ColorRGB text_colour, const string& string) {
+    text_colour.toColour4d();
     glRasterPos2f(x, y);
-    for (int i = 0; i < strlen(string); i++) {
-        glutBitmapCharacter(GLUT_BITMAP_TIMES_ROMAN_24, string[i]);
+    for (int i = 0; i < string.length(); i++) {
+        glutBitmapCharacter(GLUT_BITMAP_HELVETICA_18, string[i]);
     }
 }

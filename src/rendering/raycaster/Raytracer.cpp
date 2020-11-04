@@ -91,13 +91,6 @@ static void renderMap2D(int sw = screenW, int sh = screenH) {
     }
 }
 
-inline void drawPixel(int x, int y, Colour::ColorRGB colour) {
-    int idx = y * screenW + x;
-    pixel_buffer_obj[3 * idx + 0] = colour.r;
-    pixel_buffer_obj[3 * idx + 1] = colour.g;
-    pixel_buffer_obj[3 * idx + 2] = colour.b;
-}
-
 inline static void renderFloorCeiling() {
     float rayDirX0, rayDirY0, rayDirX1, rayDirY1, posZ, rowDistance, floorStepX, floorStepY, floorX, floorY;
     int p, cellX, cellY, tx, ty, checkerBoardPattern;
@@ -135,12 +128,12 @@ inline static void renderFloorCeiling() {
             textures.get(gameMap.floor_texture, tex);
             color = tex.texture[renderCfg.texture_width * ty + tx];
             color = (color >> 1) & DARK_SHADER;
-            drawPixel(x, screenH - y, Colour::INTtoRGB(color));
+            pixel_buffer_obj.pushToBuffer(x, screenH - y, Colour::INTtoRGB(color));
 
             textures.get(gameMap.ceiling_texture, tex);
             color = tex.texture[renderCfg.texture_width * ty + tx];
             color = (color >> 1) & DARK_SHADER;
-            drawPixel(x, y - 1, Colour::INTtoRGB(color));
+            pixel_buffer_obj.pushToBuffer(x, y - 1, Colour::INTtoRGB(color));
         }
     }
 }
@@ -229,7 +222,7 @@ inline static void renderWalls() {
             if (side == 1) {
                 color = (color >> 1) & DARK_SHADER;
             }
-            drawPixel(x, screenH - y, Colour::INTtoRGB(color));
+            pixel_buffer_obj.pushToBuffer(x, screenH - y, Colour::INTtoRGB(color));
         }
 
         zBuf[x] = perpWallDist;
@@ -303,7 +296,7 @@ inline static void renderSprites() {
                 texY = IDIV_256((d * renderCfg.texture_height) / spriteHeight);
                 color = tex.texture[renderCfg.texture_width * texY + texX];
                 if ((color & 0x00FFFFFF) != 0) {
-                    drawPixel(stripe, screenH - y, Colour::INTtoRGB(color));
+                    pixel_buffer_obj.pushToBuffer(stripe, screenH - y, Colour::INTtoRGB(color));
                 }
             }
         }
@@ -314,11 +307,13 @@ inline static void updateTimeTick() {
     oldTime = newTime;
     newTime = glutGet(GLUT_ELAPSED_TIME);
     frameTime = (newTime - oldTime) / 1000.0;
-    displayText(10, 10, Colour::RGB_Yellow, to_string(1.0 / frameTime).c_str());
-    // IMPL: USE https://learnopengl.com/In-Practice/Text-Rendering TO PRINT OUT THE TEXT TO SCREEN
 
     player.moveSpeed = frameTime * playerCfg.move_speed;
     player.rotSpeed = frameTime * playerCfg.rotation_speed;
+
+    if (loggingCfg.show_fps) {
+        displayText(10, 10, Colour::RGB_Yellow, string("FPS: ") + to_string(1.0 / frameTime).c_str());
+    }
 }
 
 static void display(void) {
@@ -336,21 +331,8 @@ static void display(void) {
         renderSprites();
     }
 
-    glEnable(GL_TEXTURE_2D);
-    glClear(GL_COLOR_BUFFER_BIT);
-
-    glTexSubImage2D(GL_TEXTURE_2D,
-        0, 0, 0, screenW,screenH,
-        GL_RGB, GL_UNSIGNED_BYTE,
-        pixel_buffer_obj.data());
-
-    glBegin(GL_QUADS);
-        glTexCoord2d(1,1); glVertex2d(0, 0);
-        glTexCoord2d(0,1); glVertex2d(screenW, 0);
-        glTexCoord2d(0,0); glVertex2d(screenW, screenH);
-        glTexCoord2d(1,0); glVertex2d(0, screenH);
-    glEnd();
-    glDisable(GL_TEXTURE_2D);
+    pixel_buffer_obj.pushBufferToGPU();
+    updateTimeTick();
     glutSwapBuffers();
 }
 
@@ -433,23 +415,15 @@ void __INIT() {
 
     debugContext.logAppInfo("Initialised player object");
 
-    pixel_buffer_obj = Rendering::PBO(screenW * screenH * 3);
-    debugContext.logApiInfo("Initialised new PBO of size " + to_string(screenW * screenH * 4) + " [" + to_string(screenW) + "*" + to_string(screenH) + "*3" + "]");
-
-    glGenTextures(1, &texid);
-    glBindTexture(GL_TEXTURE_2D, texid);
-    debugContext.logApiInfo("Bound PBO texture to id: " + to_string(texid));
-
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, screenW, screenH, 0, GL_RGB, GL_UNSIGNED_BYTE, pixel_buffer_obj.data());
-    debugContext.logApiInfo("Allocated PBO texture to from:" + ADDR_OF(*pixel_buffer_obj.data()));
+    pixel_buffer_obj = Rendering::PBO(screenW, screenH);
+    pixel_buffer_obj.init();
 }
 
 static void __WINDOW_RESHAPE(int width, int height) {
     screenW = width;
     screenH = height;
     zBuf.resize(width);
-    pixel_buffer_obj.resize(width * height * 3);
+    pixel_buffer_obj.resize(width, height);
 }
 
 static void __GLUT_IDLE(void) {

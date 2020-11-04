@@ -43,3 +43,4 @@
 #include "Ray.hpp"
 #include "../../io/resource_management/PNGReader.hpp"
 #include "../../environment/constructs/sprites/Sprite.hpp"
+#include "../buffering/PBO.hpp"

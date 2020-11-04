@@ -260,6 +260,7 @@ hide_infos = false
 tex_skip_invalid = true
 map_skip_invalid = true
 log_verbose = true
+show_fps = false
 
 [rendering] ; NOT YET IMPLEMENTED (ALL)
 headless_mode = false
@@ -293,6 +294,7 @@ In order to make it easier to traverse the file system, here is a tree depicting
     * map
     * world
   * exceptions
+    * buffering
     * configuration
     * debug
     * hashing
@@ -310,6 +312,7 @@ In order to make it easier to traverse the file system, here is a tree depicting
     * hashing
   * physics
   * rendering
+    * buffering
     * camera
     * colour
     * drawing

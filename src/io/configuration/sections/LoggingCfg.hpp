@@ -10,4 +10,5 @@ struct LoggingCfg {
     bool hide_warnings;
     bool hide_infos;
     bool log_verbose;
+    bool show_fps;
 };

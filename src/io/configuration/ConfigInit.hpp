@@ -80,7 +80,8 @@ LoggingCfg ConfigInit::initLoggingConfig() {
         reader.GetBoolean(LOGGING_SECTION, "map_skip_invalid", false),
         reader.GetBoolean(LOGGING_SECTION, "hide_warnings", false),
         reader.GetBoolean(LOGGING_SECTION, "hide_infos", false),
-        reader.GetBoolean(LOGGING_SECTION, "log_verbose", false)
+        reader.GetBoolean(LOGGING_SECTION, "log_verbose", false),
+        reader.GetBoolean(LOGGING_SECTION, "show_fps", false)
     };
 };
 

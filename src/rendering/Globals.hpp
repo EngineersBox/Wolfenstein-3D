@@ -67,7 +67,6 @@ typedef unsigned long int int_id;
 typedef vector<uint32_t> PNGTex;
 
 namespace Rendering {
-    typedef vector<GLubyte> PBO;
     typedef vector<Ray> RayBuffer;
     typedef vector<double> ZBuffer;
 }

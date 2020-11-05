@@ -44,3 +44,5 @@
 #include "../../io/resource_management/PNGReader.hpp"
 #include "../../environment/constructs/sprites/Sprite.hpp"
 #include "../buffering/PBO.hpp"
+#include "../../gui/minimap/Minimap.hpp"
+#include "../../gui/debug_overlay/DebugOverlay.hpp"

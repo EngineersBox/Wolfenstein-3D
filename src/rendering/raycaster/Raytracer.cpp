@@ -25,13 +25,12 @@ Player player;
 int mapScreenW = screenW;
 int mapScreenH = screenH;
 
-float mapScalingX;
-float mapScalingY;
-
 // Configs
 ResourceManager::ConfigInit cfgInit;
 
 GameMap gameMap = GameMap();
+Minimap minimap;
+DebugOverlay debugOverlay;
 
 vector<int> spriteOrder;
 vector<double> spriteDistance;
@@ -45,66 +44,6 @@ Rendering::PBO pixel_buffer_obj;
 Rendering::RayBuffer rays;
 Rendering::ZBuffer zBuf;
 GLuint texid;
-
-///
-/// Render the player
-///
-/// @return void
-///
-inline static void renderPlayerPos(int sw = screenW, int sh = screenH) {
-    int xOffset = minimapCfg.isLeft() ? 0 : sw - minimapCfg.size;
-    int yOffset = minimapCfg.isTop() ? 0 : sh - minimapCfg.size;
-
-    Colour::RGB_Red.toColour4d();
-    glPointSize(8);
-
-    // Draw player point
-    glBegin(GL_POINTS);
-    glVertex2d(xOffset + (player.x * mapScalingY), yOffset + (player.y * mapScalingX));
-
-    glEnd();
-
-    // Draw direction vector
-    renderRay(
-        xOffset + (player.x * mapScalingX),
-        yOffset + (player.y * mapScalingY),
-        xOffset + ((player.x + player.dx * 1.5) * mapScalingX),
-        yOffset + ((player.y + player.dy * 1.5) * mapScalingY),
-        3, Colour::RGB_Red
-    );
-}
-
-///
-/// Render the map as squares
-///
-/// @return void
-///
-static void renderMap2D(int sw = screenW, int sh = screenH) {
-    float mapScalingX = ((float)minimapCfg.size) / ((float)gameMap.map_width);
-    float mapScalingY = ((float)minimapCfg.size) / ((float)gameMap.map_height);
-    int xOffset = minimapCfg.isLeft() ? 0 : sw - minimapCfg.size;
-    int yOffset = minimapCfg.isTop() ? 0 : sh - minimapCfg.size;
-    int x, y;
-    GLint current_colour[4];
-    glGetIntegerv(GL_CURRENT_COLOR, current_colour);
-    for (y = 0; y < gameMap.map_height; y++) {
-        for (x = 0; x < gameMap.map_width; x++) {
-            // Change to colour coresponding to map location
-            if (gameMap.getAt(x,y).wf_left.texture != "") {
-                glColor3i(0,0,0);
-            } else {
-                gameMap.getAt(x, y).wf_left.colour.toColour4d();
-            }
-            drawRectangle(xOffset + x * mapScalingX, yOffset + y * mapScalingY, mapScalingX, mapScalingY);
-        }
-    }
-    renderPlayerPos(sw, sh);
-    glColor3i(
-        current_colour[0],
-        current_colour[1],
-        current_colour[2]
-    );
-}
 
 inline static void renderFloorCeiling() {
     float rayDirX0, rayDirY0, rayDirX1, rayDirY1, posZ, rowDistance, floorStepX, floorStepY, floorX, floorY;
@@ -325,10 +264,6 @@ inline static void updateTimeTick() {
 
     player.moveSpeed = frameTime * playerCfg.move_speed;
     player.rotSpeed = frameTime * playerCfg.rotation_speed;
-
-    if (loggingCfg.show_fps) {
-        displayText(10, 10, Colour::RGB_Yellow, string("FPS: ") + to_string(1.0 / frameTime).c_str());
-    }
 }
 
 static void display(void) {
@@ -348,8 +283,14 @@ static void display(void) {
 
     pixel_buffer_obj.pushBufferToGPU();
     updateTimeTick();
-    renderMap2D(screenW, screenH);
-    astar.renderPath(path, Colour::RGB_Blue, screenW, screenH, mapScalingX, mapScalingY);
+    
+    minimap.render(screenW, screenH);
+    astar.renderPath(
+        path, Colour::RGB_Blue,
+        screenW, screenH,
+        minimap.getScalingX(), minimap.getScalingY()
+    );
+    debugOverlay.render(frameTime);
     glutSwapBuffers();
 }
 
@@ -412,9 +353,6 @@ void __INIT() {
     gameMap.wall_width = mapScreenW / gameMap.map_width;
     gameMap.wall_height = mapScreenH / gameMap.map_height;
 
-    mapScalingX = ((float)minimapCfg.size) / ((float)gameMap.map_width);
-    mapScalingY = ((float)minimapCfg.size) / ((float)gameMap.map_height);
-
     astar = AStar(gameMap);
     path = astar.find(gameMap.start, gameMap.end);
 
@@ -429,8 +367,12 @@ void __INIT() {
         -1.0,
         0.0,
         0);
+    debugContext.logAppInfo("Initialised player object at: " + ADDR_OF(player));
 
-    debugContext.logAppInfo("Initialised player object");
+    minimap = Minimap(&player, &gameMap, screenW, screenH);
+    debugContext.logAppInfo("Initialised minimap object at: " + ADDR_OF(minimap));
+
+    debugOverlay = DebugOverlay(&player, &minimap, &gameMap, GLUT_BITMAP_HELVETICA_18);
 
     pixel_buffer_obj = Rendering::PBO(screenW, screenH);
     pixel_buffer_obj.init();

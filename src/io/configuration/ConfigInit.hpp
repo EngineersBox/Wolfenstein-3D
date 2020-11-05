@@ -75,13 +75,14 @@ MinimapCfg ConfigInit::initMinimapConfig() {
 LoggingCfg ConfigInit::initLoggingConfig() {
     return LoggingCfg{
         reader.GetBoolean(LOGGING_SECTION, "gl_debug", false),
-        reader.GetBoolean(LOGGING_SECTION, "player_pos", false),
         reader.GetBoolean(LOGGING_SECTION, "tex_skip_invalid", false),
         reader.GetBoolean(LOGGING_SECTION, "map_skip_invalid", false),
         reader.GetBoolean(LOGGING_SECTION, "hide_warnings", false),
         reader.GetBoolean(LOGGING_SECTION, "hide_infos", false),
         reader.GetBoolean(LOGGING_SECTION, "log_verbose", false),
-        reader.GetBoolean(LOGGING_SECTION, "show_fps", false)
+        reader.GetBoolean(LOGGING_SECTION, "show_fps", false),
+        reader.GetBoolean(LOGGING_SECTION, "show_player_pos", false),
+        reader.GetBoolean(LOGGING_SECTION, "show_time_tick", false)
     };
 };
 

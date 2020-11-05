@@ -52,15 +52,15 @@ GLuint texid;
 /// @return void
 ///
 inline static void renderPlayerPos(int sw = screenW, int sh = screenH) {
-    int xOffset = minimapCfg.isLeft() ? 0 : sw - (gameMap.map_width * minimapCfg.size);
-    int yOffset = minimapCfg.isTop() ? 0 : sh - (gameMap.map_height * minimapCfg.size);
+    int xOffset = minimapCfg.isLeft() ? 0 : sw - minimapCfg.size;
+    int yOffset = minimapCfg.isTop() ? 0 : sh - minimapCfg.size;
 
     Colour::RGB_Red.toColour4d();
     glPointSize(8);
 
     // Draw player point
     glBegin(GL_POINTS);
-    glVertex2d(xOffset + (player.x * mapScalingX), yOffset + (player.y * mapScalingY));
+    glVertex2d(xOffset + (player.x * mapScalingY), yOffset + (player.y * mapScalingX));
 
     glEnd();
 
@@ -68,9 +68,10 @@ inline static void renderPlayerPos(int sw = screenW, int sh = screenH) {
     renderRay(
         xOffset + (player.x * mapScalingX),
         yOffset + (player.y * mapScalingY),
-        xOffset + ((player.x + player.dx * 5) * mapScalingX),
-        yOffset + ((player.y + player.dy * 5) * mapScalingY),
-        3, Colour::RGB_Red);
+        xOffset + ((player.x + player.dx * 1.5) * mapScalingX),
+        yOffset + ((player.y + player.dy * 1.5) * mapScalingY),
+        3, Colour::RGB_Red
+    );
 }
 
 ///
@@ -79,16 +80,30 @@ inline static void renderPlayerPos(int sw = screenW, int sh = screenH) {
 /// @return void
 ///
 static void renderMap2D(int sw = screenW, int sh = screenH) {
-    int xOffset = minimapCfg.isLeft() ? 0 : sw - (gameMap.map_width * minimapCfg.size);
-    int yOffset = minimapCfg.isTop() ? 0 : sh - (gameMap.map_height * minimapCfg.size);
+    float mapScalingX = ((float)minimapCfg.size) / ((float)gameMap.map_width);
+    float mapScalingY = ((float)minimapCfg.size) / ((float)gameMap.map_height);
+    int xOffset = minimapCfg.isLeft() ? 0 : sw - minimapCfg.size;
+    int yOffset = minimapCfg.isTop() ? 0 : sh - minimapCfg.size;
     int x, y;
+    GLint current_colour[4];
+    glGetIntegerv(GL_CURRENT_COLOR, current_colour);
     for (y = 0; y < gameMap.map_height; y++) {
         for (x = 0; x < gameMap.map_width; x++) {
             // Change to colour coresponding to map location
-            gameMap.getAt(x, y).wf_left.colour.toColour4d();
-            drawRectangle(xOffset + x * minimapCfg.size, yOffset + y * minimapCfg.size, minimapCfg.size, minimapCfg.size);
+            if (gameMap.getAt(x,y).wf_left.texture != "") {
+                glColor3i(0,0,0);
+            } else {
+                gameMap.getAt(x, y).wf_left.colour.toColour4d();
+            }
+            drawRectangle(xOffset + x * mapScalingX, yOffset + y * mapScalingY, mapScalingX, mapScalingY);
         }
     }
+    renderPlayerPos(sw, sh);
+    glColor3i(
+        current_colour[0],
+        current_colour[1],
+        current_colour[2]
+    );
 }
 
 inline static void renderFloorCeiling() {
@@ -333,6 +348,8 @@ static void display(void) {
 
     pixel_buffer_obj.pushBufferToGPU();
     updateTimeTick();
+    renderMap2D(screenW, screenH);
+    astar.renderPath(path, Colour::RGB_Blue, screenW, screenH, mapScalingX, mapScalingY);
     glutSwapBuffers();
 }
 
@@ -395,8 +412,8 @@ void __INIT() {
     gameMap.wall_width = mapScreenW / gameMap.map_width;
     gameMap.wall_height = mapScreenH / gameMap.map_height;
 
-    mapScalingX = (minimapCfg.size / (float)mapScreenW) * gameMap.map_width;
-    mapScalingY = (minimapCfg.size / (float)mapScreenH) * gameMap.map_height;
+    mapScalingX = ((float)minimapCfg.size) / ((float)gameMap.map_width);
+    mapScalingY = ((float)minimapCfg.size) / ((float)gameMap.map_height);
 
     astar = AStar(gameMap);
     path = astar.find(gameMap.start, gameMap.end);

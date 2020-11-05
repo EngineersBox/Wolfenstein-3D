@@ -176,20 +176,30 @@ vector<Coords>* AStar::find(Coords start_loc, Coords end_loc) {
     return rebuildPath(traversals, start, goal);
 };
 
-void AStar::renderPath(vector<Coords>* path, Colour::ColorRGB path_colour, int sw, int sh, float scalingX, float scalingY) {
+void AStar::renderPath(vector<Coords>* path, Colour::ColorRGB path_colour, int sw, int sh, float mapScalingX, float mapScalingY) {
     if (path->size() < 2) {
         return;
     }
-    int xOffset = minimapCfg.isLeft() ? 0 : sw - (map.map_width * minimapCfg.size);
-    int yOffset = minimapCfg.isTop() ? 0 : sh - (map.map_height * minimapCfg.size);
-    int inBlockOffset = IDIV_2(minimapCfg.size);
+    int xOffset = minimapCfg.isLeft() ? 0 : sw - minimapCfg.size;
+    int yOffset = minimapCfg.isTop() ? 0 : sh - minimapCfg.size;
+    int inBlockOffsetX = mapScalingX / 2.0;
+    int inBlockOffsetY = mapScalingY / 2.0;
+
+    int x, y;
+    GLint current_colour[4];
     for (int i = 0; i < path->size() - 1; i++) {
         renderRay(
-            inBlockOffset + xOffset + ((path->at(i).x * map.wall_width) * scalingX),
-            inBlockOffset + yOffset + ((path->at(i).y * map.wall_height) * scalingY),
-            inBlockOffset + xOffset + ((path->at(i + 1).x * map.wall_width) * scalingX),
-            inBlockOffset + yOffset + ((path->at(i + 1).y * map.wall_height) * scalingY),
-            5,
-            path_colour);
+            xOffset + inBlockOffsetX + (path->at(i).x * mapScalingX),
+            yOffset + inBlockOffsetY + (path->at(i).y * mapScalingX),
+            xOffset + inBlockOffsetX + (path->at(i + 1).x * mapScalingX),
+            yOffset + inBlockOffsetY + (path->at(i + 1).y * mapScalingX),
+            2,
+            path_colour
+        );
     }
+    glColor3i(
+        current_colour[0],
+        current_colour[1],
+        current_colour[2]
+    );
 };

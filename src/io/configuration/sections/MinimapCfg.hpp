@@ -10,9 +10,9 @@ enum MinimapPos {
 };
 
 enum MinimapSize: int {
-    SMALL = 30,
-    MEDIUM = 20,
-    LARGE = 10
+    SMALL = 100,
+    MEDIUM = 150,
+    LARGE = 200
 };
 
 MinimapPos parseMinimapPos(const string& pos_str) {

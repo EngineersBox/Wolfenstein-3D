@@ -199,7 +199,7 @@ inline static void renderSprites() {
     sortSprites();
 
     double sprite_x, sprite_y, transform_x, transform_y;
-    int sprite_screen_x, vert_move_screen, sprite_height, sprite_width, draw_start_posY, draw_end_posY, draw_start_posX, draw_end_posX, tex_x, tex_y, d;
+    int sprite_screen_x, vert_move_screen, sprite_height, sprite_width, draw_start_pos_y, draw_end_pos_y, draw_start_pos_x, draw_end_pos_x, tex_x, tex_y, d;
     Texture tex;
     uint32_t color;
     double inverse_det = 1.0 / (player.camera.clip_plane_x * player.dy - player.dx * player.camera.clip_plane_y);
@@ -215,36 +215,36 @@ inline static void renderSprites() {
         vert_move_screen = (int)(SPRITE_V_MOVE / transform_y);
 
         sprite_height = abs((int)(screen_height / (transform_y))) / SPRITE_V_DIV;
-        draw_start_posY = -IDIV_2(sprite_height) + IDIV_2(screen_height) + vert_move_screen;
-        if (draw_start_posY < 0) {
-            draw_start_posY = 0;
+        draw_start_pos_y = -IDIV_2(sprite_height) + IDIV_2(screen_height) + vert_move_screen;
+        if (draw_start_pos_y < 0) {
+            draw_start_pos_y = 0;
         }
-        draw_end_posY = IDIV_2(sprite_height) + IDIV_2(screen_height) + vert_move_screen;
-        if (draw_end_posY >= screen_height) {
-            draw_end_posY = screen_height - 1;
+        draw_end_pos_y = IDIV_2(sprite_height) + IDIV_2(screen_height) + vert_move_screen;
+        if (draw_end_pos_y >= screen_height) {
+            draw_end_pos_y = screen_height - 1;
         }
 
         sprite_width = abs((int)(screen_height / (transform_y))) / SPRITE_U_DIV;
-        draw_start_posX = IDIV_2(-sprite_width) + sprite_screen_x;
-        if (draw_start_posX < 0) {
-            draw_start_posX = 0;
+        draw_start_pos_x = IDIV_2(-sprite_width) + sprite_screen_x;
+        if (draw_start_pos_x < 0) {
+            draw_start_pos_x = 0;
         }
-        draw_end_posX = IDIV_2(sprite_width) + sprite_screen_x;
-        if (draw_end_posX >= screen_width) {
-            draw_end_posX = screen_width - 1;
+        draw_end_pos_x = IDIV_2(sprite_width) + sprite_screen_x;
+        if (draw_end_pos_x >= screen_width) {
+            draw_end_pos_x = screen_width - 1;
         }
         textures.get(gameMap.sprites[spriteOrder[i]].texture, tex);
-        for (int stripe = draw_start_posX; stripe < draw_end_posX; stripe++) {
-            tex_x = (int)IDIV_256((IMUL_256((stripe - (IDIV_2(-sprite_width) + sprite_screen_x))) * renderCfg.texture_width / sprite_width));
-            if (!(transform_y > 0 && stripe > 0 && stripe < screen_width && transform_y < zBuf[stripe])) {
+        for (int pixel_row = draw_start_pos_x; pixel_row < draw_end_pos_x; pixel_row++) {
+            tex_x = (int)IDIV_256((IMUL_256((pixel_row - (IDIV_2(-sprite_width) + sprite_screen_x))) * renderCfg.texture_width / sprite_width));
+            if (!(transform_y > 0 && pixel_row > 0 && pixel_row < screen_width && transform_y < zBuf[pixel_row])) {
                 continue;
             }
-            for (int y = draw_start_posY; y < draw_end_posY; y++) {
-                d = IMUL_256((y - vert_move_screen)) - IMUL_128(screen_height) + IMUL_128(sprite_height);
+            for (int pixel_column = draw_start_pos_y; pixel_column < draw_end_pos_y; pixel_column++) {
+                d = IMUL_256((pixel_column - vert_move_screen)) - IMUL_128(screen_height) + IMUL_128(sprite_height);
                 tex_y = IDIV_256((d * renderCfg.texture_height) / sprite_height);
                 color = tex.texture[renderCfg.texture_width * tex_y + tex_x];
                 if ((color & 0x00FFFFFF) != 0) {
-                    pixelBuffer.pushToBuffer(stripe, screen_height - y, Colour::INTtoRGB(color));
+                    pixelBuffer.pushToBuffer(pixel_row, screen_height - pixel_column, Colour::INTtoRGB(color));
                 }
             }
         }

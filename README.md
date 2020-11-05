@@ -244,25 +244,26 @@ Below is an example of a configuration file:
 fov = 80.0
 dof = 8.0
 move_speed = 3.0
-rotation_speed = 2.0
+rotation_speed = 1.0
 
 [minimap]
 enable = true
-render_rays = false ; NOT YET IMPLEMENTED
-pos = TOP_RIGHT ; NOT YET IMPLEMENTED
+render_rays = false
+pos = TOP_LEFT
 size = MEDIUM
 
-[logging] ; NOT YET IMPLEMENTED (ALL)
+[logging]
 gl_debug = true
-player_pos = false
 hide_warnings = false
 hide_infos = false
 tex_skip_invalid = true
 map_skip_invalid = true
 log_verbose = true
-show_fps = false
+show_fps = true
+show_player_pos = true
+show_time_tick = true
 
-[rendering] ; NOT YET IMPLEMENTED (ALL)
+[rendering]
 headless_mode = false
 double_buffer = false
 render_walls = true
@@ -270,8 +271,10 @@ render_floor_ceiling = true
 render_sprites = true
 refresh_rate = 60 ; Value in Hz
 ray_count = 80
+render_distance = 10
 texture_width = 64
 texture_height = 64
+
 ```
 
 ## File system tree
@@ -298,18 +301,25 @@ In order to make it easier to traverse the file system, here is a tree depicting
     * configuration
     * debug
     * hashing
+    * heap
     * image
     * map
     * pathfinding
     * textures
+  * gui
+    * debug_overlay
+    * minimap
+    * stats_bar
   * io
     * configuration
       * sections
     * logging
     * resource_management
   * logic
-    * pathfinding
     * hashing
+    * id
+    * pathfinding
+    * queue
   * physics
   * rendering
     * buffering

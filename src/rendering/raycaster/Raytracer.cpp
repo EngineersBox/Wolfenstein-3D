@@ -11,8 +11,8 @@
 using namespace std;
 
 // Screen
-int screenW = 1024;
-int screenH = 512;
+int screen_width = 1024;
+int screen_height = 512;
 
 ResourceManager::TextureLoader texLoader;
 HashTable<Texture> textures;
@@ -20,10 +20,6 @@ AStar astar;
 vector<Coords> *path = new vector<Coords>();
 // Player
 Player player;
-
-// Map
-int mapScreenW = screenW;
-int mapScreenH = screenH;
 
 // Configs
 ResourceManager::ConfigInit cfgInit;
@@ -35,151 +31,149 @@ DebugOverlay debugOverlay;
 vector<int> spriteOrder;
 vector<double> spriteDistance;
 
-double newTime = 0;
-double oldTime = 0;
+double new_time = 0;
+double old_time = 0;
 
-double frameTime = 0;
+double frame_time = 0;
 
-Rendering::PBO pixel_buffer_obj;
+Rendering::PBO pixelBuffer;
 Rendering::RayBuffer rays;
 Rendering::ZBuffer zBuf;
-GLuint texid;
 
 inline static void renderFloorCeiling() {
-    float rayDirX0, rayDirY0, rayDirX1, rayDirY1, posZ, rowDistance, floorStepX, floorStepY, floorX, floorY;
-    int p, cellX, cellY, tx, ty, checkerBoardPattern;
+    float ray_dir_x0, ray_dir_y0, ray_dir_x1, ray_dir_y1, pos_z, dist, step_x, step_y, floor_x, floor_y;
+    int p, cell_x, cell_y, tx, ty;
     Texture tex;
-    string floorTexture, ceilingTexture;
     uint32_t color;
-    for (int y = screenH - 1; y >= IDIV_2(screenH) + 1; --y) {
-        rayDirX0 = player.dx - player.camera.clip_plane_x;
-        rayDirY0 = player.dy - player.camera.clip_plane_y;
-        rayDirX1 = player.dx + player.camera.clip_plane_x;
-        rayDirY1 = player.dy + player.camera.clip_plane_y;
+    for (int y = screen_height - 1; y >= IDIV_2(screen_height) + 1; --y) {
+        ray_dir_x0 = player.dx - player.camera.clip_plane_x;
+        ray_dir_y0 = player.dy - player.camera.clip_plane_y;
+        ray_dir_x1 = player.dx + player.camera.clip_plane_x;
+        ray_dir_y1 = player.dy + player.camera.clip_plane_y;
 
-        p = y - IDIV_2(screenH);
+        p = y - IDIV_2(screen_height);
 
-        posZ = 0.5 * screenH;
+        pos_z = 0.5 * screen_height;
 
-        rowDistance = posZ / p;
+        dist = pos_z / p;
 
-        floorStepX = rowDistance * (rayDirX1 - rayDirX0) / screenW;
-        floorStepY = rowDistance * (rayDirY1 - rayDirY0) / screenW;
+        step_x = dist * (ray_dir_x1 - ray_dir_x0) / screen_width;
+        step_y = dist * (ray_dir_y1 - ray_dir_y0) / screen_width;
 
-        floorX = player.x + rowDistance * rayDirX0;
-        floorY = player.y + rowDistance * rayDirY0;
+        floor_x = player.x + dist * ray_dir_x0;
+        floor_y = player.y + dist * ray_dir_y0;
 
-        for (int x = screenW - 1; x >= 0; --x) {
-            cellX = (int)(floorX);
-            cellY = (int)(floorY);
+        for (int x = screen_width - 1; x >= 0; --x) {
+            cell_x = (int)(floor_x);
+            cell_y = (int)(floor_y);
 
-            tx = (int)(renderCfg.texture_width * (floorX - cellX)) & (renderCfg.texture_width - 1);
-            ty = (int)(renderCfg.texture_height * (floorY - cellY)) & (renderCfg.texture_height - 1);
+            tx = (int)(renderCfg.texture_width * (floor_x - cell_x)) & (renderCfg.texture_width - 1);
+            ty = (int)(renderCfg.texture_height * (floor_y - cell_y)) & (renderCfg.texture_height - 1);
 
-            floorX += floorStepX;
-            floorY += floorStepY;
+            floor_x += step_x;
+            floor_y += step_y;
 
             textures.get(gameMap.floor_texture, tex);
             color = tex.texture[renderCfg.texture_width * ty + tx];
             color = (color >> 1) & DARK_SHADER;
-            pixel_buffer_obj.pushToBuffer(x, screenH - y, Colour::INTtoRGB(color));
+            pixelBuffer.pushToBuffer(x, screen_height - y, Colour::INTtoRGB(color));
 
             textures.get(gameMap.ceiling_texture, tex);
             color = tex.texture[renderCfg.texture_width * ty + tx];
             color = (color >> 1) & DARK_SHADER;
-            pixel_buffer_obj.pushToBuffer(x, y - 1, Colour::INTtoRGB(color));
+            pixelBuffer.pushToBuffer(x, y - 1, Colour::INTtoRGB(color));
         }
     }
 }
 
 inline static void renderWalls() {
-    double rayDirX, rayDirY, sideDistX, sideDistY, deltaDistX, deltaDistY, perpWallDist, wallX, step, texPos;
-    int mapX, mapY, stepX, stepY, hit, side, lineHeight, drawStart, drawEnd, texX, texY;
-    string wallTex;
+    double ray_dir_x, ray_dir_y, side_dist_x, side_dist_y, delta_x, delta_y, perp_wall_dist, wall_x, step, tex_pos;
+    int map_x, map_y, step_x, step_y, hit, side, line_height, draw_start_pos, draw_end_pos, tex_x, tex_y;
+    string wall_tex;
     uint32_t color;
     Texture tex;
-    for (int x = screenW - 1; x >= 0; x--) {
-        player.camera.x = 2 * x / double(screenW) - 1;
-        rayDirX = player.dx + player.camera.clip_plane_x * player.camera.x;
-        rayDirY = player.dy + player.camera.clip_plane_y * player.camera.x;
+    for (int x = screen_width - 1; x >= 0; x--) {
+        player.camera.x = 2 * x / double(screen_width) - 1;
+        ray_dir_x = player.dx + player.camera.clip_plane_x * player.camera.x;
+        ray_dir_y = player.dy + player.camera.clip_plane_y * player.camera.x;
 
-        mapX = (int)player.x;
-        mapY = (int)player.y;
+        map_x = (int)player.x;
+        map_y = (int)player.y;
 
-        deltaDistX = abs(1 / rayDirX);
-        deltaDistY = abs(1 / rayDirY);
+        delta_x = abs(1 / ray_dir_x);
+        delta_y = abs(1 / ray_dir_y);
 
         hit = 0;
-        if (rayDirX < 0) {
-            stepX = -1;
-            sideDistX = (player.x - mapX) * deltaDistX;
+        if (ray_dir_x < 0) {
+            step_x = -1;
+            side_dist_x = (player.x - map_x) * delta_x;
         } else {
-            stepX = 1;
-            sideDistX = (mapX + 1.0 - player.x) * deltaDistX;
+            step_x = 1;
+            side_dist_x = (map_x + 1.0 - player.x) * delta_x;
         }
-        if (rayDirY < 0) {
-            stepY = -1;
-            sideDistY = (player.y - mapY) * deltaDistY;
+        if (ray_dir_y < 0) {
+            step_y = -1;
+            side_dist_y = (player.y - map_y) * delta_y;
         } else {
-            stepY = 1;
-            sideDistY = (mapY + 1.0 - player.y) * deltaDistY;
+            step_y = 1;
+            side_dist_y = (map_y + 1.0 - player.y) * delta_y;
         }
 
         while (hit == 0) {
-            if (sideDistX < sideDistY) {
-                sideDistX += deltaDistX;
-                mapX += stepX;
+            if (side_dist_x < side_dist_y) {
+                side_dist_x += delta_x;
+                map_x += step_x;
                 side = 0;
             } else {
-                sideDistY += deltaDistY;
-                mapY += stepY;
+                side_dist_y += delta_y;
+                map_y += step_y;
                 side = 1;
             }
-            hit = gameMap.getAt(mapX, mapY).wf_left.texture != "";
+            hit = gameMap.getAt(map_x, map_y).wf_left.texture != "";
         }
 
         if (side == 0) {
-            perpWallDist = (mapX - player.x + IDIV_2((1 - stepX))) / rayDirX;
+            perp_wall_dist = (map_x - player.x + IDIV_2((1 - step_x))) / ray_dir_x;
         } else {
-            perpWallDist = (mapY - player.y + IDIV_2((1 - stepY))) / rayDirY;
+            perp_wall_dist = (map_y - player.y + IDIV_2((1 - step_y))) / ray_dir_y;
         }
-        lineHeight = (int)(screenH / perpWallDist);
+        line_height = (int)(screen_height / perp_wall_dist);
 
-        drawStart = IDIV_2(-lineHeight) + IDIV_2(screenH);
-        if (drawStart < 0) {
-            drawStart = 0;
+        draw_start_pos = IDIV_2(-line_height) + IDIV_2(screen_height);
+        if (draw_start_pos < 0) {
+            draw_start_pos = 0;
         }
-        drawEnd = IDIV_2(lineHeight) + IDIV_2(screenH);
-        if (drawEnd >= screenH) {
-            drawEnd = screenH - 1;
+        draw_end_pos = IDIV_2(line_height) + IDIV_2(screen_height);
+        if (draw_end_pos >= screen_height) {
+            draw_end_pos = screen_height - 1;
         }
-        wallTex = gameMap.getAt(mapX, mapY).wf_left.texture;
+        wall_tex = gameMap.getAt(map_x, map_y).wf_left.texture;
 
-        wallX = side == 0 ? player.y + perpWallDist* rayDirY : player.x + perpWallDist * rayDirX;
-        wallX -= floor((wallX));
+        wall_x = side == 0 ? player.y + perp_wall_dist* ray_dir_y : player.x + perp_wall_dist * ray_dir_x;
+        wall_x -= floor((wall_x));
 
-        texX = (int)(wallX * double(renderCfg.texture_width));
-        if (side == 0 && rayDirX > 0) {
-            texX = renderCfg.texture_width - texX - 1;
+        tex_x = (int)(wall_x * double(renderCfg.texture_width));
+        if (side == 0 && ray_dir_x > 0) {
+            tex_x = renderCfg.texture_width - tex_x - 1;
         }
-        if (side == 1 && rayDirY < 0) {
-            texX = renderCfg.texture_width - texX - 1;
+        if (side == 1 && ray_dir_y < 0) {
+            tex_x = renderCfg.texture_width - tex_x - 1;
         }
 
-        step = 1.0 * renderCfg.texture_height / lineHeight;
-        texPos = (drawStart - IDIV_2(screenH) + IDIV_2(lineHeight)) * step;
-        for (int y = drawStart; y < drawEnd; y++) {
-            texY = (int)texPos & (renderCfg.texture_height - 1);
-            texPos += step;
-            textures.get(wallTex, tex);
-            color = tex.texture[renderCfg.texture_height * texY + texX];
+        step = 1.0 * renderCfg.texture_height / line_height;
+        tex_pos = (draw_start_pos - IDIV_2(screen_height) + IDIV_2(line_height)) * step;
+        for (int y = draw_start_pos; y < draw_end_pos; y++) {
+            tex_y = (int)tex_pos & (renderCfg.texture_height - 1);
+            tex_pos += step;
+            textures.get(wall_tex, tex);
+            color = tex.texture[renderCfg.texture_height * tex_y + tex_x];
             if (side == 1) {
                 color = (color >> 1) & DARK_SHADER;
             }
-            pixel_buffer_obj.pushToBuffer(x, screenH - y, Colour::INTtoRGB(color));
+            pixelBuffer.pushToBuffer(x, screen_height - y, Colour::INTtoRGB(color));
         }
 
-        zBuf[x] = perpWallDist;
+        zBuf[x] = perp_wall_dist;
     }
 }
 
@@ -204,53 +198,53 @@ inline void sortSprites() {
 inline static void renderSprites() {
     sortSprites();
 
-    double spriteX, spriteY, transformX, transformY;
-    int spriteScreenX, V_MOVEScreen, spriteHeight, drawStartY, drawEndY, spriteWidth, drawStartX, drawEndX, texX, texY, d;
+    double sprite_x, sprite_y, transform_x, transform_y;
+    int sprite_screen_x, vert_move_screen, sprite_height, sprite_width, draw_start_posY, draw_end_posY, draw_start_posX, draw_end_posX, tex_x, tex_y, d;
     Texture tex;
     uint32_t color;
-    double invDet = 1.0 / (player.camera.clip_plane_x * player.dy - player.dx * player.camera.clip_plane_y);
+    double inverse_det = 1.0 / (player.camera.clip_plane_x * player.dy - player.dx * player.camera.clip_plane_y);
     for (int i = gameMap.sprites.size() - 1; i >= 0; i--) {
-        spriteX = gameMap.sprites[spriteOrder[i]].location.x - player.x;
-        spriteY = gameMap.sprites[spriteOrder[i]].location.y - player.y;
+        sprite_x = gameMap.sprites[spriteOrder[i]].location.x - player.x;
+        sprite_y = gameMap.sprites[spriteOrder[i]].location.y - player.y;
 
-        transformX = invDet * (player.dy * spriteX - player.dx * spriteY);
-        transformY = invDet * (-player.camera.clip_plane_y * spriteX + player.camera.clip_plane_x * spriteY);
+        transform_x = inverse_det * (player.dy * sprite_x - player.dx * sprite_y);
+        transform_y = inverse_det * (-player.camera.clip_plane_y * sprite_x + player.camera.clip_plane_x * sprite_y);
 
-        spriteScreenX = (int)(IDIV_2(screenW) * (1 + transformX / transformY));
+        sprite_screen_x = (int)(IDIV_2(screen_width) * (1 + transform_x / transform_y));
 
-        V_MOVEScreen = (int)(SPRITE_V_MOVE / transformY);
+        vert_move_screen = (int)(SPRITE_V_MOVE / transform_y);
 
-        spriteHeight = abs((int)(screenH / (transformY))) / SPRITE_V_DIV;
-        drawStartY = -IDIV_2(spriteHeight) + IDIV_2(screenH) + V_MOVEScreen;
-        if (drawStartY < 0) {
-            drawStartY = 0;
+        sprite_height = abs((int)(screen_height / (transform_y))) / SPRITE_V_DIV;
+        draw_start_posY = -IDIV_2(sprite_height) + IDIV_2(screen_height) + vert_move_screen;
+        if (draw_start_posY < 0) {
+            draw_start_posY = 0;
         }
-        drawEndY = IDIV_2(spriteHeight) + IDIV_2(screenH) + V_MOVEScreen;
-        if (drawEndY >= screenH) {
-            drawEndY = screenH - 1;
+        draw_end_posY = IDIV_2(sprite_height) + IDIV_2(screen_height) + vert_move_screen;
+        if (draw_end_posY >= screen_height) {
+            draw_end_posY = screen_height - 1;
         }
 
-        spriteWidth = abs((int)(screenH / (transformY))) / SPRITE_U_DIV;
-        drawStartX = IDIV_2(-spriteWidth) + spriteScreenX;
-        if (drawStartX < 0) {
-            drawStartX = 0;
+        sprite_width = abs((int)(screen_height / (transform_y))) / SPRITE_U_DIV;
+        draw_start_posX = IDIV_2(-sprite_width) + sprite_screen_x;
+        if (draw_start_posX < 0) {
+            draw_start_posX = 0;
         }
-        drawEndX = IDIV_2(spriteWidth) + spriteScreenX;
-        if (drawEndX >= screenW) {
-            drawEndX = screenW - 1;
+        draw_end_posX = IDIV_2(sprite_width) + sprite_screen_x;
+        if (draw_end_posX >= screen_width) {
+            draw_end_posX = screen_width - 1;
         }
         textures.get(gameMap.sprites[spriteOrder[i]].texture, tex);
-        for (int stripe = drawStartX; stripe < drawEndX; stripe++) {
-            texX = (int)IDIV_256((IMUL_256((stripe - (IDIV_2(-spriteWidth) + spriteScreenX))) * renderCfg.texture_width / spriteWidth));
-            if (!(transformY > 0 && stripe > 0 && stripe < screenW && transformY < zBuf[stripe])) {
+        for (int stripe = draw_start_posX; stripe < draw_end_posX; stripe++) {
+            tex_x = (int)IDIV_256((IMUL_256((stripe - (IDIV_2(-sprite_width) + sprite_screen_x))) * renderCfg.texture_width / sprite_width));
+            if (!(transform_y > 0 && stripe > 0 && stripe < screen_width && transform_y < zBuf[stripe])) {
                 continue;
             }
-            for (int y = drawStartY; y < drawEndY; y++) {
-                d = IMUL_256((y - V_MOVEScreen)) - IMUL_128(screenH) + IMUL_128(spriteHeight);
-                texY = IDIV_256((d * renderCfg.texture_height) / spriteHeight);
-                color = tex.texture[renderCfg.texture_width * texY + texX];
+            for (int y = draw_start_posY; y < draw_end_posY; y++) {
+                d = IMUL_256((y - vert_move_screen)) - IMUL_128(screen_height) + IMUL_128(sprite_height);
+                tex_y = IDIV_256((d * renderCfg.texture_height) / sprite_height);
+                color = tex.texture[renderCfg.texture_width * tex_y + tex_x];
                 if ((color & 0x00FFFFFF) != 0) {
-                    pixel_buffer_obj.pushToBuffer(stripe, screenH - y, Colour::INTtoRGB(color));
+                    pixelBuffer.pushToBuffer(stripe, screen_height - y, Colour::INTtoRGB(color));
                 }
             }
         }
@@ -258,12 +252,12 @@ inline static void renderSprites() {
 }
 
 inline static void updateTimeTick() {
-    oldTime = newTime;
-    newTime = glutGet(GLUT_ELAPSED_TIME);
-    frameTime = (newTime - oldTime) / 1000.0;
+    old_time = new_time;
+    new_time = glutGet(GLUT_ELAPSED_TIME);
+    frame_time = (new_time - old_time) / 1000.0;
 
-    player.moveSpeed = frameTime * playerCfg.move_speed;
-    player.rotSpeed = frameTime * playerCfg.rotation_speed;
+    player.moveSpeed = frame_time * playerCfg.move_speed;
+    player.rotSpeed = frame_time * playerCfg.rotation_speed;
 }
 
 static void display(void) {
@@ -281,16 +275,16 @@ static void display(void) {
         renderSprites();
     }
 
-    pixel_buffer_obj.pushBufferToGPU();
+    pixelBuffer.pushBufferToGPU();
     updateTimeTick();
     
-    minimap.render(screenW, screenH);
+    minimap.render(screen_width, screen_height);
     astar.renderPath(
         path, Colour::RGB_Blue,
-        screenW, screenH,
+        screen_width, screen_height,
         minimap.getScalingX(), minimap.getScalingY()
     );
-    debugOverlay.render(frameTime);
+    debugOverlay.render(frame_time);
     glutSwapBuffers();
 }
 
@@ -332,9 +326,7 @@ static void __KEY_HANDLER(unsigned char key, int x, int y) {
 ///
 void __INIT() {
     cfgInit.initAll(playerCfg, minimapCfg, loggingCfg, renderCfg);
-    if (minimapCfg.enable) {
-        mapScreenW = IDIV_2(mapScreenW);
-    }
+
     debugContext = GLDebugContext(&loggingCfg);
     debugContext.logAppInfo("Loaded debug context");
 
@@ -348,19 +340,16 @@ void __INIT() {
     spriteDistance.resize(gameMap.sprites.size());
 
     rays = Rendering::RayBuffer(playerCfg.fov);
-    zBuf = Rendering::ZBuffer(screenW);
-
-    gameMap.wall_width = mapScreenW / gameMap.map_width;
-    gameMap.wall_height = mapScreenH / gameMap.map_height;
+    zBuf = Rendering::ZBuffer(screen_width);
 
     astar = AStar(gameMap);
     path = astar.find(gameMap.start, gameMap.end);
 
-    player.moveSpeed = frameTime * playerCfg.move_speed;
-    player.rotSpeed = frameTime * playerCfg.rotation_speed;
+    player.moveSpeed = frame_time * playerCfg.move_speed;
+    player.rotSpeed = frame_time * playerCfg.rotation_speed;
 
     // toClearColour(bg_colour);
-    gluOrtho2D(0, screenW, screenH, 0);
+    gluOrtho2D(0, screen_width, screen_height, 0);
     player = Player(
         gameMap.start.x,
         gameMap.start.y,
@@ -369,20 +358,20 @@ void __INIT() {
         0);
     debugContext.logAppInfo("Initialised player object at: " + ADDR_OF(player));
 
-    minimap = Minimap(&player, &gameMap, screenW, screenH);
+    minimap = Minimap(&player, &gameMap, screen_width, screen_height);
     debugContext.logAppInfo("Initialised minimap object at: " + ADDR_OF(minimap));
 
     debugOverlay = DebugOverlay(&player, &minimap, &gameMap, GLUT_BITMAP_HELVETICA_18);
 
-    pixel_buffer_obj = Rendering::PBO(screenW, screenH);
-    pixel_buffer_obj.init();
+    pixelBuffer = Rendering::PBO(screen_width, screen_height);
+    pixelBuffer.init();
 }
 
 static void __WINDOW_RESHAPE(int width, int height) {
-    screenW = width;
-    screenH = height;
+    screen_width = width;
+    screen_height = height;
     zBuf.resize(width);
-    pixel_buffer_obj.resize(width, height);
+    pixelBuffer.resize(width, height);
 }
 
 static void __GLUT_IDLE(void) {
@@ -400,7 +389,7 @@ static void __GLUT_IDLE(void) {
 int main(int argc, char* argv[]) {
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
-    glutInitWindowSize(screenW, screenH);
+    glutInitWindowSize(screen_width, screen_height);
     glutCreateWindow("Ray Caster");
 
     __INIT();

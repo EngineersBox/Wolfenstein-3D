@@ -20,7 +20,7 @@ class MinHeap {
         MinHeap();
 
         void emplace(K key, V value);
-        V& top();
+        V top();
         void pop();
 
         inline bool isEmpty() const noexcept;
@@ -78,7 +78,7 @@ void MinHeap<K, V>::emplace(K key, V value) {
 }
 
 template <typename K, typename V>
-V& MinHeap<K,V>::top() {
+V MinHeap<K,V>::top() {
     if (size == 0) {
         throw EmptyHeapException();
     }

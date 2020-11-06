@@ -100,6 +100,7 @@ inline void PBO::resize(int newWidth, int newHeight) {
     this->width = newWidth;
     this->height = newHeight;
     this->buffer.resize(newWidth * newHeight * 3);
+    debugContext.logApiInfo("Resized PBO to " + to_string(newWidth * newHeight * 3) + " [" + to_string(newWidth) + "*" + to_string(newHeight) + "*3" + "]");
 }
 
 }

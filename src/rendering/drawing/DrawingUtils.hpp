@@ -17,7 +17,7 @@
 using namespace std;
 
 ///
-/// Render a square at coodinates with top-left origin
+/// Render a rectangle at coodinates with top-left origin
 ///
 /// @param int x: X coordinate
 /// @param int y: Y coordinate
@@ -77,4 +77,23 @@ inline static void renderRay(float ax, float ay, float bx, float by, int line_wi
     glVertex2f(bx, by);
 
     glEnd();
+}
+
+///
+/// Render the outline of a rectangle at coodinates with top-left origin
+///
+/// @param float x: X coordinate
+/// @param float y: Y coordinate
+/// @param float xSidelength: Side length of the x-axis
+/// @param float ySideLength: Side length of the y-axis
+/// @param int lineWidth: Size of line to draw
+/// @param ColourRGB colour: Line colour
+///
+/// @return void
+///
+inline static void drawOutline(float x, float y, float xSideLength, float ySideLength, int lineWidth, Colour::ColorRGB colour) {
+    renderRay(x, y, xSideLength, y, lineWidth, colour);
+    renderRay(x, ySideLength, xSideLength, ySideLength, lineWidth, colour);
+    renderRay(x, y, x, ySideLength, lineWidth, colour);
+    renderRay(xSideLength, y, xSideLength, ySideLength, lineWidth, colour);
 }

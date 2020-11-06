@@ -27,6 +27,7 @@ ResourceManager::ConfigInit cfgInit;
 GameMap gameMap = GameMap();
 Minimap minimap;
 DebugOverlay debugOverlay;
+StatsBar statsBar;
 
 vector<int> spriteOrder;
 vector<double> spriteDistance;
@@ -42,7 +43,7 @@ Rendering::ZBuffer zBuf;
 
 inline static void renderFloorCeiling() {
     float ray_dir_x0, ray_dir_y0, ray_dir_x1, ray_dir_y1, pos_z, dist, step_x, step_y, floor_x, floor_y;
-    int p, cell_x, cell_y, tx, ty;
+    int p, cell_x, cell_y, tex_x, tex_y;
     Texture tex;
     uint32_t color;
     for (int y = screen_height - 1; y >= IDIV_2(screen_height) + 1; --y) {
@@ -67,21 +68,21 @@ inline static void renderFloorCeiling() {
             cell_x = (int)(floor_x);
             cell_y = (int)(floor_y);
 
-            tx = (int)(renderCfg.texture_width * (floor_x - cell_x)) & (renderCfg.texture_width - 1);
-            ty = (int)(renderCfg.texture_height * (floor_y - cell_y)) & (renderCfg.texture_height - 1);
+            tex_x = (int)(renderCfg.texture_width * (floor_x - cell_x)) & (renderCfg.texture_width - 1);
+            tex_y = (int)(renderCfg.texture_height * (floor_y - cell_y)) & (renderCfg.texture_height - 1);
 
             floor_x += step_x;
             floor_y += step_y;
 
             textures.get(gameMap.floor_texture, tex);
-            color = tex.texture[renderCfg.texture_width * ty + tx];
+            color = tex.texture[renderCfg.texture_width * tex_y + tex_x];
             color = (color >> 1) & DARK_SHADER;
-            pixelBuffer.pushToBuffer(x, screen_height - y, Colour::INTtoRGB(color));
+            pixelBuffer.pushToBuffer(screen_width - x, screen_height - y, Colour::INTtoRGB(color));
 
             textures.get(gameMap.ceiling_texture, tex);
-            color = tex.texture[renderCfg.texture_width * ty + tx];
+            color = tex.texture[renderCfg.texture_width * tex_y + tex_x];
             color = (color >> 1) & DARK_SHADER;
-            pixelBuffer.pushToBuffer(x, y - 1, Colour::INTtoRGB(color));
+            pixelBuffer.pushToBuffer(screen_width - x, y - 1, Colour::INTtoRGB(color));
         }
     }
 }
@@ -285,36 +286,41 @@ static void display(void) {
         minimap.getScalingX(), minimap.getScalingY()
     );
     debugOverlay.render(frame_time);
+    statsBar.render(screen_width, screen_height);
     glutSwapBuffers();
 }
 
 static void __KEY_HANDLER(unsigned char key, int x, int y) {
     if (key == 'w') {
-        if (gameMap.getAt((int)(player.x + player.dx * player.moveSpeed), (int)player.y).wf_left.texture == "")
+        if (gameMap.getAt((int)(player.x + player.dx * player.moveSpeed), (int)player.y).wf_left.texture == "") {
             player.x += player.dx * player.moveSpeed;
-        if (gameMap.getAt((int)player.x, (int)(player.y + player.dy * player.moveSpeed)).wf_left.texture == "")
+        }
+        if (gameMap.getAt((int)player.x, (int)(player.y + player.dy * player.moveSpeed)).wf_left.texture == "") {
             player.y += player.dy * player.moveSpeed;
+        }
     } else if (key == 's') {
-        if (gameMap.getAt((int)(player.x - player.dx * player.moveSpeed), (int)player.y).wf_left.texture == "")
+        if (gameMap.getAt((int)(player.x - player.dx * player.moveSpeed), (int)player.y).wf_left.texture == "") {
             player.x -= player.dx * player.moveSpeed;
-        if (gameMap.getAt((int)player.x, (int)(player.y - player.dy * player.moveSpeed)).wf_left.texture == "")
+        }
+        if (gameMap.getAt((int)player.x, (int)(player.y - player.dy * player.moveSpeed)).wf_left.texture == "") {
             player.y -= player.dy * player.moveSpeed;
+        }
     } else if (key == 'a') {
-        double oldDirX = player.dx;
+        double old_dir_x = player.dx;
         player.dx = player.dx * cos(-player.rotSpeed) - player.dy * sin(-player.rotSpeed);
-        player.dy = oldDirX * sin(-player.rotSpeed) + player.dy * cos(-player.rotSpeed);
+        player.dy = old_dir_x * sin(-player.rotSpeed) + player.dy * cos(-player.rotSpeed);
 
-        double oldPlaneX = player.camera.clip_plane_x;
+        double old_plane_x = player.camera.clip_plane_x;
         player.camera.clip_plane_x = player.camera.clip_plane_x * cos(-player.rotSpeed) - player.camera.clip_plane_y * sin(-player.rotSpeed);
-        player.camera.clip_plane_y = oldPlaneX * sin(-player.rotSpeed) + player.camera.clip_plane_y * cos(-player.rotSpeed);
+        player.camera.clip_plane_y = old_plane_x * sin(-player.rotSpeed) + player.camera.clip_plane_y * cos(-player.rotSpeed);
     } else if (key == 'd') {
-        double oldDirX = player.dx;
+        double old_dir_x = player.dx;
         player.dx = player.dx * cos(player.rotSpeed) - player.dy * sin(player.rotSpeed);
-        player.dy = oldDirX * sin(player.rotSpeed) + player.dy * cos(player.rotSpeed);
+        player.dy = old_dir_x * sin(player.rotSpeed) + player.dy * cos(player.rotSpeed);
 
-        double oldPlaneX = player.camera.clip_plane_x;
+        double old_plane_x = player.camera.clip_plane_x;
         player.camera.clip_plane_x = player.camera.clip_plane_x * cos(player.rotSpeed) - player.camera.clip_plane_y * sin(player.rotSpeed);
-        player.camera.clip_plane_y = oldPlaneX * sin(player.rotSpeed) + player.camera.clip_plane_y * cos(player.rotSpeed);
+        player.camera.clip_plane_y = old_plane_x * sin(player.rotSpeed) + player.camera.clip_plane_y * cos(player.rotSpeed);
     }
     glutPostRedisplay();
 }
@@ -362,6 +368,9 @@ void __INIT() {
     debugContext.logAppInfo("Initialised minimap object at: " + ADDR_OF(minimap));
 
     debugOverlay = DebugOverlay(&player, &minimap, &gameMap, GLUT_BITMAP_HELVETICA_18);
+
+    statsBar = StatsBar(screen_width, screen_height,
+        Colour::RGB_Blue, Colour::RGB_Navy, Colour::RGB_White);
 
     pixelBuffer = Rendering::PBO(screen_width, screen_height);
     pixelBuffer.init();

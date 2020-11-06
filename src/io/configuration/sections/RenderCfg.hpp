@@ -13,4 +13,5 @@ struct RenderCfg {
     int render_distance;
     int texture_width;
     int texture_height;
+    bool show_stats_bar;
 };

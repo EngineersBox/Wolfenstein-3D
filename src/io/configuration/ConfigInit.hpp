@@ -97,7 +97,8 @@ RenderCfg ConfigInit::initRenderConfig() {
         static_cast<int>(reader.GetInteger(RENDER_SECTION, "ray_count", 80)),
         static_cast<int>(reader.GetInteger(RENDER_SECTION, "render_distance", 10)),
         static_cast<int>(reader.GetInteger(RENDER_SECTION, "texture_width", 64)),
-        static_cast<int>(reader.GetInteger(RENDER_SECTION, "texture_height", 64))
+        static_cast<int>(reader.GetInteger(RENDER_SECTION, "texture_height", 64)),
+        reader.GetBoolean(RENDER_SECTION, "show_stats_bar", false)
     };
 }
 

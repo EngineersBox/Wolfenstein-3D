@@ -37,7 +37,7 @@ class DebugOverlay {
 DebugOverlay::DebugOverlay(Player* player, Minimap* minimap, GameMap* map, GLfont font) {
     this->font = font;
     this->player = player;
-    this->fpsPosX = minimap->getOffsetX() + (map->map_width * minimap->getScalingX()) + 10;
+    this->fpsPosX = !minimapCfg.isLeft() ? 10 : minimap->getOffsetX() + (map->map_width * minimap->getScalingX()) + 10;
     this->fpsPosY = 15;
     this->playerPosX = this->fpsPosX;
     this->playerPosY = this->fpsPosY + 15;

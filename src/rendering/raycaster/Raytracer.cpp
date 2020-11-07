@@ -47,10 +47,10 @@ inline static void renderFloorCeiling() {
     Texture tex;
     uint32_t color;
     for (int y = screen_height - 1; y >= IDIV_2(screen_height) + 1; --y) {
-        ray_dir_x0 = player.dx - player.camera.clip_plane_x;
-        ray_dir_y0 = player.dy - player.camera.clip_plane_y;
-        ray_dir_x1 = player.dx + player.camera.clip_plane_x;
-        ray_dir_y1 = player.dy + player.camera.clip_plane_y;
+        ray_dir_x0 = player.camera.frustrum.getFovX() - player.camera.clip_plane_x;
+        ray_dir_y0 = player.camera.frustrum.getFovY() - player.camera.clip_plane_y;
+        ray_dir_x1 = player.camera.frustrum.getFovX() + player.camera.clip_plane_x;
+        ray_dir_y1 = player.camera.frustrum.getFovY() + player.camera.clip_plane_y;
 
         p = y - IDIV_2(screen_height);
 
@@ -95,8 +95,8 @@ inline static void renderWalls() {
     Texture tex;
     for (int x = screen_width - 1; x >= 0; x--) {
         player.camera.x = 2 * x / double(screen_width) - 1;
-        ray_dir_x = player.dx + player.camera.clip_plane_x * player.camera.x;
-        ray_dir_y = player.dy + player.camera.clip_plane_y * player.camera.x;
+        ray_dir_x = player.camera.frustrum.getFovX() + player.camera.clip_plane_x * player.camera.x;
+        ray_dir_y = player.camera.frustrum.getFovY() + player.camera.clip_plane_y * player.camera.x;
 
         map_x = (int)player.x;
         map_y = (int)player.y;
@@ -188,12 +188,12 @@ inline static void renderSprites() {
     int sprite_screen_x, vert_move_screen, sprite_height, sprite_width, draw_start_pos_y, draw_end_pos_y, draw_start_pos_x, draw_end_pos_x, tex_coord_x, tex_coord_y, d;
     Texture tex;
     uint32_t color;
-    double inverse_det = 1.0 / (player.camera.clip_plane_x * player.dy - player.dx * player.camera.clip_plane_y);
+    double inverse_det = 1.0 / (player.camera.clip_plane_x * player.camera.frustrum.getFovY() - player.camera.frustrum.getFovX() * player.camera.clip_plane_y);
     for (int i = gameMap.sprites.size() - 1; i >= 0; i--) {
         sprite_x = gameMap.sprites[i].location.x - player.x;
         sprite_y = gameMap.sprites[i].location.y - player.y;
 
-        transform_x = inverse_det * (player.dy * sprite_x - player.dx * sprite_y);
+        transform_x = inverse_det * (player.camera.frustrum.getFovY() * sprite_x - player.camera.frustrum.getFovX() * sprite_y);
         transform_y = inverse_det * (-player.camera.clip_plane_y * sprite_x + player.camera.clip_plane_x * sprite_y);
 
         sprite_screen_x = (int)(IDIV_2(screen_width) * (1 + transform_x / transform_y));
@@ -277,31 +277,31 @@ static void display(void) {
 
 static void __KEY_HANDLER(unsigned char key, int x, int y) {
     if (key == 'w') {
-        if (gameMap.getAt((int)(player.x + player.dx * player.moveSpeed), (int)player.y).wf_left.texture == "") {
-            player.x += player.dx * player.moveSpeed;
+        if (gameMap.getAt((int)(player.x + player.camera.frustrum.getFovX() * player.moveSpeed), (int)player.y).wf_left.texture == "") {
+            player.x += player.camera.frustrum.getFovX() * player.moveSpeed;
         }
-        if (gameMap.getAt((int)player.x, (int)(player.y + player.dy * player.moveSpeed)).wf_left.texture == "") {
-            player.y += player.dy * player.moveSpeed;
+        if (gameMap.getAt((int)player.x, (int)(player.y + player.camera.frustrum.getFovY() * player.moveSpeed)).wf_left.texture == "") {
+            player.y += player.camera.frustrum.getFovY() * player.moveSpeed;
         }
     } else if (key == 's') {
-        if (gameMap.getAt((int)(player.x - player.dx * player.moveSpeed), (int)player.y).wf_left.texture == "") {
-            player.x -= player.dx * player.moveSpeed;
+        if (gameMap.getAt((int)(player.x - player.camera.frustrum.getFovX() * player.moveSpeed), (int)player.y).wf_left.texture == "") {
+            player.x -= player.camera.frustrum.getFovX() * player.moveSpeed;
         }
-        if (gameMap.getAt((int)player.x, (int)(player.y - player.dy * player.moveSpeed)).wf_left.texture == "") {
-            player.y -= player.dy * player.moveSpeed;
+        if (gameMap.getAt((int)player.x, (int)(player.y - player.camera.frustrum.getFovY() * player.moveSpeed)).wf_left.texture == "") {
+            player.y -= player.camera.frustrum.getFovY() * player.moveSpeed;
         }
-    } else if (key == 'a') {
-        double old_dir_x = player.dx;
-        player.dx = player.dx * cos(-player.rotSpeed) - player.dy * sin(-player.rotSpeed);
-        player.dy = old_dir_x * sin(-player.rotSpeed) + player.dy * cos(-player.rotSpeed);
+    } else if (key == 'd') {
+        double old_dir_x = player.camera.frustrum.getFovX();
+        player.camera.frustrum.setFovX(player.camera.frustrum.getFovX() * cos(-player.rotSpeed) - player.camera.frustrum.getFovY() * sin(-player.rotSpeed));
+        player.camera.frustrum.setFovY(old_dir_x * sin(-player.rotSpeed) + player.camera.frustrum.getFovY() * cos(-player.rotSpeed));
 
         double old_plane_x = player.camera.clip_plane_x;
         player.camera.clip_plane_x = player.camera.clip_plane_x * cos(-player.rotSpeed) - player.camera.clip_plane_y * sin(-player.rotSpeed);
         player.camera.clip_plane_y = old_plane_x * sin(-player.rotSpeed) + player.camera.clip_plane_y * cos(-player.rotSpeed);
-    } else if (key == 'd') {
-        double old_dir_x = player.dx;
-        player.dx = player.dx * cos(player.rotSpeed) - player.dy * sin(player.rotSpeed);
-        player.dy = old_dir_x * sin(player.rotSpeed) + player.dy * cos(player.rotSpeed);
+    } else if (key == 'a') {
+        double old_dir_x = player.camera.frustrum.getFovX();
+        player.camera.frustrum.setFovX(player.camera.frustrum.getFovX() * cos(player.rotSpeed) - player.camera.frustrum.getFovY() * sin(player.rotSpeed));
+        player.camera.frustrum.setFovY(old_dir_x * sin(player.rotSpeed) + player.camera.frustrum.getFovY() * cos(player.rotSpeed));
 
         double old_plane_x = player.camera.clip_plane_x;
         player.camera.clip_plane_x = player.camera.clip_plane_x * cos(player.rotSpeed) - player.camera.clip_plane_y * sin(player.rotSpeed);
@@ -341,7 +341,7 @@ void __INIT() {
     player = Player(
         gameMap.start.x,
         gameMap.start.y,
-        0.0,
+        1.0,
         0.0,
         0);
     debugContext.logAppInfo("Initialised Player object at: " + ADDR_OF(player));

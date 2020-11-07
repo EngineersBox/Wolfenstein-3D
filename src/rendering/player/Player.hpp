@@ -2,13 +2,14 @@
 
 #include "../../io/logging/GLDebug.hpp"
 #include "../../rendering/Globals.hpp"
-#include "../camera/Camera.hpp"
+#include "../viewmodel/Camera.hpp"
+#include "../viewmodel/Frustrum.hpp"
 
 using namespace std;
 
 struct Player {
     Player();
-    Player(double x, double y, double dx, double dy, double angle);
+    Player(double x, double y, double fov_x, double fov_y, double angle);
     void printLocation();
     void logLocation();
 
@@ -20,16 +21,18 @@ struct Player {
     double moveSpeed;
     double rotSpeed;
 
-    Camera camera{0,0,0,0.66};
+    ViewModel::Camera camera{0,0,0,0.66, ViewModel::Frustrum()};
 };
 
 Player::Player(){};
 
-Player::Player(double x, double y, double dx, double dy, double angle) {
+Player::Player(double x, double y, double fov_x, double fov_y, double angle) {
     this->x = x;
     this->y = y;
-    this->dx = dx;
-    this->dy = dy;
+    this->camera.frustrum.setFovX(fov_x);
+    this->camera.frustrum.setFovY(fov_y);
+    this->dx = fov_x;
+    this->dy = fov_y;
     this->angle = angle;
 };
 

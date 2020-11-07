@@ -60,8 +60,8 @@ void Minimap::renderPlayerPos() {
     renderRay(
         xOffset + (player->x * scalingX),
         yOffset + (player->y * scalingY),
-        xOffset + ((player->x + player->dx * 1.5) * scalingX),
-        yOffset + ((player->y + player->dy * 1.5) * scalingY),
+        xOffset + ((player->x + player->camera.frustrum.getFovX() * 1.5) * scalingX),
+        yOffset + ((player->y + player->camera.frustrum.getFovY() * 1.5) * scalingY),
         3,
         Colour::RGB_Red
     );

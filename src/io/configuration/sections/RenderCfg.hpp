@@ -2,6 +2,8 @@
 
 using namespace std;
 
+namespace ConfigSection {
+
 struct RenderCfg {
     bool headless_mode;
     bool double_buffer;
@@ -15,3 +17,4 @@ struct RenderCfg {
     int texture_height;
     bool show_stats_bar;
 };
+}

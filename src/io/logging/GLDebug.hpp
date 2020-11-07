@@ -136,19 +136,19 @@ class GLDebugContext {
         string toHex(int value) noexcept;
     public:
         GLDebugContext();
-        GLDebugContext(LoggingCfg* l_cfg, const DEBUG_LOG_FORMAT format = DEBUG_LOG_FORMAT::DEFAULT, string optional_prefix = "");
+        GLDebugContext(ConfigSection::LoggingCfg* l_cfg, const DEBUG_LOG_FORMAT format = DEBUG_LOG_FORMAT::DEFAULT, string optional_prefix = "");
         ~GLDebugContext();
         void glDebugMessageCallback(GL_DEBUG_SOURCE source, GL_DEBUG_TYPE type, GL_DEBUG_SEVERITY severity, const string& message);
         void logAppInfo(const string& message);
         void logApiInfo(const string& message);
         void logSysInfo(const string& message);
         void logAppVerb(const string& message);
-        LoggingCfg* l_cfg;
+        ConfigSection::LoggingCfg* l_cfg;
 };
 
 GLDebugContext::GLDebugContext(){};
 
-GLDebugContext::GLDebugContext(LoggingCfg* l_cfg, const DEBUG_LOG_FORMAT format, string optional_prefix) {
+GLDebugContext::GLDebugContext(ConfigSection::LoggingCfg* l_cfg, const DEBUG_LOG_FORMAT format, string optional_prefix) {
     this->l_cfg = l_cfg;
     this->format = DEBUG_LOG_FORMAT_LUT[format];
     this->filename += this->format.prefix + optional_prefix + getCurrentTime(this->format.suffix.c_str()) + ".log";

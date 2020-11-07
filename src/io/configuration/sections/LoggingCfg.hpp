@@ -2,6 +2,8 @@
 
 using namespace std;
 
+namespace ConfigSection {
+
 struct LoggingCfg {
     bool gl_debug;
     bool tex_skip_invalid;
@@ -13,3 +15,4 @@ struct LoggingCfg {
     bool show_player_pos;
     bool show_time_tick;
 };
+}

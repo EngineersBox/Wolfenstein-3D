@@ -2,6 +2,8 @@
 
 using namespace std;
 
+namespace ConfigSection {
+
 enum MinimapPos {
     TOP_LEFT,
     TOP_RIGHT,
@@ -56,3 +58,4 @@ inline bool MinimapCfg::isTop() {
 inline bool MinimapCfg::isLeft() {
     return this->pos == TOP_LEFT || this->pos == BOTTOM_LEFT;
 };
+}

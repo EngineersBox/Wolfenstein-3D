@@ -33,11 +33,11 @@ class ConfigInit {
 
         void processCfg();
 
-        PlayerCfg initPlayerConfig();
-        MinimapCfg initMinimapConfig();
-        LoggingCfg initLoggingConfig();
-        RenderCfg initRenderConfig();
-        void initAll(PlayerCfg& p_cfg, MinimapCfg& m_cfg, LoggingCfg& l_cfg, RenderCfg& r_cfg);
+        ConfigSection::PlayerCfg initPlayerConfig();
+        ConfigSection::MinimapCfg initMinimapConfig();
+        ConfigSection::LoggingCfg initLoggingConfig();
+        ConfigSection::RenderCfg initRenderConfig();
+        void initAll(ConfigSection::PlayerCfg& p_cfg, ConfigSection::MinimapCfg& m_cfg, ConfigSection::LoggingCfg& l_cfg, ConfigSection::RenderCfg& r_cfg);
 };
 
 ConfigInit::ConfigInit(const string& cfg_file) {
@@ -54,26 +54,25 @@ void ConfigInit::processCfg() {
     }
 }
 
-PlayerCfg ConfigInit::initPlayerConfig() {
-    return PlayerCfg{
-        reader.GetFloat(PLAYER_SECTION, "fov", 70.0f),
+ConfigSection::PlayerCfg ConfigInit::initPlayerConfig() {
+    return ConfigSection::PlayerCfg(
+        reader.GetReal(PLAYER_SECTION, "fov", BASE_FOV_VAL),
         reader.GetFloat(PLAYER_SECTION, "dof", 8.0f),
         reader.GetFloat(PLAYER_SECTION, "move_speed", 3.0f),
         reader.GetFloat(PLAYER_SECTION, "rotation_speed", 2.0f)
-    };
+    );
 };
 
-MinimapCfg ConfigInit::initMinimapConfig() {
-    return MinimapCfg{
+ConfigSection::MinimapCfg ConfigInit::initMinimapConfig() {
+    return ConfigSection::MinimapCfg{
         reader.GetBoolean(MINIMAP_SECTION, "enable", false),
         reader.GetBoolean(MINIMAP_SECTION, "render_rays", false),
-        parseMinimapPos(reader.Get(MINIMAP_SECTION, "pos", "TOP_RIGHT")),
-        parseMinimapSize(reader.Get(MINIMAP_SECTION, "size", "MEDIUM"))
-    };
+        ConfigSection::parseMinimapPos(reader.Get(MINIMAP_SECTION, "pos", "TOP_RIGHT")),
+        ConfigSection::parseMinimapSize(reader.Get(MINIMAP_SECTION, "size", "MEDIUM"))};
 };
 
-LoggingCfg ConfigInit::initLoggingConfig() {
-    return LoggingCfg{
+ConfigSection::LoggingCfg ConfigInit::initLoggingConfig() {
+    return ConfigSection::LoggingCfg{
         reader.GetBoolean(LOGGING_SECTION, "gl_debug", false),
         reader.GetBoolean(LOGGING_SECTION, "tex_skip_invalid", false),
         reader.GetBoolean(LOGGING_SECTION, "map_skip_invalid", false),
@@ -86,8 +85,8 @@ LoggingCfg ConfigInit::initLoggingConfig() {
     };
 };
 
-RenderCfg ConfigInit::initRenderConfig() {
-    return RenderCfg{
+ConfigSection::RenderCfg ConfigInit::initRenderConfig() {
+    return ConfigSection::RenderCfg{
         reader.GetBoolean(RENDER_SECTION, "headless_mode", false),
         reader.GetBoolean(RENDER_SECTION, "double_buffer", false),
         reader.GetBoolean(RENDER_SECTION, "render_walls", true),
@@ -102,7 +101,7 @@ RenderCfg ConfigInit::initRenderConfig() {
     };
 }
 
-void ConfigInit::initAll(PlayerCfg& p_cfg, MinimapCfg& m_cfg, LoggingCfg& l_cfg, RenderCfg& r_cfg) {
+void ConfigInit::initAll(ConfigSection::PlayerCfg& p_cfg, ConfigSection::MinimapCfg& m_cfg, ConfigSection::LoggingCfg& l_cfg, ConfigSection::RenderCfg& r_cfg) {
     p_cfg = initPlayerConfig();
     m_cfg = initMinimapConfig();
     l_cfg = initLoggingConfig();

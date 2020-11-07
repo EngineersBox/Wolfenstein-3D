@@ -56,10 +56,10 @@ string toHex(int value) noexcept {
 
 constexpr double THREE_HALF_PI = 3 * M_PI / 2;
 
-static PlayerCfg playerCfg = PlayerCfg();
-static MinimapCfg minimapCfg = MinimapCfg();
-static LoggingCfg loggingCfg = LoggingCfg();
-static RenderCfg renderCfg = RenderCfg();
+static ConfigSection::PlayerCfg playerCfg = ConfigSection::PlayerCfg();
+static ConfigSection::MinimapCfg minimapCfg = ConfigSection::MinimapCfg();
+static ConfigSection::LoggingCfg loggingCfg = ConfigSection::LoggingCfg();
+static ConfigSection::RenderCfg renderCfg = ConfigSection::RenderCfg();
 
 static GLDebugContext debugContext = GLDebugContext();
 

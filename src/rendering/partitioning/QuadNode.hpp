@@ -6,7 +6,7 @@
 #include <vector>
 
 #include "../../environment/constructs/walls/AABB.hpp"
-#include "../../environment/map/map.hpp"
+#include "../../environment/world/World.hpp"
 #include "../../rendering/Globals.hpp"
 #include "../../rendering/raycaster/Ray.hpp"
 

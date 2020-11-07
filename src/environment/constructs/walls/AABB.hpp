@@ -8,7 +8,7 @@
 #include "AABBFace.hpp"
 #include "../../../rendering/raycaster/Ray.hpp"
 #include "../../base/object/IObjectBase.hpp"
-#include "../../map/Coordinates.hpp"
+#include "../../world/Coordinates.hpp"
 
 using namespace std;
 

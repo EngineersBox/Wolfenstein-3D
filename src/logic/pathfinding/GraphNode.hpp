@@ -2,7 +2,7 @@
 
 #include <algorithm>
 
-#include "../../environment/map/Coordinates.hpp"
+#include "../../environment/world/Coordinates.hpp"
 #include "../../rendering/Globals.hpp"
 
 using namespace std;

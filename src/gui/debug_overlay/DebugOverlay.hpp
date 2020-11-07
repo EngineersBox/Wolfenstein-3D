@@ -3,7 +3,7 @@
 #include "../../rendering/Globals.hpp"
 #include "../../rendering/drawing/RasterText.hpp"
 #include "../../rendering/player/Player.hpp"
-#include "../../environment/map/map.hpp"
+#include "../../environment/world/World.hpp"
 #include "../minimap/Minimap.hpp"
 
 using namespace std;
@@ -13,7 +13,7 @@ typedef void* GLfont;
 class DebugOverlay {
     public:
         DebugOverlay(){};
-        DebugOverlay(Player* player, Minimap* minimap, GameMap* map, GLfont font);
+        DebugOverlay(Player* player, Minimap* minimap, World* map, GLfont font);
 
         void render(double frame_time);
     private:
@@ -34,7 +34,7 @@ class DebugOverlay {
         float currentFrameTime = 0.0;
 };
 
-DebugOverlay::DebugOverlay(Player* player, Minimap* minimap, GameMap* map, GLfont font) {
+DebugOverlay::DebugOverlay(Player* player, Minimap* minimap, World* map, GLfont font) {
     this->font = font;
     this->player = player;
     this->fpsPosX = !minimapCfg.isLeft() ? 10 : minimap->getOffsetX() + (map->map_width * minimap->getScalingX()) + 10;

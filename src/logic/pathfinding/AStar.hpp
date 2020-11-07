@@ -5,8 +5,8 @@
 #include <unordered_map>
 #include <vector>
 
-#include "../../environment/map/map.hpp"
-#include "../../environment/map/Coordinates.hpp"
+#include "../../environment/world/World.hpp"
+#include "../../environment/world/Coordinates.hpp"
 #include "../../exceptions/pathfinding/InvalidPathTargets.hpp"
 #include "../../rendering/Globals.hpp"
 #include "../../rendering/drawing/DrawingUtils.hpp"
@@ -19,7 +19,7 @@ using namespace std;
 class AStar {
     public:
         AStar();
-        AStar(GameMap map);
+        AStar(World map);
         ~AStar();
 
         vector<Coords>* rebuildPath(unordered_map<GraphNode, GraphNode>& traversals, GraphNode start, GraphNode goal);
@@ -34,12 +34,12 @@ class AStar {
         inline void initCosts(unordered_map<GraphNode, int>& cost);
         void logPath(vector<Coords>& path);
 
-        GameMap map;
+        World map;
 };
 
 AStar::AStar(){};
 
-AStar::AStar(GameMap map) {
+AStar::AStar(World map) {
     this->map = map;
 };
 

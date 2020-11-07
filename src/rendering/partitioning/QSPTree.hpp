@@ -5,8 +5,8 @@
 #include <vector>
 
 #include "../../environment/constructs/walls/AABB.hpp"
-#include "../../environment/map/Coordinates.hpp"
-#include "../../environment/map/map.hpp"
+#include "../../environment/world/Coordinates.hpp"
+#include "../../environment/world/World.hpp"
 #include "../Globals.hpp"
 #include "../raycaster/Ray.hpp"
 #include "QuadNode.hpp"
@@ -32,7 +32,7 @@ struct TraversalRecord {
 class QSPTree {
     public:
         QSPTree();
-        QSPTree(GameMap map, vector<Constructs::AABB>* ordered_walls, vector<Constructs::AABB>* u_bound, vector<Constructs::AABB>* d_bound, vector<Constructs::AABB>* l_bound, vector<Constructs::AABB>* r_bound);
+        QSPTree(World map, vector<Constructs::AABB>* ordered_walls, vector<Constructs::AABB>* u_bound, vector<Constructs::AABB>* d_bound, vector<Constructs::AABB>* l_bound, vector<Constructs::AABB>* r_bound);
         ~QSPTree();
 
         void buildTree();
@@ -48,7 +48,7 @@ class QSPTree {
         void findMiddle();
         inline void traverseNext(RelativePosition& currBranch, QuadNode* currNode, TraversalRecord& currTraversal, stack<TraversalRecord>& nodesVisited);
 
-        GameMap map;
+        World map;
         vector<Constructs::AABB>* walls;
         vector<Constructs::AABB>* up_boundary;
         vector<Constructs::AABB>* down_boundary;
@@ -60,7 +60,7 @@ class QSPTree {
 
 QSPTree::QSPTree(){};
 
-QSPTree::QSPTree(GameMap map, vector<Constructs::AABB>* ordered_walls, vector<Constructs::AABB>* u_bound, vector<Constructs::AABB>* d_bound, vector<Constructs::AABB>* l_bound, vector<Constructs::AABB>* r_bound) {
+QSPTree::QSPTree(World map, vector<Constructs::AABB>* ordered_walls, vector<Constructs::AABB>* u_bound, vector<Constructs::AABB>* d_bound, vector<Constructs::AABB>* l_bound, vector<Constructs::AABB>* r_bound) {
     this->map = map;
     this->walls = ordered_walls;
     findMiddle();

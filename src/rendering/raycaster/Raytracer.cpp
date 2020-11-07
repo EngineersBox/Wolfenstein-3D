@@ -26,7 +26,7 @@ Player player;
 // Configs
 ResourceManager::ConfigInit cfgInit;
 
-GameMap gameMap = GameMap();
+World world = World();
 Minimap minimap;
 DebugOverlay debugOverlay;
 StatsBar statsBar;
@@ -73,12 +73,12 @@ inline static void renderFloorCeiling() {
             floor_x += step_x;
             floor_y += step_y;
 
-            textures.get(gameMap.floor_texture, tex);
+            textures.get(world.floor_texture, tex);
             color = tex.texture[renderCfg.texture_width * tex_coord_y + tex_coord_x];
             color = (color >> 1) & DARK_SHADER;
             pixelBuffer.pushToBuffer(screen_width - x, screen_height - y, Colour::INTtoRGB(color));
 
-            textures.get(gameMap.ceiling_texture, tex);
+            textures.get(world.ceiling_texture, tex);
             color = tex.texture[renderCfg.texture_width * tex_coord_y + tex_coord_x];
             color = (color >> 1) & DARK_SHADER;
             pixelBuffer.pushToBuffer(screen_width - x, y - 1, Colour::INTtoRGB(color));
@@ -119,7 +119,7 @@ inline static void renderWalls() {
                 map_y += step_y;
                 side = 1;
             }
-            hit = gameMap.getAt(map_x, map_y).wf_left.texture != "";
+            hit = world.getAt(map_x, map_y).wf_left.texture != "";
         }
 
         if (side == 0) {
@@ -137,7 +137,7 @@ inline static void renderWalls() {
         if (draw_end_pos >= screen_height) {
             draw_end_pos = screen_height - 1;
         }
-        wall_tex = gameMap.getAt(map_x, map_y).wf_left.texture;
+        wall_tex = world.getAt(map_x, map_y).wf_left.texture;
 
         wall_x = side == 0 ? player.y + perp_wall_dist * ray_dir_y : player.x + perp_wall_dist * ray_dir_x;
         wall_x -= floor((wall_x));
@@ -168,16 +168,16 @@ inline static void renderWalls() {
 }
 
 inline static void renderSprites() {
-    gameMap.sortSprites(player);
+    world.sortSprites(player);
 
     double sprite_x, sprite_y, transform_x, transform_y;
     int sprite_screen_x, vert_move_screen, sprite_height, sprite_width, draw_start_pos_y, draw_end_pos_y, draw_start_pos_x, draw_end_pos_x, tex_coord_x, tex_coord_y, d;
     Texture tex;
     uint32_t color;
     double inverse_det = 1.0 / (player.camera.clip_plane_x * player.camera.frustrum.getFovY() - player.camera.frustrum.getFovX() * player.camera.clip_plane_y);
-    for (int i = gameMap.sprites.size() - 1; i >= 0; i--) {
-        sprite_x = gameMap.sprites[i].location.x - player.x;
-        sprite_y = gameMap.sprites[i].location.y - player.y;
+    for (int i = world.sprites.size() - 1; i >= 0; i--) {
+        sprite_x = world.sprites[i].location.x - player.x;
+        sprite_y = world.sprites[i].location.y - player.y;
 
         transform_x = inverse_det * (player.camera.frustrum.getFovY() * sprite_x - player.camera.frustrum.getFovX() * sprite_y);
         transform_y = inverse_det * (-player.camera.clip_plane_y * sprite_x + player.camera.clip_plane_x * sprite_y);
@@ -205,7 +205,7 @@ inline static void renderSprites() {
         if (draw_end_pos_x >= screen_width) {
             draw_end_pos_x = screen_width - 1;
         }
-        textures.get(gameMap.sprites[i].texture, tex);
+        textures.get(world.sprites[i].texture, tex);
         for (int pixel_row = draw_end_pos_x - 1; pixel_row >= draw_start_pos_x; pixel_row--) {
             tex_coord_x = (int)IDIV_256((IMUL_256((pixel_row - (IDIV_2(-sprite_width) + sprite_screen_x))) * renderCfg.texture_width / sprite_width));
             if (!(transform_y > 0 && pixel_row > 0 && pixel_row < screen_width && transform_y < zBuf[pixel_row])) {
@@ -259,17 +259,17 @@ static void display(void) {
 
 static void __KEY_HANDLER(unsigned char key, int x, int y) {
     if (key == 'w') {
-        if (gameMap.getAt((int)(player.x + player.camera.frustrum.getFovX() * player.moveSpeed), (int)player.y).wf_left.texture == "") {
+        if (world.getAt((int)(player.x + player.camera.frustrum.getFovX() * player.moveSpeed), (int)player.y).wf_left.texture == "") {
             player.x += player.camera.frustrum.getFovX() * player.moveSpeed;
         }
-        if (gameMap.getAt((int)player.x, (int)(player.y + player.camera.frustrum.getFovY() * player.moveSpeed)).wf_left.texture == "") {
+        if (world.getAt((int)player.x, (int)(player.y + player.camera.frustrum.getFovY() * player.moveSpeed)).wf_left.texture == "") {
             player.y += player.camera.frustrum.getFovY() * player.moveSpeed;
         }
     } else if (key == 's') {
-        if (gameMap.getAt((int)(player.x - player.camera.frustrum.getFovX() * player.moveSpeed), (int)player.y).wf_left.texture == "") {
+        if (world.getAt((int)(player.x - player.camera.frustrum.getFovX() * player.moveSpeed), (int)player.y).wf_left.texture == "") {
             player.x -= player.camera.frustrum.getFovX() * player.moveSpeed;
         }
-        if (gameMap.getAt((int)player.x, (int)(player.y - player.camera.frustrum.getFovY() * player.moveSpeed)).wf_left.texture == "") {
+        if (world.getAt((int)player.x, (int)(player.y - player.camera.frustrum.getFovY() * player.moveSpeed)).wf_left.texture == "") {
             player.y -= player.camera.frustrum.getFovY() * player.moveSpeed;
         }
     } else if (key == 'a') {
@@ -307,13 +307,13 @@ void __INIT() {
     texLoader.loadTextures(textures);
     debugContext.logAppInfo(string("Loaded " + to_string(textures.size()) + " textures"));
 
-    gameMap.readMapFromJSON(MAPS_DIR + "map2.json");
+    world.readMapFromJSON(MAPS_DIR + "map2.json");
 
     rays = Rendering::RayBuffer(playerCfg.fov);
     zBuf = Rendering::ZBuffer(screen_width);
 
-    astar = AStar(gameMap);
-    path = astar.find(gameMap.start, gameMap.end);
+    astar = AStar(world);
+    path = astar.find(world.start, world.end);
 
     player.moveSpeed = frame_time * playerCfg.move_speed;
     player.rotSpeed = frame_time * playerCfg.rotation_speed;
@@ -321,17 +321,17 @@ void __INIT() {
     // toClearColour(bg_colour);
     gluOrtho2D(0, screen_width, screen_height, 0);
     player = Player(
-        gameMap.start.x,
-        gameMap.start.y,
+        world.start.x,
+        world.start.y,
         -playerCfg.fov,
         0.0,
         0);
     debugContext.logAppInfo("Initialised Player object at: " + ADDR_OF(player));
 
-    minimap = Minimap(&player, &gameMap, screen_width, screen_height);
+    minimap = Minimap(&player, &world, screen_width, screen_height);
     debugContext.logAppInfo("Initialised Minimap object at: " + ADDR_OF(minimap));
 
-    debugOverlay = DebugOverlay(&player, &minimap, &gameMap, GLUT_BITMAP_HELVETICA_18);
+    debugOverlay = DebugOverlay(&player, &minimap, &world, GLUT_BITMAP_HELVETICA_18);
     debugContext.logAppInfo("Initialised DebugOverlay object at: " + ADDR_OF(debugOverlay));
 
     statsBar = StatsBar(screen_width, screen_height,

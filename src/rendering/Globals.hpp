@@ -8,7 +8,7 @@
 #include "../io/configuration/sections/MinimapCfg.hpp"
 #include "../io/configuration/sections/RenderCfg.hpp"
 #include "../io/logging/GLDebug.hpp"
-#include "../environment/map/Coordinates.hpp"
+#include "../environment/world/Coordinates.hpp"
 #include "raycaster/Ray.hpp"
 
 using namespace std;

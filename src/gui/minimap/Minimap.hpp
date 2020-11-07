@@ -10,7 +10,7 @@ using namespace std;
 class Minimap {
     public:
         Minimap(){};
-        Minimap(Player* player, GameMap* map, int screen_width, int screen_height);
+        Minimap(Player* player, World* map, int screen_width, int screen_height);
         
         void render(int screen_width, int screen_height);
 
@@ -32,12 +32,12 @@ class Minimap {
         int screenH;
 
         Player* player;
-        GameMap* gameMap;
+        World* world;
 };
 
-Minimap::Minimap(Player* player, GameMap* map, int screen_width, int screen_height) {
+Minimap::Minimap(Player* player, World* map, int screen_width, int screen_height) {
     this->player = player;
-    this->gameMap = map;
+    this->world = map;
     this->screenW = screen_width;
     this->screenH = screen_height;
     this->xOffset = minimapCfg.isLeft() ? 0 : screen_width - minimapCfg.size;
@@ -69,13 +69,13 @@ void Minimap::renderPlayerPos() {
 
 void Minimap::renderMap2D() {
     int x, y;
-    for (y = 0; y < gameMap->map_height; y++) {
-        for (x = 0; x < gameMap->map_width; x++) {
+    for (y = 0; y < world->map_height; y++) {
+        for (x = 0; x < world->map_width; x++) {
             // Change to colour coresponding to map location
-            if (gameMap->getAt(x,y).wf_left.texture != "") {
+            if (world->getAt(x,y).wf_left.texture != "") {
                 glColor3i(0,0,0);
             } else {
-                gameMap->getAt(x, y).wf_left.colour.toColour4d();
+                world->getAt(x, y).wf_left.colour.toColour4d();
             }
             drawRectangle(
                 xOffset + x * scalingX,

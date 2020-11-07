@@ -29,8 +29,8 @@ Minimap minimap;
 DebugOverlay debugOverlay;
 StatsBar statsBar;
 
-vector<int> spriteOrder;
-vector<double> spriteDistance;
+// vector<int> spriteOrder;
+// vector<double> spriteDistance;
 
 double new_time = 0;
 double old_time = 0;
@@ -43,7 +43,7 @@ Rendering::ZBuffer zBuf;
 
 inline static void renderFloorCeiling() {
     float ray_dir_x0, ray_dir_y0, ray_dir_x1, ray_dir_y1, pos_z, dist, step_x, step_y, floor_x, floor_y;
-    int p, cell_x, cell_y, tex_x, tex_y;
+    int p, cell_x, cell_y, tex_coord_x, tex_coord_y;
     Texture tex;
     uint32_t color;
     for (int y = screen_height - 1; y >= IDIV_2(screen_height) + 1; --y) {
@@ -68,19 +68,19 @@ inline static void renderFloorCeiling() {
             cell_x = (int)(floor_x);
             cell_y = (int)(floor_y);
 
-            tex_x = (int)(renderCfg.texture_width * (floor_x - cell_x)) & (renderCfg.texture_width - 1);
-            tex_y = (int)(renderCfg.texture_height * (floor_y - cell_y)) & (renderCfg.texture_height - 1);
+            tex_coord_x = (int)(renderCfg.texture_width * (floor_x - cell_x)) & (renderCfg.texture_width - 1);
+            tex_coord_y = (int)(renderCfg.texture_height * (floor_y - cell_y)) & (renderCfg.texture_height - 1);
 
             floor_x += step_x;
             floor_y += step_y;
 
             textures.get(gameMap.floor_texture, tex);
-            color = tex.texture[renderCfg.texture_width * tex_y + tex_x];
+            color = tex.texture[renderCfg.texture_width * tex_coord_y + tex_coord_x];
             color = (color >> 1) & DARK_SHADER;
             pixelBuffer.pushToBuffer(screen_width - x, screen_height - y, Colour::INTtoRGB(color));
 
             textures.get(gameMap.ceiling_texture, tex);
-            color = tex.texture[renderCfg.texture_width * tex_y + tex_x];
+            color = tex.texture[renderCfg.texture_width * tex_coord_y + tex_coord_x];
             color = (color >> 1) & DARK_SHADER;
             pixelBuffer.pushToBuffer(screen_width - x, y - 1, Colour::INTtoRGB(color));
         }
@@ -89,7 +89,7 @@ inline static void renderFloorCeiling() {
 
 inline static void renderWalls() {
     double ray_dir_x, ray_dir_y, side_dist_x, side_dist_y, delta_x, delta_y, perp_wall_dist, wall_x, step, tex_pos;
-    int map_x, map_y, step_x, step_y, hit, side, line_height, draw_start_pos, draw_end_pos, tex_x, tex_y;
+    int map_x, map_y, step_x, step_y, hit, side, line_height, draw_start_pos, draw_end_pos, tex_coord_x, tex_coord_y;
     string wall_tex;
     uint32_t color;
     Texture tex;
@@ -105,20 +105,10 @@ inline static void renderWalls() {
         delta_y = abs(1 / ray_dir_y);
 
         hit = 0;
-        if (ray_dir_x < 0) {
-            step_x = -1;
-            side_dist_x = (player.x - map_x) * delta_x;
-        } else {
-            step_x = 1;
-            side_dist_x = (map_x + 1.0 - player.x) * delta_x;
-        }
-        if (ray_dir_y < 0) {
-            step_y = -1;
-            side_dist_y = (player.y - map_y) * delta_y;
-        } else {
-            step_y = 1;
-            side_dist_y = (map_y + 1.0 - player.y) * delta_y;
-        }
+        step_x = copysign(1.0, ray_dir_x);
+        side_dist_x = delta_x * (ray_dir_x < 0 ? player.x - map_x : map_x + 1.0 - player.x);
+        step_y = copysign(1.0, ray_dir_y);
+        side_dist_y = delta_y * (ray_dir_y < 0 ? player.y - map_y : map_y + 1.0 - player.y);
 
         while (hit == 0) {
             if (side_dist_x < side_dist_y) {
@@ -150,28 +140,28 @@ inline static void renderWalls() {
         }
         wall_tex = gameMap.getAt(map_x, map_y).wf_left.texture;
 
-        wall_x = side == 0 ? player.y + perp_wall_dist* ray_dir_y : player.x + perp_wall_dist * ray_dir_x;
+        wall_x = side == 0 ? player.y + perp_wall_dist * ray_dir_y : player.x + perp_wall_dist * ray_dir_x;
         wall_x -= floor((wall_x));
 
-        tex_x = (int)(wall_x * double(renderCfg.texture_width));
+        tex_coord_x = (int)(wall_x * double(renderCfg.texture_width));
         if (side == 0 && ray_dir_x > 0) {
-            tex_x = renderCfg.texture_width - tex_x - 1;
+            tex_coord_x = renderCfg.texture_width - tex_coord_x - 1;
         }
         if (side == 1 && ray_dir_y < 0) {
-            tex_x = renderCfg.texture_width - tex_x - 1;
+            tex_coord_x = renderCfg.texture_width - tex_coord_x - 1;
         }
 
         step = 1.0 * renderCfg.texture_height / line_height;
         tex_pos = (draw_start_pos - IDIV_2(screen_height) + IDIV_2(line_height)) * step;
-        for (int y = draw_start_pos; y < draw_end_pos; y++) {
-            tex_y = (int)tex_pos & (renderCfg.texture_height - 1);
+        for (int y = draw_end_pos - 1; y >= draw_start_pos; y--) {
+            tex_coord_y = (int)tex_pos & (renderCfg.texture_height - 1);
             tex_pos += step;
             textures.get(wall_tex, tex);
-            color = tex.texture[renderCfg.texture_height * tex_y + tex_x];
+            color = tex.texture[renderCfg.texture_height * tex_coord_y + tex_coord_x];
             if (side == 1) {
                 color = (color >> 1) & DARK_SHADER;
             }
-            pixelBuffer.pushToBuffer(x, screen_height - y, Colour::INTtoRGB(color));
+            pixelBuffer.pushToBuffer(x, y, Colour::INTtoRGB(color));
         }
 
         zBuf[x] = perp_wall_dist;
@@ -183,30 +173,25 @@ inline double sqDist(double ax, double ay, double bx, double by) {
 }
 
 inline void sortSprites() {
-    int amount = gameMap.sprites.size();
-    vector<pair<double, int>> sprites(amount);
-    for (int i = amount - 1; i >= 0; i--) {
-        sprites[i].first = sqDist(gameMap.sprites[i].location.x, player.x, gameMap.sprites[i].location.y, player.y);
-        sprites[i].second = i;
-    }
-    sort(sprites.begin(), sprites.end());
-    for (int i = amount - 1; i >= 0; i--) {
-        spriteDistance[i] = sprites[amount - i - 1].first;
-        spriteOrder[i] = sprites[amount - i - 1].second;
-    }
+    accumulate(gameMap.sprites.begin(), gameMap.sprites.end(), 0, [](int i, Constructs::Sprite& sprite) -> int {
+        sprite.distance = sqDist(sprite.location.x, player.x, sprite.location.y, player.y);
+        sprite.order = i;
+        return i++;
+    });
+    sort(gameMap.sprites.begin(), gameMap.sprites.end());
 }
 
 inline static void renderSprites() {
     sortSprites();
 
     double sprite_x, sprite_y, transform_x, transform_y;
-    int sprite_screen_x, vert_move_screen, sprite_height, sprite_width, draw_start_pos_y, draw_end_pos_y, draw_start_pos_x, draw_end_pos_x, tex_x, tex_y, d;
+    int sprite_screen_x, vert_move_screen, sprite_height, sprite_width, draw_start_pos_y, draw_end_pos_y, draw_start_pos_x, draw_end_pos_x, tex_coord_x, tex_coord_y, d;
     Texture tex;
     uint32_t color;
     double inverse_det = 1.0 / (player.camera.clip_plane_x * player.dy - player.dx * player.camera.clip_plane_y);
     for (int i = gameMap.sprites.size() - 1; i >= 0; i--) {
-        sprite_x = gameMap.sprites[spriteOrder[i]].location.x - player.x;
-        sprite_y = gameMap.sprites[spriteOrder[i]].location.y - player.y;
+        sprite_x = gameMap.sprites[i].location.x - player.x;
+        sprite_y = gameMap.sprites[i].location.y - player.y;
 
         transform_x = inverse_det * (player.dy * sprite_x - player.dx * sprite_y);
         transform_y = inverse_det * (-player.camera.clip_plane_y * sprite_x + player.camera.clip_plane_x * sprite_y);
@@ -234,16 +219,16 @@ inline static void renderSprites() {
         if (draw_end_pos_x >= screen_width) {
             draw_end_pos_x = screen_width - 1;
         }
-        textures.get(gameMap.sprites[spriteOrder[i]].texture, tex);
-        for (int pixel_row = draw_start_pos_x; pixel_row < draw_end_pos_x; pixel_row++) {
-            tex_x = (int)IDIV_256((IMUL_256((pixel_row - (IDIV_2(-sprite_width) + sprite_screen_x))) * renderCfg.texture_width / sprite_width));
+        textures.get(gameMap.sprites[i].texture, tex);
+        for (int pixel_row = draw_end_pos_x - 1; pixel_row >= draw_start_pos_x; pixel_row--) {
+            tex_coord_x = (int)IDIV_256((IMUL_256((pixel_row - (IDIV_2(-sprite_width) + sprite_screen_x))) * renderCfg.texture_width / sprite_width));
             if (!(transform_y > 0 && pixel_row > 0 && pixel_row < screen_width && transform_y < zBuf[pixel_row])) {
                 continue;
             }
-            for (int pixel_column = draw_start_pos_y; pixel_column < draw_end_pos_y; pixel_column++) {
+            for (int pixel_column = draw_end_pos_y - 1; pixel_column >= draw_start_pos_y; pixel_column--) {
                 d = IMUL_256((pixel_column - vert_move_screen)) - IMUL_128(screen_height) + IMUL_128(sprite_height);
-                tex_y = IDIV_256((d * renderCfg.texture_height) / sprite_height);
-                color = tex.texture[renderCfg.texture_width * tex_y + tex_x];
+                tex_coord_y = IDIV_256((d * renderCfg.texture_height) / sprite_height);
+                color = tex.texture[renderCfg.texture_width * tex_coord_y + tex_coord_x];
                 if ((color & 0x00FFFFFF) != 0) {
                     pixelBuffer.pushToBuffer(pixel_row, screen_height - pixel_column, Colour::INTtoRGB(color));
                 }
@@ -341,9 +326,6 @@ void __INIT() {
     debugContext.logAppInfo(string("Loaded " + to_string(textures.size()) + " textures"));
 
     gameMap.readMapFromJSON(MAPS_DIR + "map2.json");
-
-    spriteOrder.resize(gameMap.sprites.size());
-    spriteDistance.resize(gameMap.sprites.size());
 
     rays = Rendering::RayBuffer(playerCfg.fov);
     zBuf = Rendering::ZBuffer(screen_width);

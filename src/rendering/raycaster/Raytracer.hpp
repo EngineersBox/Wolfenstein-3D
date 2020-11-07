@@ -23,6 +23,7 @@
 #include <string>
 #include <tuple>
 #include <vector>
+#include <numeric>
 
 #include "../../io/configuration/ConfigInit.hpp"
 #include "../drawing/DrawingUtils.hpp"

@@ -6,7 +6,7 @@
 #define SPRITE_V_DIV 1
 #define SPRITE_V_MOVE 0.0
 
-#define DARK_SHADER 8355711
+#define DARK_SHADER 0x7F7F7F
 
 using namespace std;
 
@@ -28,9 +28,6 @@ GameMap gameMap = GameMap();
 Minimap minimap;
 DebugOverlay debugOverlay;
 StatsBar statsBar;
-
-// vector<int> spriteOrder;
-// vector<double> spriteDistance;
 
 double new_time = 0;
 double old_time = 0;
@@ -168,21 +165,8 @@ inline static void renderWalls() {
     }
 }
 
-inline double sqDist(double ax, double ay, double bx, double by) {
-    return pow(bx - ax, 2) + pow(by - ay, 2);
-}
-
-inline void sortSprites() {
-    accumulate(gameMap.sprites.begin(), gameMap.sprites.end(), 0, [](int i, Constructs::Sprite& sprite) -> int {
-        sprite.distance = sqDist(sprite.location.x, player.x, sprite.location.y, player.y);
-        sprite.order = i;
-        return i++;
-    });
-    sort(gameMap.sprites.begin(), gameMap.sprites.end());
-}
-
 inline static void renderSprites() {
-    sortSprites();
+    gameMap.sortSprites(player);
 
     double sprite_x, sprite_y, transform_x, transform_y;
     int sprite_screen_x, vert_move_screen, sprite_height, sprite_width, draw_start_pos_y, draw_end_pos_y, draw_start_pos_x, draw_end_pos_x, tex_coord_x, tex_coord_y, d;
@@ -290,7 +274,7 @@ static void __KEY_HANDLER(unsigned char key, int x, int y) {
         if (gameMap.getAt((int)player.x, (int)(player.y - player.camera.frustrum.getFovY() * player.moveSpeed)).wf_left.texture == "") {
             player.y -= player.camera.frustrum.getFovY() * player.moveSpeed;
         }
-    } else if (key == 'd') {
+    } else if (key == 'a') {
         double old_dir_x = player.camera.frustrum.getFovX();
         player.camera.frustrum.setFovX(player.camera.frustrum.getFovX() * cos(-player.rotSpeed) - player.camera.frustrum.getFovY() * sin(-player.rotSpeed));
         player.camera.frustrum.setFovY(old_dir_x * sin(-player.rotSpeed) + player.camera.frustrum.getFovY() * cos(-player.rotSpeed));
@@ -298,7 +282,7 @@ static void __KEY_HANDLER(unsigned char key, int x, int y) {
         double old_plane_x = player.camera.clip_plane_x;
         player.camera.clip_plane_x = player.camera.clip_plane_x * cos(-player.rotSpeed) - player.camera.clip_plane_y * sin(-player.rotSpeed);
         player.camera.clip_plane_y = old_plane_x * sin(-player.rotSpeed) + player.camera.clip_plane_y * cos(-player.rotSpeed);
-    } else if (key == 'a') {
+    } else if (key == 'd') {
         double old_dir_x = player.camera.frustrum.getFovX();
         player.camera.frustrum.setFovX(player.camera.frustrum.getFovX() * cos(player.rotSpeed) - player.camera.frustrum.getFovY() * sin(player.rotSpeed));
         player.camera.frustrum.setFovY(old_dir_x * sin(player.rotSpeed) + player.camera.frustrum.getFovY() * cos(player.rotSpeed));
@@ -341,7 +325,7 @@ void __INIT() {
     player = Player(
         gameMap.start.x,
         gameMap.start.y,
-        playerCfg.fov,
+        -playerCfg.fov,
         0.0,
         0);
     debugContext.logAppInfo("Initialised Player object at: " + ADDR_OF(player));

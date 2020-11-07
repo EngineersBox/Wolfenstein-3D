@@ -14,6 +14,7 @@
 #include "../../rendering/Globals.hpp"
 #include "../constructs/sprites/Sprite.hpp"
 #include "../../rendering/colour/Colours.hpp"
+#include "../../rendering/player/Player.hpp"
 
 using namespace std;
 #define MAP_DELIM ";"
@@ -26,6 +27,9 @@ struct GameMap {
     void readMapFromJSON(string filename);
     Constructs::AABB getAt(int x, int y);
     Constructs::AABB getAtPure(int loc);
+
+    inline double sqDist(double ax, double ay, double bx, double by);
+    inline void sortSprites(Player& player);
 
     int map_width;
     int map_height;
@@ -170,3 +174,16 @@ Constructs::AABB GameMap::getAt(int x, int y) {
 Constructs::AABB GameMap::getAtPure(int loc) {
     return this->walls.at(loc);
 };
+
+double GameMap::sqDist(double ax, double ay, double bx, double by) {
+    return pow(bx - ax, 2) + pow(by - ay, 2);
+}
+
+inline void GameMap::sortSprites(Player& player) {
+    accumulate(this->sprites.begin(), this->sprites.end(), 0, [this, player](int i, Constructs::Sprite& sprite) -> int {
+        sprite.distance = sqDist(sprite.location.x, player.x, sprite.location.y, player.y);
+        sprite.order = i;
+        return i++;
+    });
+    sort(this->sprites.begin(), this->sprites.end());
+}

@@ -25,7 +25,6 @@ struct PlayerCfg {
 
 PlayerCfg::PlayerCfg(double fov, float dof, float move_speed, float rotation_speed) {
     this->fov = scaleFov(fov);
-    cout << this->fov << endl;
     this->dof = dof;
     this->move_speed = move_speed;
     this->rotation_speed = rotation_speed;

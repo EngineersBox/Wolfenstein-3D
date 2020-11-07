@@ -8,6 +8,8 @@
 
 #define DARK_SHADER 0x7F7F7F
 
+#define __DEFAULT_DISPLAY_FUNC [](){}
+
 using namespace std;
 
 // Screen
@@ -231,10 +233,6 @@ inline static void updateTimeTick() {
 }
 
 static void display(void) {
-    if (renderCfg.headless_mode) {
-        return;
-    }
-
     if (renderCfg.render_floor_ceiling) {
         renderFloorCeiling();
     }
@@ -372,8 +370,13 @@ int main(int argc, char* argv[]) {
     __INIT();
     debugContext.logAppInfo("---- COMPLETED APPLICATION INIT PHASE ----");
 
-    glutDisplayFunc(display);
-    debugContext.logApiInfo("Initialised glutDisplayFunc [display] at: " + ADDR_OF(display));
+    if (renderCfg.headless_mode) {
+        debugContext.logAppInfo("Running in headless mode, glutDisplayFun not initialised");
+        glutDisplayFunc(__DEFAULT_DISPLAY_FUNC);
+    } else {
+        glutDisplayFunc(display);
+        debugContext.logApiInfo("Initialised glutDisplayFunc [display] at: " + ADDR_OF(display));
+    }
     glutReshapeFunc(__WINDOW_RESHAPE);
     debugContext.logApiInfo("Initialised glutReshapeFunc [__WINDOW_RESHAPE] at: " + ADDR_OF(__WINDOW_RESHAPE));
     glutKeyboardFunc(__KEY_HANDLER);

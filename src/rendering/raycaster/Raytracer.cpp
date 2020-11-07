@@ -344,15 +344,17 @@ void __INIT() {
         -1.0,
         0.0,
         0);
-    debugContext.logAppInfo("Initialised player object at: " + ADDR_OF(player));
+    debugContext.logAppInfo("Initialised Player object at: " + ADDR_OF(player));
 
     minimap = Minimap(&player, &gameMap, screen_width, screen_height);
-    debugContext.logAppInfo("Initialised minimap object at: " + ADDR_OF(minimap));
+    debugContext.logAppInfo("Initialised Minimap object at: " + ADDR_OF(minimap));
 
     debugOverlay = DebugOverlay(&player, &minimap, &gameMap, GLUT_BITMAP_HELVETICA_18);
+    debugContext.logAppInfo("Initialised DebugOverlay object at: " + ADDR_OF(debugOverlay));
 
     statsBar = StatsBar(screen_width, screen_height,
         Colour::RGB_Blue, Colour::RGB_Navy, Colour::RGB_White);
+    debugContext.logAppInfo("Initialised StatsBar object at: " + ADDR_OF(statsBar));
 
     pixelBuffer = Rendering::PBO(screen_width, screen_height);
     pixelBuffer.init();

@@ -20,16 +20,21 @@ If you have CMake installed then running the raycaster is really straight forwar
 4. Start the built raycaster with `make run`
 
 Below is a full list of commands and their usages:
+*NOTE: All commands have supported equivalents in the `makefile.alt` for non CMake users*
 
 |Command|Description|
 |---|---|
 |`cmake .`| Initialise the build environment|
 |`make QSP`| Build the raycaster to `out/`|
 |`make run`| Execute a build in `out/`|
+|`make run_memprof`| Execute a build in `out/` within a call of `leaks` *(UNIX only)*|
 |`make destroy`| Removes all files in the `out/`|
 |`make clean_logs`| Removes all log files from `logs/`|
-|`make archive_logs`| Compress all `*.log` files into a date time named zip archive in the format: `archive-DD-MM-YYYY_HH-MM-SS.zip`|
+|`make archive_logs`| Compress all `*.log` files in `logs/` into a date time named zip archive in the format: `archive-DD-MM-YYYY_HH-MM-SS.zip`|
 |`make clean_archives`| Remove all archives from `logs/`|
+|`make clean_memprof`| Remove all memory profiles from `memory_analysis/`|
+|`make archive_memprof`| Compres all `*.memgraph` memory profiles from `memory_analysis/` into a date time named zip archive in the format: `archive-DD-MM-YYYY_HH-MM-SS.zip`|
+|`make clean_memprof`| Remove all archives from `memory_analysis/`|
 |`make build_tests`| Build the test cases to `out/tests`|
 |`make run_tests`| Run the test cases with assertion fails only|
 |`make run_tests_wo`| Run the test cases with output for all assertions|
@@ -323,13 +328,13 @@ In order to make it easier to traverse the file system, here is a tree depicting
   * physics
   * rendering
     * buffering
-    * camera
     * colour
     * drawing
     * partitioning
     * player
     * raycaster
     * texturing
+    * viewmodel
 * test
   * asset_loading
   * framework

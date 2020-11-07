@@ -17,7 +17,7 @@
 * [x] Add start + end locations in map definitions
 * [ ] Change raycasting to query against walls from results of BSP rather than raymarching
 * [x] Implement minmap and player position scaling
-* [ ] Fix ray rendering on minimap
+* [x] Fix ray rendering on minimap
 * [x] Fix Linux + Windows GL window rendering (incorrect scaling)
 * [x] Change TextureLoader to iterate through `resources/textures/*` and load all in there (verify existance and format)
 * [x] Fix sprite rendering order, currently far sprites render on top of near, this should be inverted

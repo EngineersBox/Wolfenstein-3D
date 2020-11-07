@@ -341,7 +341,7 @@ void __INIT() {
     player = Player(
         gameMap.start.x,
         gameMap.start.y,
-        -1.0,
+        0.0,
         0.0,
         0);
     debugContext.logAppInfo("Initialised Player object at: " + ADDR_OF(player));

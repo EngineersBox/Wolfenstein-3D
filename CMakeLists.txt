@@ -19,6 +19,8 @@ set(SOURCES "src/rendering/raycaster/Raytracer.cpp")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY out)
 FILE(GLOB logs_contents "logs/*.log")
 
+set(MEMORY_ANALYSIS "memory_analysis")
+
 add_custom_target(clean_out ALL)
 add_custom_target(clean_logs ALL)
 add_custom_target(archive_logs ALL)
@@ -95,6 +97,65 @@ add_custom_command(
 	COMMAND ${CMAKE_COMMAND} -E cmake_echo_color --cyan --bold --no-newline \"\>\> \"
 	COMMAND ${CMAKE_COMMAND} -E cmake_echo_color --green \"Stopped running\"
 	COMMAND echo \"\\n\"
+)
+
+add_custom_target(run_memprof ALL)
+add_custom_target(clean_memprof ALL)
+add_custom_target(archive_memprof ALL)
+add_custom_target(clean_memprof_archives ALL)
+add_custom_command(
+	TARGET run_memprof
+	COMMAND ${CMAKE_COMMAND} -E cmake_echo_color --cyan --bold --no-newline \"\>\> \"
+	COMMAND ${CMAKE_COMMAND} -E cmake_echo_color --green --no-newline \"Running new build with memory profiling\"
+	COMMAND ${CMAKE_COMMAND} -E cmake_echo_color --white --no-newline \"[\"
+	COMMAND ${CMAKE_COMMAND} -E cmake_echo_color --red --bold --no-newline \"out/${PROJECT_NAME}\"
+	COMMAND ${CMAKE_COMMAND} -E cmake_echo_color --purple --bold --no-newline \" -> \"
+	COMMAND ${CMAKE_COMMAND} -E cmake_echo_color --red --bold --no-newline \"${MEMORY_ANALYSIS}/*\"
+	COMMAND ${CMAKE_COMMAND} -E cmake_echo_color --white \"]\"
+	COMMAND echo \"--------------------------------\"
+	COMMAND mkdir -p ${MEMORY_ANALYSIS}
+	COMMAND leaks --fullStacks --outputGraph=${MEMORY_ANALYSIS}/$$\(date +\"%Y-%m-%d_%H-%M-%S\"\) --fullContent --hex --forkCorpse --atExit -- ./out/${PROJECT_NAME}
+	COMMAND echo \"--------------------------------\"
+	COMMAND ${CMAKE_COMMAND} -E cmake_echo_color --cyan --bold --no-newline \"\>\> \"
+	COMMAND ${CMAKE_COMMAND} -E cmake_echo_color --green \"Stopped running and profiling\"
+	COMMAND echo \"\\n\"
+)
+add_custom_command(
+    TARGET clean_memprof
+    COMMAND ${CMAKE_COMMAND} -E cmake_echo_color --cyan --bold --no-newline \"\>\> \"
+	COMMAND ${CMAKE_COMMAND} -E cmake_echo_color --green --no-newline \"Removing memory profiles in \"
+	COMMAND ${CMAKE_COMMAND} -E cmake_echo_color --white --no-newline \"[\"
+	COMMAND ${CMAKE_COMMAND} -E cmake_echo_color --red --bold --no-newline \"${MEMORY_ANALYSIS}/*\"
+	COMMAND ${CMAKE_COMMAND} -E cmake_echo_color --white \"]\"
+	COMMAND echo \"--------------------------------\"
+	COMMAND [ `ls -A ${MEMORY_ANALYSIS}/*.memgraph 2>/dev/null | wc -m` == "0" ] && cmake -E cmake_echo_color --red --bold "No profiles to remove" || rm -rvf ${MEMORY_ANALYSIS}/*.memgraph
+	COMMAND ${CMAKE_COMMAND} -E cmake_echo_color --white --no-newline \"\"
+    COMMAND echo \"--------------------------------\\n\"
+)
+add_custom_command(
+    TARGET archive_memprof
+    COMMAND ${CMAKE_COMMAND} -E cmake_echo_color --cyan --bold --no-newline \"\>\> \"
+	COMMAND ${CMAKE_COMMAND} -E cmake_echo_color --green --no-newline \"Archiving memory profiles in \"
+	COMMAND ${CMAKE_COMMAND} -E cmake_echo_color --white --no-newline \"[\"
+	COMMAND ${CMAKE_COMMAND} -E cmake_echo_color --red --bold --no-newline \"${MEMORY_ANALYSIS}/*\"
+	COMMAND ${CMAKE_COMMAND} -E cmake_echo_color --white \"]\"
+	COMMAND echo \"--------------------------------\"
+	COMMAND [ `ls -A ${MEMORY_ANALYSIS}/*.memgraph 2>/dev/null | wc -m` == "0" ] && cmake -E cmake_echo_color --red --bold "No profiles to archive" || zip -r ${MEMORY_ANALYSIS}/archive-$$\(date +"%Y-%m-%d_%H-%M-%S"\)\.zip ${MEMORY_ANALYSIS}/*.memgraph
+	COMMAND ${CMAKE_COMMAND} -E cmake_echo_color --white --no-newline \"\"
+    COMMAND echo \"--------------------------------\\n\"
+	COMMAND make clean_memprof
+)
+add_custom_command(
+    TARGET clean_memprof_archives
+    COMMAND ${CMAKE_COMMAND} -E cmake_echo_color --cyan --bold --no-newline \"\>\> \"
+	COMMAND ${CMAKE_COMMAND} -E cmake_echo_color --green --no-newline \"Removing archives in \"
+	COMMAND ${CMAKE_COMMAND} -E cmake_echo_color --white --no-newline \"[\"
+	COMMAND ${CMAKE_COMMAND} -E cmake_echo_color --red --bold --no-newline \"${MEMORY_ANALYSIS}/*\"
+	COMMAND ${CMAKE_COMMAND} -E cmake_echo_color --white \"]\"
+	COMMAND echo \"--------------------------------\"
+	COMMAND [ `ls -A ${MEMORY_ANALYSIS}/archive-*.zip 2>/dev/null | wc -m` == "0" ] && cmake -E cmake_echo_color --red --bold "No archives to remove" || rm -rvf ${MEMORY_ANALYSIS}/archive-*.zip
+	COMMAND ${CMAKE_COMMAND} -E cmake_echo_color --white --no-newline \"\"
+    COMMAND echo \"--------------------------------\\n\"
 )
 
 # Set test source file

@@ -130,6 +130,19 @@ depend:
 .PHONY : depend
 
 #=============================================================================
+# Target rules for targets named QSP
+
+# Build rule for target.
+QSP: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 QSP
+.PHONY : QSP
+
+# fast build rule for target.
+QSP/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/QSP.dir/build.make CMakeFiles/QSP.dir/build
+.PHONY : QSP/fast
+
+#=============================================================================
 # Target rules for targets named run_tests_wo
 
 # Build rule for target.
@@ -169,17 +182,56 @@ build_tests/fast:
 .PHONY : build_tests/fast
 
 #=============================================================================
-# Target rules for targets named QSP
+# Target rules for targets named clean_memprof_archives
 
 # Build rule for target.
-QSP: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 QSP
-.PHONY : QSP
+clean_memprof_archives: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 clean_memprof_archives
+.PHONY : clean_memprof_archives
 
 # fast build rule for target.
-QSP/fast:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/QSP.dir/build.make CMakeFiles/QSP.dir/build
-.PHONY : QSP/fast
+clean_memprof_archives/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/clean_memprof_archives.dir/build.make CMakeFiles/clean_memprof_archives.dir/build
+.PHONY : clean_memprof_archives/fast
+
+#=============================================================================
+# Target rules for targets named archive_memprof
+
+# Build rule for target.
+archive_memprof: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 archive_memprof
+.PHONY : archive_memprof
+
+# fast build rule for target.
+archive_memprof/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/archive_memprof.dir/build.make CMakeFiles/archive_memprof.dir/build
+.PHONY : archive_memprof/fast
+
+#=============================================================================
+# Target rules for targets named destroy
+
+# Build rule for target.
+destroy: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 destroy
+.PHONY : destroy
+
+# fast build rule for target.
+destroy/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/destroy.dir/build.make CMakeFiles/destroy.dir/build
+.PHONY : destroy/fast
+
+#=============================================================================
+# Target rules for targets named run_memprof
+
+# Build rule for target.
+run_memprof: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 run_memprof
+.PHONY : run_memprof
+
+# fast build rule for target.
+run_memprof/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/run_memprof.dir/build.make CMakeFiles/run_memprof.dir/build
+.PHONY : run_memprof/fast
 
 #=============================================================================
 # Target rules for targets named archive_logs
@@ -221,17 +273,17 @@ clean_logs/fast:
 .PHONY : clean_logs/fast
 
 #=============================================================================
-# Target rules for targets named destroy
+# Target rules for targets named clean_memprof
 
 # Build rule for target.
-destroy: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 destroy
-.PHONY : destroy
+clean_memprof: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 clean_memprof
+.PHONY : clean_memprof
 
 # fast build rule for target.
-destroy/fast:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/destroy.dir/build.make CMakeFiles/destroy.dir/build
-.PHONY : destroy/fast
+clean_memprof/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/clean_memprof.dir/build.make CMakeFiles/clean_memprof.dir/build
+.PHONY : clean_memprof/fast
 
 #=============================================================================
 # Target rules for targets named run
@@ -295,12 +347,16 @@ help:
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
 	@echo "... archive_logs"
+	@echo "... archive_memprof"
 	@echo "... build_tests"
 	@echo "... clean_archives"
 	@echo "... clean_logs"
+	@echo "... clean_memprof"
+	@echo "... clean_memprof_archives"
 	@echo "... clean_out"
 	@echo "... destroy"
 	@echo "... run"
+	@echo "... run_memprof"
 	@echo "... run_tests"
 	@echo "... run_tests_wo"
 	@echo "... QSP"

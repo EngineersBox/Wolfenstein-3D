@@ -8,6 +8,9 @@
 
 using namespace std;
 
+#define OVERLAY_TEXT_SPACING 15
+#define OVERLAY_TEXT_OFFSET_X 10
+
 typedef void* GLfont;
 
 class DebugOverlay {
@@ -37,12 +40,12 @@ class DebugOverlay {
 DebugOverlay::DebugOverlay(Player* player, Minimap* minimap, World* map, GLfont font) {
     this->font = font;
     this->player = player;
-    this->fpsPosX = !minimapCfg.isLeft() ? 10 : minimap->getOffsetX() + (map->map_width * minimap->getScalingX()) + 10;
-    this->fpsPosY = 15;
+    this->fpsPosX = !minimapCfg.isLeft() ? OVERLAY_TEXT_OFFSET_X : minimap->getOffsetX() + (map->map_width * minimap->getScalingX()) + OVERLAY_TEXT_OFFSET_X;
+    this->fpsPosY = OVERLAY_TEXT_SPACING;
     this->playerPosX = this->fpsPosX;
-    this->playerPosY = this->fpsPosY + 15;
+    this->playerPosY = this->fpsPosY + OVERLAY_TEXT_SPACING;
     this->timeTickPosX = this->playerPosX;
-    this->timeTickPosY = this->playerPosY + 15;
+    this->timeTickPosY = this->playerPosY + OVERLAY_TEXT_SPACING;
 };
 
 void DebugOverlay::renderFPS(double frame_time) {

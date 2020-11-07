@@ -15,6 +15,7 @@ RESET := $(shell tput sgr0)
 SRC:=src/rendering/raycaster/Raytracer.cpp
 OUT:=out/QSP
 LOGS_DIR=logs
+MEMORY_ANALYSIS:=memory_analysis
 
 OSX_FRAMEWORK:=-framework OpenGL -framework GLUT
 LINUX_FRAMEWORK:=-lm -lGL -lGLU -lglut
@@ -65,6 +66,44 @@ run:
 	@ $(OUT)
 	@echo '--------------------------------'
 	@echo '$(CYAN)>> $(GREEN) Stopped running$(RESET)'
+
+run_memprof:
+	@echo '$(CYAN)>> $(GREEN) Running new build with memory profiling $(WHITE)[$(RED)$(BOLD)$(OUT) $(WHITE)-> $(RED)$(MEMORY_ANALYSIS)/*$(RESET)$(WHITE)]'
+	@echo '--------------------------------'
+	@leaks --fullStacks --outputGraph=$(MEMORY_ANALYSIS)/$(DATE) --fullContent --hex --forkCorpse --atExit -- ./$(OUT)
+	@echo '--------------------------------'
+	@echo '$(CYAN)>> $(GREEN) Stopped running and profiling$(RESET)'
+
+clean_memprof:
+	@echo '$(CYAN)>> $(GREEN) Removing memory profiles in $(WHITE)[$(RED)$(BOLD)$(MEMORY_ANALYSIS)/*$(RESET)$(WHITE)]'
+	@echo '--------------------------------'
+ifeq (,$(wildcard $(MEMORY_ANALYSIS)/*.memgraph))
+	@echo "$(RED)$(BOLD)No profiles to remove$(RESET)"
+else
+	-@rm -rvf $(MEMORY_ANALYSIS)/*.memgraph
+endif
+	@echo '--------------------------------'
+
+archive_memprof:
+	@echo '$(CYAN)>> $(GREEN) Archiving memory profiles in $(WHITE)[$(RED)$(BOLD)$(MEMORY_ANALYSIS)$(RESET)$(WHITE)]'
+	@echo '--------------------------------'
+ifeq (,$(wildcard $(MEMORY_ANALYSIS)/*.memgraph))
+	@echo "$(RED)$(BOLD)No profiles to archive$(RESET)"
+else
+	-@zip -pr $(MEMORY_ANALYSIS)/archive-$(DATE).zip $(MEMORY_ANALYSIS)/*.memgraph
+endif
+	@echo '--------------------------------'
+	@make -f Makefile.alt clean_memprof
+
+clean_memprof_archives:
+	@echo '$(CYAN)>> $(GREEN) Removing archives in $(WHITE)[$(RED)$(BOLD)$(MEMORY_ANALYSIS)/*$(RESET)$(WHITE)]'
+	@echo '--------------------------------'
+ifeq (,$(wildcard $(MEMORY_ANALYSIS)/*.zip))
+	@echo "$(RED)$(BOLD)No archives to remove$(RESET)"
+else
+	-@rm -rvf $(MEMORY_ANALYSIS)/*.zip
+endif
+	@echo '--------------------------------'
 
 clean_logs:
 	@echo '$(CYAN)>> $(GREEN) Removing logs in $(WHITE)[$(RED)$(BOLD)$(LOGS_DIR)/*$(RESET)$(WHITE)]'

@@ -30,10 +30,11 @@ class PBO {
         PBO(int width, int height);
 
         void init();
-        inline void pushBufferToGPU();
+        void swapBuffer();
 
         inline void pushToBuffer(int x, int y, Colour::ColorRGB colour);
         inline void resize(int newWidth, int newHeight);
+        inline void clear();
     private:
         bool inRange(int value, int min, int max);
 
@@ -60,10 +61,10 @@ void PBO::init() {
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB8, this->width, this->height, 0, GL_RGB, GL_UNSIGNED_BYTE, this->buffer.data());
-    debugContext.logApiInfo("Allocated PBO texture to from: " + ADDR_OF(*this->buffer.data()));
+    debugContext.logApiInfo("Allocated memory for PBO texture at: " + ADDR_OF(*this->buffer.data()));
 };
 
-inline void PBO::pushBufferToGPU() {
+void PBO::swapBuffer() {
     glEnable(GL_TEXTURE_2D);
     glClear(GL_COLOR_BUFFER_BIT);
 
@@ -101,6 +102,10 @@ inline void PBO::resize(int newWidth, int newHeight) {
     this->height = newHeight;
     this->buffer.resize(newWidth * newHeight * 3);
     debugContext.logApiInfo("Resized PBO to " + to_string(newWidth * newHeight * 3) + " [" + to_string(newWidth) + "*" + to_string(newHeight) + "*3" + "]");
+}
+
+inline void PBO::clear() {
+    this->buffer.clear();
 }
 
 }

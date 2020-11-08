@@ -243,7 +243,7 @@ static void display(void) {
         renderSprites();
     }
 
-    pixelBuffer.pushBufferToGPU();
+    pixelBuffer.swapBuffer();
     updateTimeTick();
     
     minimap.render(screen_width, screen_height);

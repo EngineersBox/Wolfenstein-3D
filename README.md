@@ -184,7 +184,7 @@ A map is described by a JSON object contain information about the map parameters
 * `Walls`: The layout of the map and how it renders
 * `Sprites`: Positions of 2D sprites in the map
 
-Map files are stored in `resources/maps/`. Below is the JSON type data and structure of the file:
+Map files are stored in `resources/maps/`. Below is the JSON schema for a map file:
 
 ```JSON
 {

@@ -24,6 +24,7 @@
 * [ ] Finish StatsBar
 * [ ] Add animation frames to Enemies
 * [ ] Add hit scan shooting when player clicks, call `hitScanCheck()` on enemies
+* [ ] Fix wall textures vertical offset shifting on every second pixel
 
 ## Logging
 

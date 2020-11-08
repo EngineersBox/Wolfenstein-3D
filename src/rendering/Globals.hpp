@@ -65,8 +65,11 @@ static GLDebugContext debugContext = GLDebugContext();
 
 typedef unsigned long int int_id;
 typedef vector<uint32_t> PNGTex;
+typedef uint64_t Tick;
 
 namespace Rendering {
     typedef vector<Ray> RayBuffer;
     typedef vector<double> ZBuffer;
 }
+
+Tick global_tick;

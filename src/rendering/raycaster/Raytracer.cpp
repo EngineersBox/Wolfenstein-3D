@@ -60,8 +60,8 @@ inline static void renderFloorCeiling() {
         step_x = dist * (ray_dir_x1 - ray_dir_x0) / screen_width;
         step_y = dist * (ray_dir_y1 - ray_dir_y0) / screen_width;
 
-        floor_x = player.x + dist * ray_dir_x0;
-        floor_y = player.y + dist * ray_dir_y0;
+        floor_x = player.location.x + dist * ray_dir_x0;
+        floor_y = player.location.y + dist * ray_dir_y0;
 
         for (int x = screen_width - 1; x >= 0; --x) {
             cell_x = (int)(floor_x);
@@ -97,17 +97,17 @@ inline static void renderWalls() {
         ray_dir_x = player.camera.frustrum.getFovX() + player.camera.clip_plane_x * player.camera.x;
         ray_dir_y = player.camera.frustrum.getFovY() + player.camera.clip_plane_y * player.camera.x;
 
-        map_x = (int)player.x;
-        map_y = (int)player.y;
+        map_x = (int)player.location.x;
+        map_y = (int)player.location.y;
 
         delta_x = abs(1 / ray_dir_x);
         delta_y = abs(1 / ray_dir_y);
 
         hit = 0;
         step_x = copysign(1.0, ray_dir_x);
-        side_dist_x = delta_x * (ray_dir_x < 0 ? player.x - map_x : map_x + 1.0 - player.x);
+        side_dist_x = delta_x * (ray_dir_x < 0 ? player.location.x - map_x : map_x + 1.0 - player.location.x);
         step_y = copysign(1.0, ray_dir_y);
-        side_dist_y = delta_y * (ray_dir_y < 0 ? player.y - map_y : map_y + 1.0 - player.y);
+        side_dist_y = delta_y * (ray_dir_y < 0 ? player.location.y - map_y : map_y + 1.0 - player.location.y);
 
         while (hit == 0) {
             if (side_dist_x < side_dist_y) {
@@ -123,9 +123,9 @@ inline static void renderWalls() {
         }
 
         if (side == 0) {
-            perp_wall_dist = (map_x - player.x + IDIV_2((1 - step_x))) / ray_dir_x;
+            perp_wall_dist = (map_x - player.location.x + IDIV_2((1 - step_x))) / ray_dir_x;
         } else {
-            perp_wall_dist = (map_y - player.y + IDIV_2((1 - step_y))) / ray_dir_y;
+            perp_wall_dist = (map_y - player.location.y + IDIV_2((1 - step_y))) / ray_dir_y;
         }
         line_height = (int)(screen_height / perp_wall_dist);
 
@@ -139,7 +139,7 @@ inline static void renderWalls() {
         }
         wall_tex = world.getAt(map_x, map_y).wf_left.texture;
 
-        wall_x = side == 0 ? player.y + perp_wall_dist * ray_dir_y : player.x + perp_wall_dist * ray_dir_x;
+        wall_x = side == 0 ? player.location.y + perp_wall_dist * ray_dir_y : player.location.x + perp_wall_dist * ray_dir_x;
         wall_x -= floor((wall_x));
 
         tex_coord_x = (int)(wall_x * double(renderCfg.texture_width));
@@ -176,8 +176,8 @@ inline static void renderSprites() {
     uint32_t color;
     double inverse_det = 1.0 / (player.camera.clip_plane_x * player.camera.frustrum.getFovY() - player.camera.frustrum.getFovX() * player.camera.clip_plane_y);
     for (int i = world.sprites.size() - 1; i >= 0; i--) {
-        sprite_x = world.sprites[i].location.x - player.x;
-        sprite_y = world.sprites[i].location.y - player.y;
+        sprite_x = world.sprites[i].location.x - player.location.x;
+        sprite_y = world.sprites[i].location.y - player.location.y;
 
         transform_x = inverse_det * (player.camera.frustrum.getFovY() * sprite_x - player.camera.frustrum.getFovX() * sprite_y);
         transform_y = inverse_det * (-player.camera.clip_plane_y * sprite_x + player.camera.clip_plane_x * sprite_y);
@@ -230,6 +230,10 @@ inline static void updateTimeTick() {
 
     player.moveSpeed = frame_time * playerCfg.move_speed;
     player.rotSpeed = frame_time * playerCfg.rotation_speed;
+
+    global_tick++;
+    world.updateSprites();
+    player.update();
 }
 
 static void display(void) {
@@ -259,18 +263,18 @@ static void display(void) {
 
 static void __KEY_HANDLER(unsigned char key, int x, int y) {
     if (key == 'w') {
-        if (world.getAt((int)(player.x + player.camera.frustrum.getFovX() * player.moveSpeed), (int)player.y).wf_left.texture == "") {
-            player.x += player.camera.frustrum.getFovX() * player.moveSpeed;
+        if (world.getAt((int)(player.location.x + player.camera.frustrum.getFovX() * player.moveSpeed), (int)player.location.y).wf_left.texture == "") {
+            player.location.x += player.camera.frustrum.getFovX() * player.moveSpeed;
         }
-        if (world.getAt((int)player.x, (int)(player.y + player.camera.frustrum.getFovY() * player.moveSpeed)).wf_left.texture == "") {
-            player.y += player.camera.frustrum.getFovY() * player.moveSpeed;
+        if (world.getAt((int)player.location.x, (int)(player.location.y + player.camera.frustrum.getFovY() * player.moveSpeed)).wf_left.texture == "") {
+            player.location.y += player.camera.frustrum.getFovY() * player.moveSpeed;
         }
     } else if (key == 's') {
-        if (world.getAt((int)(player.x - player.camera.frustrum.getFovX() * player.moveSpeed), (int)player.y).wf_left.texture == "") {
-            player.x -= player.camera.frustrum.getFovX() * player.moveSpeed;
+        if (world.getAt((int)(player.location.x - player.camera.frustrum.getFovX() * player.moveSpeed), (int)player.location.y).wf_left.texture == "") {
+            player.location.x -= player.camera.frustrum.getFovX() * player.moveSpeed;
         }
-        if (world.getAt((int)player.x, (int)(player.y - player.camera.frustrum.getFovY() * player.moveSpeed)).wf_left.texture == "") {
-            player.y -= player.camera.frustrum.getFovY() * player.moveSpeed;
+        if (world.getAt((int)player.location.x, (int)(player.location.y - player.camera.frustrum.getFovY() * player.moveSpeed)).wf_left.texture == "") {
+            player.location.y -= player.camera.frustrum.getFovY() * player.moveSpeed;
         }
     } else if (key == 'a') {
         double old_dir_x = player.camera.frustrum.getFovX();
@@ -318,7 +322,6 @@ void __INIT() {
     player.moveSpeed = frame_time * playerCfg.move_speed;
     player.rotSpeed = frame_time * playerCfg.rotation_speed;
 
-    // toClearColour(bg_colour);
     gluOrtho2D(0, screen_width, screen_height, 0);
     player = Player(
         world.start.x,
@@ -326,7 +329,7 @@ void __INIT() {
         -playerCfg.fov,
         0.0,
         0);
-    debugContext.logAppInfo("Initialised Player object at: " + ADDR_OF(player));
+    debugContext.logAppInfo("Initialised Player object [" + to_string(player.id) + "] at: " + ADDR_OF(player));
 
     minimap = Minimap(&player, &world, screen_width, screen_height);
     debugContext.logAppInfo("Initialised Minimap object at: " + ADDR_OF(minimap));
@@ -340,6 +343,9 @@ void __INIT() {
 
     pixelBuffer = Rendering::PBO(screen_width, screen_height);
     pixelBuffer.init();
+
+    global_tick = 0;
+    debugContext.logAppInfo("Initialised global tick");
 }
 
 static void __WINDOW_RESHAPE(int width, int height) {

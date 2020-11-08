@@ -4,16 +4,17 @@
 #include "../../../rendering/Globals.hpp"
 #include "../../../physics/Interaction.hpp"
 #include "../../../logic/id/IDGenerator.hpp"
+#include "../element/ITickedBased.hpp"
 
 using namespace std;
 
 namespace BaseInterface {
 
 template <typename T = int, template <typename> class C = Coordinates>
-struct IEntityBase {
+struct IEntityBase : public ITickedBase {
     IEntityBase(C<T> eloc, INTERACTION_TYPE itype);
     virtual bool operator==(IEntityBase<T, C>& other);
-    int_id ent_id = IDGenerator::instance()->next();
+    int_id id = IDGenerator::instance()->next();
     C<T> location;
     INTERACTION_TYPE interaction_type;
 };

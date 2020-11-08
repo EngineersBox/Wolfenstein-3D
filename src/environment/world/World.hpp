@@ -14,7 +14,7 @@
 #include "../../rendering/Globals.hpp"
 #include "../constructs/sprites/Sprite.hpp"
 #include "../../rendering/colour/Colours.hpp"
-#include "../../rendering/player/Player.hpp"
+#include "../player/Player.hpp"
 
 using namespace std;
 #define MAP_DELIM ";"
@@ -30,6 +30,7 @@ struct World {
 
     inline double sqDist(double ax, double ay, double bx, double by);
     inline void sortSprites(Player& player);
+    void updateSprites();
 
     int map_width;
     int map_height;
@@ -177,13 +178,19 @@ Constructs::AABB World::getAtPure(int loc) {
 
 double World::sqDist(double ax, double ay, double bx, double by) {
     return pow(bx - ax, 2) + pow(by - ay, 2);
-}
+};
 
 inline void World::sortSprites(Player& player) {
     accumulate(this->sprites.begin(), this->sprites.end(), 0, [this, player](int i, Constructs::Sprite& sprite) -> int {
-        sprite.distance = sqDist(sprite.location.x, player.x, sprite.location.y, player.y);
+        sprite.distance = sqDist(sprite.location.x, player.location.x, sprite.location.y, player.location.y);
         sprite.order = i;
         return i++;
     });
     sort(this->sprites.begin(), this->sprites.end());
-}
+};
+
+void World::updateSprites() {
+    for_each(this->sprites.begin(), this->sprites.end(), [](Constructs::Sprite &sprite){
+        sprite.update();
+    });
+};

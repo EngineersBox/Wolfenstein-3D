@@ -2,7 +2,7 @@
 
 #include "../../rendering/Globals.hpp"
 #include "../../rendering/drawing/RasterText.hpp"
-#include "../../rendering/player/Player.hpp"
+#include "../../environment/player/Player.hpp"
 #include "../../environment/world/World.hpp"
 #include "../minimap/Minimap.hpp"
 
@@ -65,8 +65,8 @@ void DebugOverlay::renderPlayerPos() {
             this->playerPosX, this->playerPosY,
             Colour::RGB_Yellow, this->font,
             string("[Player Position] X: ")
-                + to_string(this->player->x).c_str() + " Y: "
-                + to_string(this->player->y).c_str()
+                + to_string(this->player->location.x).c_str() + " Y: "
+                + to_string(this->player->location.y).c_str()
         );
     }
 };

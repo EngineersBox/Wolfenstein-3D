@@ -3,7 +3,7 @@
 #include "../../rendering/Globals.hpp"
 #include "../../rendering/drawing/DrawingUtils.hpp"
 #include "../../rendering/colour/Colours.hpp"
-#include "../../rendering/player/Player.hpp"
+#include "../../environment/player/Player.hpp"
 
 using namespace std;
 
@@ -52,16 +52,16 @@ void Minimap::renderPlayerPos() {
 
     // Draw player point
     glBegin(GL_POINTS);
-    glVertex2d(xOffset + (player->x * scalingY), yOffset + (player->y * scalingX));
+    glVertex2d(xOffset + (player->location.x * scalingY), yOffset + (player->location.y * scalingX));
 
     glEnd();
 
     // Draw direction vector
     renderRay(
-        xOffset + (player->x * scalingX),
-        yOffset + (player->y * scalingY),
-        xOffset + ((player->x + player->camera.frustrum.getFovX() * 1.5) * scalingX),
-        yOffset + ((player->y + player->camera.frustrum.getFovY() * 1.5) * scalingY),
+        xOffset + (player->location.x * scalingX),
+        yOffset + (player->location.y * scalingY),
+        xOffset + ((player->location.x + player->camera.frustrum.getFovX() * 1.5) * scalingX),
+        yOffset + ((player->location.y + player->camera.frustrum.getFovY() * 1.5) * scalingY),
         3,
         Colour::RGB_Red
     );

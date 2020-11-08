@@ -4,10 +4,10 @@
 
 ## Raycaster
 
-* [x] Create generic method for both `checkVertical()` and `checkHorizontal()` called `checkDir()`
-* [x] Break `renderRays2Dto3D()` method up into smaller methods and generify where possible
+* [x] ~~Create generic method for both `checkVertical()` and `checkHorizontal()` called `checkDir()`~~
+* [x] ~~Break `renderRays2Dto3D()` method up into smaller methods and generify where possible~~
 * [x] Create texture hashing by string using polynomial rolling
-* [x] *Change rendering to BMP columns* (WIP)
+* [x] ~~Change rendering to BMP columns~~ Changed to PNG
 * [x] Add config files and reader
 * [x] Change renderer to query wall texture
 * [x] Fix HashTable (change to hashmap K,V pairs) and fix Texture
@@ -15,12 +15,15 @@
 * [x] Add collision detection with walls
 * [x] Implement A* search algorithm
 * [x] Add start + end locations in map definitions
-* [ ] Change raycasting to query against walls from results of BSP rather than raymarching
+* [ ] Change raycasting to query against walls from results of QSP rather than raymarching
 * [x] Implement minmap and player position scaling
 * [x] Fix ray rendering on minimap
 * [x] Fix Linux + Windows GL window rendering (incorrect scaling)
 * [x] Change TextureLoader to iterate through `resources/textures/*` and load all in there (verify existance and format)
 * [x] Fix sprite rendering order, currently far sprites render on top of near, this should be inverted
+* [ ] Finish StatsBar
+* [ ] Add animation frames to Enemies
+* [ ] Add hit scan shooting when player clicks, call `hitScanCheck()` on enemies
 
 ## Logging
 

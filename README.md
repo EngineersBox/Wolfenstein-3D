@@ -293,13 +293,14 @@ In order to make it easier to traverse the file system, here is a tree depicting
 * src
   * environment
     * base
+      * element
       * entity
       * object
     * constructs
       * doors
       * sprites
       * walls
-    * map
+    * player
     * world
   * exceptions
     * buffering
@@ -331,7 +332,6 @@ In order to make it easier to traverse the file system, here is a tree depicting
     * colour
     * drawing
     * partitioning
-    * player
     * raycaster
     * texturing
     * viewmodel

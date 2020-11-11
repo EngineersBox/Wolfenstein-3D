@@ -319,6 +319,8 @@ In order to make it easier to traverse the file system, here is a tree depicting
     - pathfinding
     - textures
   - gui
+    - base
+    - button
     - debug_overlay
     - minimap
     - stats_bar

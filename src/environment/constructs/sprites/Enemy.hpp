@@ -12,14 +12,17 @@ namespace Constructs {
 class Enemy : public Sprite {
     public:
         Enemy(){};
-        Enemy(vector<string> animation_frames, Tick animation_tick_speed);
+        Enemy(double xloc, double yloc, vector<string> animation_frames, Tick animation_tick_speed);
+        void update();
     private:
         vector<string> animation_frames;
         int frame_idx = 0;
         Tick animation_tick_speed;
 };
 
-Enemy::Enemy(vector<string> animation_frames, Tick animation_tick_speed) {
+Enemy::Enemy(double xloc, double yloc, vector<string> animation_frames, Tick animation_tick_speed):
+    Sprite(xloc, yloc, animation_frames[0])
+{
     this->animation_frames = animation_frames;
     this->animation_tick_speed = animation_tick_speed;
 };

@@ -2,7 +2,7 @@
 
 ![GitHub Workflow Status](https://img.shields.io/github/workflow/status/EngineersBox/BSPMinimalRendering/CMake?style=for-the-badge) ![TODO Status](https://img.shields.io/badge/TODO-outstanding-yellow?style=for-the-badge&logo=markdown)
 
-Finding the minimal amount of polygons to render based with A* and QSP trees.
+Finding the minimal amount of polygons to render based with A\* and QSP trees.
 
 Something important to note about this repo and its implementation. The idea behind this is to use the most low level OpenGL functionality and handle of all of the graphics processing manually. This means not using OpenGL/GLUT texturing managing and perspective polygon rendering + scaling. Instead all of this is calculated as part of the raycasting implementation.
 
@@ -20,24 +20,24 @@ If you have CMake installed then running the raycaster is really straight forwar
 4. Start the built raycaster with `make run`
 
 Below is a full list of commands and their usages:
-*NOTE: All commands have supported equivalents in the `makefile.alt` for non CMake users*
+_NOTE: All commands have supported equivalents in the `makefile.alt` for non CMake users_
 
-|Command|Description|
-|---|---|
-|`cmake .`| Initialise the build environment|
-|`make QSP`| Build the raycaster to `out/`|
-|`make run`| Execute a build in `out/`|
-|`make run_memprof`| Execute a build in `out/` within a call of `leaks` *(UNIX only)*|
-|`make destroy`| Removes all files in the `out/`|
-|`make clean_logs`| Removes all log files from `logs/`|
-|`make archive_logs`| Compress all `*.log` files in `logs/` into a date time named zip archive in the format: `archive-DD-MM-YYYY_HH-MM-SS.zip`|
-|`make clean_archives`| Remove all archives from `logs/`|
-|`make clean_memprof`| Remove all memory profiles from `memory_analysis/`|
-|`make archive_memprof`| Compres all `*.memgraph` memory profiles from `memory_analysis/` into a date time named zip archive in the format: `archive-DD-MM-YYYY_HH-MM-SS.zip`|
-|`make clean_memprof`| Remove all archives from `memory_analysis/`|
-|`make build_tests`| Build the test cases to `out/tests`|
-|`make run_tests`| Run the test cases with assertion fails only|
-|`make run_tests_wo`| Run the test cases with output for all assertions|
+| Command                | Description                                                                                                                                          |
+| ---------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `cmake .`              | Initialise the build environment                                                                                                                     |
+| `make QSP`             | Build the raycaster to `out/`                                                                                                                        |
+| `make run`             | Execute a build in `out/`                                                                                                                            |
+| `make run_memprof`     | Execute a build in `out/` within a call of `leaks` _(UNIX only)_                                                                                     |
+| `make destroy`         | Removes all files in the `out/`                                                                                                                      |
+| `make clean_logs`      | Removes all log files from `logs/`                                                                                                                   |
+| `make archive_logs`    | Compress all `*.log` files in `logs/` into a date time named zip archive in the format: `archive-DD-MM-YYYY_HH-MM-SS.zip`                            |
+| `make clean_archives`  | Remove all archives from `logs/`                                                                                                                     |
+| `make clean_memprof`   | Remove all memory profiles from `memory_analysis/`                                                                                                   |
+| `make archive_memprof` | Compres all `*.memgraph` memory profiles from `memory_analysis/` into a date time named zip archive in the format: `archive-DD-MM-YYYY_HH-MM-SS.zip` |
+| `make clean_memprof`   | Remove all archives from `memory_analysis/`                                                                                                          |
+| `make build_tests`     | Build the test cases to `out/tests`                                                                                                                  |
+| `make run_tests`       | Run the test cases with assertion fails only                                                                                                         |
+| `make run_tests_wo`    | Run the test cases with output for all assertions                                                                                                    |
 
 ### Using alternate makefile
 
@@ -51,7 +51,7 @@ To build the raycaster:
 make -f Makefile.alt build_osx_clang++
 ```
 
-*or*
+_or_
 
 ```bash
 make -f Makefile.alt build_osx_g++
@@ -90,7 +90,7 @@ If you have CMake installed then running the test cases is really straight forwa
 1. Open up a terminal window and cd to this repo
 2. Run `cmake .` to set up the cmake build environment
 3. Build the test cases with `make build_tests`
-4. Run the test cases with `make run_tests` (*or* `make run_tests_wo` *if you want to see each of the assertions*)
+4. Run the test cases with `make run_tests` (_or_ `make run_tests_wo` _if you want to see each of the assertions_)
 
 ### Testing with alternate makefile
 
@@ -104,7 +104,7 @@ To build the tests:
 make -f Makefile.alt build_tests_osx_clang++
 ```
 
-*or*
+_or_
 
 ```bash
 make -f Makefile.alt build_tests_osx_g++
@@ -146,7 +146,7 @@ make -f Makefile.alt run_tests_wo
 
 ### Shortest Path
 
-In order to find the shortest path, an extension of Dijkstra's algorithm is used; known as A*. This type of path finding uses a heuristic based on distance relative to both the start and end positions. In this case however, the heuristic is modified to also take into acount polygon count changes at each move.
+In order to find the shortest path, an extension of Dijkstra's algorithm is used; known as A\*. This type of path finding uses a heuristic based on distance relative to both the start and end positions. In this case however, the heuristic is modified to also take into acount polygon count changes at each move.
 
 ![https://upload.wikimedia.org/wikipedia/commons/5/5d/Astar_progress_animation.gif](https://upload.wikimedia.org/wikipedia/commons/5/5d/Astar_progress_animation.gif)
 
@@ -162,7 +162,7 @@ This process involes quatering the render space convex hull into smaller convex 
 
 #### Links:
 
-* [OpenGL BSP implementation](https://www.opengl.org/archives/resources/code/samples/bspfaq/)
+- [OpenGL BSP implementation](https://www.opengl.org/archives/resources/code/samples/bspfaq/)
 
 ### Texture hashing
 
@@ -178,11 +178,11 @@ Reducing the overhead of texture references is done with custom texture hashing.
 
 A map is described by a JSON object contain information about the map parameters and walls. There are three main sections:
 
-* `Params`: Map specific configuration
-* `Ceiling`: Specifying the ceiling texture
-* `Floor`: Specifying the floor texture
-* `Walls`: The layout of the map and how it renders
-* `Sprites`: Positions of 2D sprites in the map
+- `Params`: Map specific configuration
+- `Ceiling`: Specifying the ceiling texture
+- `Floor`: Specifying the floor texture
+- `Walls`: The layout of the map and how it renders
+- `Sprites`: Positions of 2D sprites in the map
 
 Map files are stored in `resources/maps/`. Below is the JSON schema for a map file:
 
@@ -225,7 +225,13 @@ Map files are stored in `resources/maps/`. Below is the JSON schema for a map fi
         {
             "x": "<double>",
             "y": "<double>",
-            "Texture": "<string>"
+            "Texture": "<string>",
+            "Enemy": "<bool>",
+            "Animation Frames": [ // Enemy == true
+		"texture 1",
+		"texture 2"
+            ],
+            "Tick Rate": "<int>" // Enemy == true
         }
     ]
 }
@@ -237,10 +243,10 @@ Configuration for implementation and feature usage is done with a `config.ini` f
 
 There are four main sections:
 
-* `player`
-* `minimap`
-* `logging`
-* `rendering`
+- `player`
+- `minimap`
+- `logging`
+- `rendering`
 
 Below is an example of a configuration file:
 
@@ -286,59 +292,59 @@ texture_height = 64
 
 In order to make it easier to traverse the file system, here is a tree depicting how the nestings of directories is layed out:
 
-* resources
-  * configs
-  * maps
-  * textures
-* src
-  * environment
-    * base
-      * element
-      * entity
-      * object
-    * constructs
-      * doors
-      * sprites
-      * walls
-    * player
-    * world
-  * exceptions
-    * buffering
-    * configuration
-    * debug
-    * hashing
-    * heap
-    * image
-    * map
-    * pathfinding
-    * textures
-  * gui
-    * debug_overlay
-    * minimap
-    * stats_bar
-  * io
-    * configuration
-      * sections
-    * logging
-    * resource_management
-  * logic
-    * hashing
-    * id
-    * pathfinding
-    * queue
-  * physics
-  * rendering
-    * buffering
-    * colour
-    * drawing
-    * partitioning
-    * raycaster
-    * texturing
-    * viewmodel
-* test
-  * asset_loading
-  * framework
-  * hashing
-  * io
-  * pathfinding
-  * resources
+- resources
+  - configs
+  - maps
+  - textures
+- src
+  - environment
+    - base
+      - element
+      - entity
+      - object
+    - constructs
+      - doors
+      - sprites
+      - walls
+    - player
+    - world
+  - exceptions
+    - buffering
+    - configuration
+    - debug
+    - hashing
+    - heap
+    - image
+    - map
+    - pathfinding
+    - textures
+  - gui
+    - debug_overlay
+    - minimap
+    - stats_bar
+  - io
+    - configuration
+      - sections
+    - logging
+    - resource_management
+  - logic
+    - hashing
+    - id
+    - pathfinding
+    - queue
+  - physics
+  - rendering
+    - buffering
+    - colour
+    - drawing
+    - partitioning
+    - raycaster
+    - texturing
+    - viewmodel
+- test
+  - asset_loading
+  - framework
+  - hashing
+  - io
+  - pathfinding
+  - resources

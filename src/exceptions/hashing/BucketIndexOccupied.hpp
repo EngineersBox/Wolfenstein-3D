@@ -2,6 +2,7 @@
 
 #include <exception>
 #include <string>
+#include <string.h>
 #include "../../rendering/Globals.hpp"
 
 using namespace std;

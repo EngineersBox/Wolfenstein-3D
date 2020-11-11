@@ -2994,6 +2994,7 @@ namespace Catch {
 
 #include <exception>
 #include <string>
+#include <string.h>
 #include <vector>
 
 namespace Catch {

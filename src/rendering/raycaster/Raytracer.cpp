@@ -10,11 +10,14 @@
 
 #define __DEFAULT_DISPLAY_FUNC [](){}
 
+#define __DEFAULT_SCREEN_WIDTH 1024
+#define __DEFAULT_SCREEN_HEIGHT 512
+
 using namespace std;
 
 // Screen
-int screen_width = 1024;
-int screen_height = 512;
+int screen_width = __DEFAULT_SCREEN_WIDTH;
+int screen_height = __DEFAULT_SCREEN_HEIGHT;
 
 ResourceManager::TextureLoader texLoader;
 HashTable<Texture> textures;
@@ -168,7 +171,7 @@ inline static void renderWalls() {
 }
 
 inline static void renderSprites() {
-    world.sortSprites(player);
+    world.sortSprites(player.location);
 
     double sprite_x, sprite_y, transform_x, transform_y;
     int sprite_screen_x, vert_move_screen, sprite_height, sprite_width, draw_start_pos_y, draw_end_pos_y, draw_start_pos_x, draw_end_pos_x, tex_coord_x, tex_coord_y, d;
@@ -262,37 +265,7 @@ static void display(void) {
 }
 
 static void __KEY_HANDLER(unsigned char key, int x, int y) {
-    if (key == 'w') {
-        if (world.getAt((int)(player.location.x + player.camera.frustrum.getFovX() * player.moveSpeed), (int)player.location.y).wf_left.texture == "") {
-            player.location.x += player.camera.frustrum.getFovX() * player.moveSpeed;
-        }
-        if (world.getAt((int)player.location.x, (int)(player.location.y + player.camera.frustrum.getFovY() * player.moveSpeed)).wf_left.texture == "") {
-            player.location.y += player.camera.frustrum.getFovY() * player.moveSpeed;
-        }
-    } else if (key == 's') {
-        if (world.getAt((int)(player.location.x - player.camera.frustrum.getFovX() * player.moveSpeed), (int)player.location.y).wf_left.texture == "") {
-            player.location.x -= player.camera.frustrum.getFovX() * player.moveSpeed;
-        }
-        if (world.getAt((int)player.location.x, (int)(player.location.y - player.camera.frustrum.getFovY() * player.moveSpeed)).wf_left.texture == "") {
-            player.location.y -= player.camera.frustrum.getFovY() * player.moveSpeed;
-        }
-    } else if (key == 'a') {
-        double old_dir_x = player.camera.frustrum.getFovX();
-        player.camera.frustrum.setFovX(player.camera.frustrum.getFovX() * cos(-player.rotSpeed) - player.camera.frustrum.getFovY() * sin(-player.rotSpeed));
-        player.camera.frustrum.setFovY(old_dir_x * sin(-player.rotSpeed) + player.camera.frustrum.getFovY() * cos(-player.rotSpeed));
-
-        double old_plane_x = player.camera.clip_plane_x;
-        player.camera.clip_plane_x = player.camera.clip_plane_x * cos(-player.rotSpeed) - player.camera.clip_plane_y * sin(-player.rotSpeed);
-        player.camera.clip_plane_y = old_plane_x * sin(-player.rotSpeed) + player.camera.clip_plane_y * cos(-player.rotSpeed);
-    } else if (key == 'd') {
-        double old_dir_x = player.camera.frustrum.getFovX();
-        player.camera.frustrum.setFovX(player.camera.frustrum.getFovX() * cos(player.rotSpeed) - player.camera.frustrum.getFovY() * sin(player.rotSpeed));
-        player.camera.frustrum.setFovY(old_dir_x * sin(player.rotSpeed) + player.camera.frustrum.getFovY() * cos(player.rotSpeed));
-
-        double old_plane_x = player.camera.clip_plane_x;
-        player.camera.clip_plane_x = player.camera.clip_plane_x * cos(player.rotSpeed) - player.camera.clip_plane_y * sin(player.rotSpeed);
-        player.camera.clip_plane_y = old_plane_x * sin(player.rotSpeed) + player.camera.clip_plane_y * cos(player.rotSpeed);
-    }
+    player.handleKeyPress(key, x, y, world);
     glutPostRedisplay();
 }
 

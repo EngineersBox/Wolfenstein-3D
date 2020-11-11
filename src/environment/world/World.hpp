@@ -4,6 +4,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <numeric>
 
 #include "../constructs/walls//AABBFace.hpp"
 #include "../constructs/walls/AABB.hpp"
@@ -13,8 +14,8 @@
 #include "Coordinates.hpp"
 #include "../../rendering/Globals.hpp"
 #include "../constructs/sprites/Sprite.hpp"
+#include "../constructs/sprites/Enemy.hpp"
 #include "../../rendering/colour/Colours.hpp"
-#include "../player/Player.hpp"
 
 using namespace std;
 #define MAP_DELIM ";"
@@ -29,7 +30,7 @@ struct World {
     Constructs::AABB getAtPure(int loc);
 
     inline double sqDist(double ax, double ay, double bx, double by);
-    inline void sortSprites(Player& player);
+    inline void sortSprites(Coordinates<double> player_loc);
     void updateSprites();
 
     int map_width;
@@ -155,10 +156,26 @@ void World::readMapFromJSON(string filename) {
         double x = spriteObj["x"].as<double>();
         double y = spriteObj["y"].as<double>();
         string texture = spriteObj["Texture"].as<string>();
-        this->sprites.push_back(Constructs::Sprite(
-            x,
-            y,
-            texture));
+        ResourceManager::RSJresource isEnemyObj = spriteObj["Enemy"];
+        bool isEnemy = isEnemyObj.exists() ? isEnemyObj.as<bool>() : false;
+        if (isEnemy) {
+            ResourceManager::RSJarray animation_frames = spriteObj["Animation Frames"].as_array();
+            vector<string> frames(animation_frames.size());
+            for_each(animation_frames.begin(), animation_frames.end(), [&frames](ResourceManager::RSJresource frame) {
+                frames.push_back(frame.as<string>());
+            });
+            int tick_rate = spriteObj["Tick Rate"].as<int>();
+            this->sprites.push_back(Constructs::Enemy(
+                x,y,
+                frames,
+                tick_rate
+            ));
+        } else {
+            this->sprites.push_back(Constructs::Sprite(
+                x, y,
+                texture
+            ));
+        }
     }
     debugContext.logAppInfo("Processed " + to_string(spritearr.size()) + " Sprite entities");
     this->ceiling_texture = jsonres["Ceiling"].as<string>();
@@ -180,9 +197,9 @@ double World::sqDist(double ax, double ay, double bx, double by) {
     return pow(bx - ax, 2) + pow(by - ay, 2);
 };
 
-inline void World::sortSprites(Player& player) {
-    accumulate(this->sprites.begin(), this->sprites.end(), 0, [this, player](int i, Constructs::Sprite& sprite) -> int {
-        sprite.distance = sqDist(sprite.location.x, player.location.x, sprite.location.y, player.location.y);
+inline void World::sortSprites(Coordinates<double> player_loc) {
+    accumulate(this->sprites.begin(), this->sprites.end(), 0, [this, player_loc](int i, Constructs::Sprite& sprite) -> int {
+        sprite.distance = sqDist(sprite.location.x, player_loc.x, sprite.location.y, player_loc.y);
         sprite.order = i;
         return i++;
     });

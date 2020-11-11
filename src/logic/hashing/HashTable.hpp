@@ -10,7 +10,7 @@
 
 using namespace std;
 
-#define HASH_TABLE_MAX_SIZE 1024
+#define HASH_TABLE_MAX_SIZE 10000
 #define HASH_TABLE_DEFAULT_SIZE 16
 #define HASH_TABLE_MAX_KEY_SIZE 32
 

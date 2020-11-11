@@ -2,6 +2,8 @@
 
 #include <exception>
 #include <string>
+#include <string.h>
+#include <string.h>
 
 #include "../../rendering/Globals.hpp"
 

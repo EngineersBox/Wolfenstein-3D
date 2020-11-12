@@ -9,6 +9,8 @@
 
 using namespace std;
 
+namespace GUI {
+
 #define SB_LEVEL_RATIO 0.1
 #define SB_SCORE_RATIO 0.2
 #define SB_LIVES_RATIO 0.1
@@ -125,4 +127,5 @@ void StatsBar::render(int screen_width, int screen_height) {
         current_colour[1],
         current_colour[2]
     );
+}
 }

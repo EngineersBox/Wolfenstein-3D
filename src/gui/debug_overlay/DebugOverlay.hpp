@@ -8,6 +8,8 @@
 
 using namespace std;
 
+namespace GUI {
+
 #define OVERLAY_TEXT_SPACING 15
 #define OVERLAY_TEXT_OFFSET_X 10
 
@@ -89,3 +91,4 @@ void DebugOverlay::render(double frame_time) {
     renderPlayerPos();
     renderTimeTick(frame_time);
 };
+}

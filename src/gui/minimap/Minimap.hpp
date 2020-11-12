@@ -7,6 +7,8 @@
 
 using namespace std;
 
+namespace GUI {
+
 class Minimap {
     public:
         Minimap(){};
@@ -117,4 +119,5 @@ float Minimap::getOffsetX() const {
 
 float Minimap::getOffsetY() const {
     return this->yOffset;
+}
 }

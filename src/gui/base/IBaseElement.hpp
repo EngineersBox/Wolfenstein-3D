@@ -1,4 +1,4 @@
-#pragma
+#pragma once
 
 #include "../../logic/id/IDGenerator.hpp"
 #include "../../rendering/buffering/PBO.hpp"
@@ -9,10 +9,9 @@ using namespace std;
 namespace GUI {
 
 struct IBaseElement {
-    IBaseElement(){};
     IBaseElement(int x, int y, int width, int height, Colour::ColorRGB background_colour);
-    virtual void render(Rendering::PBO &pbo);
-    virtual void render();
+    virtual void render(Rendering::PBO &pbo) = 0;
+    virtual void render() = 0;
 
     int x;
     int y;

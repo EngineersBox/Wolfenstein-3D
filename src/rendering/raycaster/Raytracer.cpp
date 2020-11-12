@@ -30,9 +30,6 @@ Player player;
 ResourceManager::ConfigInit cfgInit;
 
 World world = World();
-Minimap minimap;
-DebugOverlay debugOverlay;
-StatsBar statsBar;
 
 double new_time = 0;
 double old_time = 0;
@@ -42,6 +39,8 @@ double frame_time = 0;
 Rendering::PBO pixelBuffer;
 Rendering::RayBuffer rays;
 Rendering::ZBuffer zBuf;
+
+GUI::Canvas canvas;
 
 inline static void renderFloorCeiling() {
     float ray_dir_x0, ray_dir_y0, ray_dir_x1, ray_dir_y1, pos_z, dist, step_x, step_y, floor_x, floor_y;
@@ -253,14 +252,15 @@ static void display(void) {
     pixelBuffer.swapBuffer();
     updateTimeTick();
     
-    minimap.render(screen_width, screen_height);
+    // canvas.getMinimap().render(screen_width, screen_height);
+    canvas.render(frame_time);
     astar.renderPath(
         path, Colour::RGB_Blue,
         screen_width, screen_height,
-        minimap.getScalingX(), minimap.getScalingY()
+        canvas.getMinimap().getScalingX(), canvas.getMinimap().getScalingY()
     );
-    debugOverlay.render(frame_time);
-    statsBar.render(screen_width, screen_height);
+    // canvas.getDebugOverlay().render(frame_time);
+    // canvas.getStatsBar().render(screen_width, screen_height);
     glutSwapBuffers();
 }
 
@@ -268,6 +268,7 @@ static void __KEY_HANDLER(unsigned char key, int x, int y) {
     player.handleKeyPress(key, x, y, world);
     glutPostRedisplay();
 }
+
 
 ///
 /// Initialise the display rendering and player position
@@ -304,15 +305,21 @@ void __INIT() {
         0);
     debugContext.logAppInfo("Initialised Player object [" + to_string(player.id) + "] at: " + ADDR_OF(player));
 
-    minimap = Minimap(&player, &world, screen_width, screen_height);
-    debugContext.logAppInfo("Initialised Minimap object at: " + ADDR_OF(minimap));
+    canvas.setMinimap(GUI::Minimap(&player, &world, screen_width, screen_height));
+    debugContext.logAppInfo("Initialised Minimap object at: " + ADDR_OF(canvas.getMinimap()));
 
-    debugOverlay = DebugOverlay(&player, &minimap, &world, GLUT_BITMAP_HELVETICA_18);
-    debugContext.logAppInfo("Initialised DebugOverlay object at: " + ADDR_OF(debugOverlay));
+    canvas.setDebugOverlay(GUI::DebugOverlay(&player, &canvas.getMinimap(), &world, GLUT_BITMAP_HELVETICA_18));
+    debugContext.logAppInfo("Initialised DebugOverlay object at: " + ADDR_OF(canvas.getDebugOverlay()));
 
-    statsBar = StatsBar(screen_width, screen_height,
-        Colour::RGB_Blue, Colour::RGB_Navy, Colour::RGB_White);
-    debugContext.logAppInfo("Initialised StatsBar object at: " + ADDR_OF(statsBar));
+    canvas.setStatsBar(GUI::StatsBar(screen_width, screen_height,
+        Colour::RGB_Blue, Colour::RGB_Navy, Colour::RGB_White));
+    debugContext.logAppInfo("Initialised StatsBar object at: " + ADDR_OF(canvas.getStatsBar()));
+
+    canvas.addButton(GUI::Button(100, 100, 100, 20, "Button",
+        Colour::RGB_Blue, Colour::RGB_Red, Colour::RGB_Green,
+    [](int_id id){
+        cout << "Button " << id << " pressed" << endl;
+    }));
 
     pixelBuffer = Rendering::PBO(screen_width, screen_height);
     pixelBuffer.init();
@@ -330,6 +337,18 @@ static void __WINDOW_RESHAPE(int width, int height) {
 
 static void __GLUT_IDLE(void) {
     glutPostRedisplay();
+}
+
+static void __MOUSE_HANDLER(int button, int state, int x, int y) {
+    canvas.handleMouse(button, state, x, y);
+}
+
+static void __ACTIVE_MOTION_HANDLER(int x, int y) {
+    canvas.handleMouse(GLUT_LEFT_BUTTON, GLUT_UP, x, y);
+}
+
+static void __PASSIVE_MOTION_HANDLER(int x, int y) {
+    canvas.handleMouse(GLUT_LEFT_BUTTON, GLUT_UP, x, y);
 }
 
 ///
@@ -360,6 +379,12 @@ int main(int argc, char* argv[]) {
     debugContext.logApiInfo("Initialised glutReshapeFunc [__WINDOW_RESHAPE] at: " + ADDR_OF(__WINDOW_RESHAPE));
     glutKeyboardFunc(__KEY_HANDLER);
     debugContext.logApiInfo("Initialised glutKeyboardFunc [__KEY_HANDLER] at: " + ADDR_OF(__KEY_HANDLER));
+    glutMouseFunc(__MOUSE_HANDLER);
+    debugContext.logApiInfo("Initialised glutMouseFunc [__MOUSE_HANDLER] at: " + ADDR_OF(__MOUSE_HANDLER));
+    glutMotionFunc(__ACTIVE_MOTION_HANDLER);
+    debugContext.logApiInfo("Initialised glutMouseFunc [__ACTIVE_MOTION_HANDLER] at: " + ADDR_OF(__ACTIVE_MOTION_HANDLER));
+    glutPassiveMotionFunc(__PASSIVE_MOTION_HANDLER);
+    debugContext.logApiInfo("Initialised glutMouseFunc [__PASSIVE_MOTION_HANDLER] at: " + ADDR_OF(__PASSIVE_MOTION_HANDLER));
     glutIdleFunc(__GLUT_IDLE);
     debugContext.logApiInfo("Initialised glutIdleFunc [__GLUT_IDLE] at: " + ADDR_OF(__GLUT_IDLE));
     glutPostRedisplay();

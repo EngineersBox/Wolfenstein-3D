@@ -48,3 +48,4 @@
 #include "../../gui/minimap/Minimap.hpp"
 #include "../../gui/debug_overlay/DebugOverlay.hpp"
 #include "../../gui/stats_bar/StatsBar.hpp"
+#include "../../gui/Canvas.hpp"

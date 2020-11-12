@@ -25,10 +25,13 @@ typedef function<void(int_id)> ButtonCallback;
 
 class Button : public IBaseElement {
     public:
-        Button(){};
-        Button(string& text, ButtonCallback callback);
-        Button(int x, int y, int width, int height, string& text, ButtonCallback callback);
-        Button(int x, int y, int width, int height, string& text, Colour::ColorRGB background_colour, Colour::ColorRGB hover_colour, Colour::ColorRGB click_colour, ButtonCallback callback);
+        Button();
+        Button(string text, ButtonCallback callback);
+        Button(int x, int y, int width, int height, string text, ButtonCallback callback);
+        Button(int x, int y, int width, int height, string text, Colour::ColorRGB background_colour, Colour::ColorRGB hover_colour, Colour::ColorRGB click_colour, ButtonCallback callback);
+
+        void render(Rendering::PBO& pbo);
+        void render();
 
         void setBackgroundColour(Colour::ColorRGB colour);
         void setHoverColour(Colour::ColorRGB colour);
@@ -42,17 +45,14 @@ class Button : public IBaseElement {
         void setY(int y);
         void setWidth(int width);
         void setHeight(int height);
-        void setText(string &text);
+        void setText(string text);
 
         int getX();
         int getY();
         int getWidth();
         int getHeight();
         string getText();
-
-        void render(Rendering::PBO& pbo);
-        void render();
-        void handleMouse(int posx, int posy, bool pressed_right, bool pressed_left);
+        void handleMouse(int button, int state, int posx, int posy);
     private:
         bool inside(int posx, int ypos);
 
@@ -63,17 +63,22 @@ class Button : public IBaseElement {
         ButtonCallback callback;
 };
 
-Button::Button(string &text, ButtonCallback callback):
+Button::Button():
+    Button(0,0,0,0, "Button", [](int_id id){})
+{};
+
+Button::Button(string text, ButtonCallback callback):
     Button(0,0,0,0, text, callback)
 {};
 
-Button::Button(int x, int y, int width, int height, string& text, ButtonCallback callback):
+Button::Button(int x, int y, int width, int height, string text, ButtonCallback callback):
     Button(x, y, width, height, text, Colour::RGB_Grey, Colour::RGB_White, Colour::RGB_Black, callback)
 {};
 
-Button::Button(int x, int y, int width, int height, string& text, Colour::ColorRGB background_colour, Colour::ColorRGB hover_colour, Colour::ColorRGB click_colour, ButtonCallback callback) {
+Button::Button(int x, int y, int width, int height, string text, Colour::ColorRGB background_colour, Colour::ColorRGB hover_colour, Colour::ColorRGB click_colour, ButtonCallback callback):
+    IBaseElement(x, y, width, height, background_colour)
+{
     this->text = text;
-    this->background_colour = background_colour;
     this->hover_colour = hover_colour;
     this->click_colour = click_colour;
     this->callback = callback;
@@ -107,7 +112,7 @@ void Button::setHeight(int height) {
     this->height = height;
 };
 
-void Button::setText(string &Text) {
+void Button::setText(string text) {
     this->text = text;
 };
 
@@ -180,8 +185,6 @@ void Button::render() {
         case BUTTON_STATE::NOT_PRESSED:
             render_colour = this->background_colour;
             break;
-        default:
-            render_colour = this->background_colour;
     }
     GLint current_colour[4];
     glGetIntegerv(GL_CURRENT_COLOR, current_colour);
@@ -202,9 +205,9 @@ bool Button::inside(int posx, int posy) {
         &&  this->y <= posy && posy <= this->y + this->height);
 }
 
-void Button::handleMouse(int posx, int posy, bool pressed_right, bool pressed_left) {
+void Button::handleMouse(int button, int state, int posx, int posy) {
     if (inside(posx, posy)) {
-        if (pressed_right || pressed_left) {
+        if (state == GLUT_DOWN && (button == GLUT_LEFT_BUTTON || button == GLUT_RIGHT_BUTTON || button == GLUT_MIDDLE_BUTTON)) {
             this->state = BUTTON_STATE::CLICKED;
             this->callback(this->id);
         } else {

@@ -187,6 +187,7 @@ void AStar::renderPath(vector<Coords>* path, Colour::ColorRGB path_colour, int s
 
     int x, y;
     GLint current_colour[4];
+    glGetIntegerv(GL_CURRENT_COLOR, current_colour);
     for (int i = 0; i < path->size() - 1; i++) {
         renderRay(
             xOffset + inBlockOffsetX + (path->at(i).x * mapScalingX),

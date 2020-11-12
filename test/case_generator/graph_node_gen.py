@@ -7,12 +7,12 @@ import numpy as np
 log = None
 
 amount_to_gen = 100
-id_min = -1000
-id_max = 1000
-x_coord_min = -1000
-x_coord_max = 1000
-y_coord_min = -1000
-y_coord_max = 1000
+id_min = -10000
+id_max = 10000
+x_coord_min = -10000
+x_coord_max = 10000
+y_coord_min = -10000
+y_coord_max = 10000
 output_filename = "nodes.txt"
 
 def generateRandomNode():
@@ -25,20 +25,13 @@ def generateRandomNode():
 def parseArgs(argv):
     global amount_to_gen, id_min, id_max, x_coord_min, x_coord_max, y_coord_min, y_coord_max, output_filename
     try:
-        opts, _ = getopt.getopt(argv, "s:n:o:xms:xmx:yms:ymx:ims:imx")
+        opts, _ = getopt.getopt(argv, "n:o:xms:xmx:yms:ymx:ims:imx")
     except getopt.GetoptError:
         log.error("Invalid arguments")
         sys.exit(2)
 
     for opt, arg in opts:
-        if (opt == "-s"):
-            if (0 < int(arg) < 100):
-                max_string_size = int(arg)
-            else:
-                log.error(
-                    "Invalid string size [" + arg + "]. Must be in range [1,100]")
-                sys.exit(1)
-        elif (opt == "-n"):
+        if (opt == "-n"):
             if (0 < int(arg)):
                 amount_to_gen = int(arg)
             else:
@@ -78,6 +71,7 @@ if __name__ == "__main__":
     parseArgs(sys.argv[1:])
     log.info("Arguments parsed")
     f = open(output_filename, "w+")
+    f.write(str(amount_to_gen) + "\n")
     log.info("Generating graph nodes...")
     for i in range(amount_to_gen):
         f.write(generateRandomNode() + "\n")

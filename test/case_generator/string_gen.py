@@ -17,7 +17,7 @@ max_string_size = 32
 output_filename = "strings.txt"
 
 def generateRandomString():
-    return "".join(np.random.choice(list(charset), np.random.randint(1, max_string_size + 1)))
+    return "".join(np.random.choice(list(charset), np.random.randint(2, max_string_size + 1)))
 
 def parseArgs(argv):
     global charset, amount_to_gen, max_string_size, output_filename
@@ -65,6 +65,7 @@ if __name__ == "__main__":
     parseArgs(sys.argv[1:])
     log.info("Arguments parsed")
     f = open(output_filename, "w+")
+    f.write(str(amount_to_gen) + "\n")
     log.info("Generating strings...")
     for i in range(amount_to_gen):
         f.write(generateRandomString() + "\n")

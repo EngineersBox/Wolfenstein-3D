@@ -228,8 +228,7 @@ Map files are stored in `resources/maps/`. Below is the JSON schema for a map fi
             "Texture": "<string>",
             "Enemy": "<bool>",
             "Animation Frames": [
-		"texture 1",
-		"texture 2"
+              "<string>"
             ],
             "Tick Rate": "<int>"
         }

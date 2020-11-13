@@ -14,20 +14,20 @@ jobs:
 
     - name: Configure CMake
       shell: bash
-      working-directory: ${{runner.workspace}}/QSPMinimalRendering
+      working-directory: ${{runner.workspace}}/Wolfenstein-3D
       run: cmake .
 
     - name: Build Raycaster
-      working-directory: ${{runner.workspace}}/QSPMinimalRendering
+      working-directory: ${{runner.workspace}}/Wolfenstein-3D
       shell: bash
       run: make W3D
 
     - name: Build Tests
-      working-directory: ${{runner.workspace}}/QSPMinimalRendering
+      working-directory: ${{runner.workspace}}/Wolfenstein-3D
       shell: bash
       run: make build_tests
 
     - name: Run Tests
-      working-directory: ${{runner.workspace}}/QSPMinimalRendering
+      working-directory: ${{runner.workspace}}/Wolfenstein-3D
       shell: bash
       run: make run_tests_wo

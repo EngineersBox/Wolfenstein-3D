@@ -20,14 +20,14 @@ jobs:
     - name: Build Raycaster
       working-directory: ${{runner.workspace}}/QSPMinimalRendering
       shell: bash
-      run: make QSP
+      run: make W3D
 
-    # - name: Build Tests
-    #   working-directory: ${{runner.workspace}}/QSPMinimalRendering
-    #   shell: bash
-    #   run: make build_tests
+    - name: Build Tests
+      working-directory: ${{runner.workspace}}/QSPMinimalRendering
+      shell: bash
+      run: make build_tests
 
-    # - name: Run Tests
-    #   working-directory: ${{runner.workspace}}/QSPMinimalRendering
-    #   shell: bash
-    #   run: make run_tests_wo
+    - name: Run Tests
+      working-directory: ${{runner.workspace}}/QSPMinimalRendering
+      shell: bash
+      run: make run_tests_wo

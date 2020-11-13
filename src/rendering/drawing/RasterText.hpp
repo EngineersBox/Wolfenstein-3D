@@ -28,3 +28,23 @@ void displayText(float x, float y, Colour::ColorRGB text_colour, void* font, con
         current_colour[2]
     );
 }
+
+void displayTextStroke(float x, float y, Colour::ColorRGB text_colour, const string& string) {
+    GLint current_colour[4];
+    glGetIntegerv(GL_CURRENT_COLOR, current_colour);
+    text_colour.toColour4d();
+
+    glPushMatrix();
+    glTranslatef(x, y, 0);
+    gluOrtho2D(0, 1, 1, 0);
+    glScaled(0.035, 0.035, 0.035);
+    for (int i = 0; i < string.length(); i++) {
+        glutStrokeCharacter(GLUT_STROKE_ROMAN, string[i]);
+    }
+    glPopMatrix();
+    
+    glColor3i(
+        current_colour[0],
+        current_colour[1],
+        current_colour[2]);
+}

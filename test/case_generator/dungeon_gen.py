@@ -302,7 +302,7 @@ class Generator():
         print('Room List: ', self.room_list)
         print('\nCorridor List: ', self.corridor_list)
 
-        [print(row) for row in self.tiles_level]
+        # [print(row) for row in self.tiles_level]
 
     def export_to_json(self):
         global output_filename
@@ -314,18 +314,33 @@ class Generator():
         if (output_filename == None):
             output_filename = map_name + ".json"
 
+        class CoordsObj:
+            def __init__(self, x, y):
+                self.x = x;
+                self.y = y;
+
+        floor_tiles = []
+        for y in range(len(self.tiles_level)):
+            for x in range(len(self.tiles_level[y])):
+                if (self.tiles_level[y][x] == CHARACTER_TILES["floor"]):
+                    floor_tiles.append(CoordsObj(y, x))
+
+
+        start_pos = np.random.choice(floor_tiles, 1)
+        end_pos = np.random.choice(floor_tiles, 1)
+        print(start_pos[0].x, start_pos[0].y, end_pos[0].x, end_pos[0].y)
         map_data = {
             "Params": {
                 "Name": map_name,
                 "Width": self.width,
                 "Height": self.height,
                 "Start": {
-                    "x": np.random.randint(0, self.width),
-                    "y": np.random.randint(0, self.height)
+                    "x": start_pos[0].x,
+                    "y": start_pos[0].y
                 },
                 "End": {
-                    "x": np.random.randint(0, self.width),
-                    "y": np.random.randint(0, self.height)
+                    "x": end_pos[0].x,
+                    "y": end_pos[0].y
                 }
             },
             "Ceiling": "wood",
@@ -370,7 +385,7 @@ max_room_count = 15
 def parseArgs(argv):
     global grid_w, grid_h, max_room_count, output_filename
     try:
-        opts, _ = getopt.getopt(argv, "w:h:o:r")
+        opts, _ = getopt.getopt(argv, "w:h:r:o")
     except getopt.GetoptError:
         log.error("Invalid arguments")
         sys.exit(2)
@@ -395,7 +410,7 @@ def parseArgs(argv):
                 log.error("Room count must be within range [1,inf)")
                 sys,exit(1)
         elif (opt == "-o"):
-            if (str(arg).endswith(".json")):
+            if (".json" in str(arg)):
                 output_filename = arg
             else:
                 log.error("Output file must be in JSON format")
@@ -407,6 +422,7 @@ if __name__ == '__main__':
     formatter = logging.Formatter(
         '[%(asctime)s][%(name)s] %(levelname)s :: %(message)s')
     sh.setFormatter(formatter)
+    parseArgs(sys.argv[1:])
 
     log.addHandler(sh)
     log.setLevel(logging.INFO)

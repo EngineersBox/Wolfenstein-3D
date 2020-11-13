@@ -252,15 +252,12 @@ static void display(void) {
     pixelBuffer.swapBuffer();
     updateTimeTick();
     
-    // canvas.getMinimap().render(screen_width, screen_height);
     canvas.render(frame_time);
     astar.renderPath(
         path, Colour::RGB_Blue,
         screen_width, screen_height,
         canvas.getMinimap().getScalingX(), canvas.getMinimap().getScalingY()
     );
-    // canvas.getDebugOverlay().render(frame_time);
-    // canvas.getStatsBar().render(screen_width, screen_height);
     glutSwapBuffers();
 }
 
@@ -291,7 +288,7 @@ void __INIT() {
     zBuf = Rendering::ZBuffer(screen_width);
 
     astar = AStar(world);
-    path = astar.find(world.start, world.end);
+    // path = astar.find(world.start, world.end);
 
     player.moveSpeed = frame_time * playerCfg.move_speed;
     player.rotSpeed = frame_time * playerCfg.rotation_speed;
@@ -315,11 +312,8 @@ void __INIT() {
         Colour::RGB_Blue, Colour::RGB_Navy, Colour::RGB_White));
     debugContext.logAppInfo("Initialised StatsBar object at: " + ADDR_OF(canvas.getStatsBar()));
 
-    canvas.addButton(GUI::Button(100, 100, 100, 20, "Button",
-        Colour::RGB_Blue, Colour::RGB_Red, Colour::RGB_Green,
-    [](int_id id){
-        cout << "Button " << id << " pressed" << endl;
-    }));
+    // canvas.addButton(new GUI::Button(138, 174, 120, 20, "Main Menu",
+    //     Colour::RGB_White, Colour::RGB_Cyan, Colour::RGB_Yellow, [](int_id id){}));
 
     pixelBuffer = Rendering::PBO(screen_width, screen_height);
     pixelBuffer.init();
@@ -344,7 +338,7 @@ static void __MOUSE_HANDLER(int button, int state, int x, int y) {
 }
 
 static void __ACTIVE_MOTION_HANDLER(int x, int y) {
-    canvas.handleMouse(GLUT_LEFT_BUTTON, GLUT_UP, x, y);
+    // canvas.handleMouse(GLUT_LEFT_BUTTON, GLUT_UP, x, y);
 }
 
 static void __PASSIVE_MOTION_HANDLER(int x, int y) {

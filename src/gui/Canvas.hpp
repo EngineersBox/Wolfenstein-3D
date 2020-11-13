@@ -16,7 +16,7 @@ class Canvas {
     public:
         Canvas(){};
 
-        void addButton(Button element);
+        void addButton(Button* element);
         void removeButton(int_id id);
 
         void setDebugOverlay(DebugOverlay overlay);
@@ -33,14 +33,14 @@ class Canvas {
 
         void render(double frame_time);
     private:
-        unordered_map<int_id, Button> buttons;
+        unordered_map<int_id, Button*> buttons;
         DebugOverlay overlay;
         Minimap minimap;
         StatsBar statsbar;
 };
 
-void Canvas::addButton(Button element) {
-    this->buttons.emplace(element.id, element);
+void Canvas::addButton(Button* element) {
+    this->buttons.emplace(element->id, element);
 };
 
 void Canvas::removeButton(int_id id) {
@@ -72,16 +72,16 @@ StatsBar& Canvas::getStatsBar() {
 };
 
 void Canvas::handleMouse(int button, int state, int posx, int posy) {
-    for (pair<int_id, Button> elem : this->buttons) {
-        elem.second.handleMouse(button, state, posx, posy);
+    for (pair<int_id, Button*> elem : this->buttons) {
+        elem.second->handleMouse(button, state, posx, posy);
     }
 };
 
 void Canvas::handleKeypress(unsigned char key, int x, int y){};
 
 void Canvas::render(double frame_time) {
-    for(pair<int_id, Button> elem : this->buttons) {
-        elem.second.render();
+    for(pair<int_id, Button*> elem : this->buttons) {
+        elem.second->render();
     }
     this->minimap.render(glutGet(GLUT_SCREEN_WIDTH), glutGet(GLUT_SCREEN_HEIGHT));
     this->overlay.render(frame_time);

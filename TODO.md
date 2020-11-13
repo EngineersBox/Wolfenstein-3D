@@ -25,6 +25,7 @@
 * [ ] Add animation frames to Enemies
 * [ ] Add hit scan shooting when player clicks, call `hitScanCheck()` on enemies
 * [ ] Fix wall textures vertical offset shifting on every second pixel
+* [ ] Integrate floor + ceiling rendering into y, windows height ,loop in `renderWalls()`. Use a full loop from 0 to height and boolean check if in start-end pos for walls
 
 ## Logging
 

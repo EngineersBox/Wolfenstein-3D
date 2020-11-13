@@ -171,6 +171,9 @@ GLDebugContext::GLDebugContext(ConfigSection::LoggingCfg* l_cfg, const DEBUG_LOG
 GLDebugContext::~GLDebugContext() {};
 
 void GLDebugContext::glDebugMessageCallback(GL_DEBUG_SOURCE source, GL_DEBUG_TYPE type, GL_DEBUG_SEVERITY severity, const string& message) {
+    if (l_cfg->hide_infos) {
+        return;
+    }
     if (message.size() > GL_MAX_DEBUG_MSG_LENGTH) {
         throw ExceededDebugMessageSize(message.size(), GL_MAX_DEBUG_MSG_LENGTH);
     }
@@ -178,7 +181,7 @@ void GLDebugContext::glDebugMessageCallback(GL_DEBUG_SOURCE source, GL_DEBUG_TYP
     string timeFormat = this->format.suffix;
     size_t pos_ = timeFormat.find("_");
     string currentTime = getCurrentTime(string(timeFormat.substr(0, pos_) + timeFormat.substr(pos_, timeFormat.size() - 1)).c_str());
-
+    
     if (l_cfg->gl_debug) {
         FILE* out_loc = type == DEBUG_TYPE_ERROR || type == DEBUG_TYPE_UNDEFINED_BEHAVIOR ? stderr : stdout;
         fprintf(out_loc, "[%s] {%s|%s|%s ~ %s}%s %s %s :: %s\n",
@@ -189,7 +192,6 @@ void GLDebugContext::glDebugMessageCallback(GL_DEBUG_SOURCE source, GL_DEBUG_TYP
                 (severity == DEBUG_SEVERITY_VERBOSE ? string(A_MAG + string(" VERBOSE")).c_str() : ""),
                 string(A_YEL + GL_DEBUG_SOURCE_STRING(source) + RST).c_str(), message.c_str());
     }
-
     FILE *debugLog = fopen(filename.c_str(), "a");
 
     fprintf(debugLog, "[%s] {%s|%s|%s ~ %s}%s %s\n",

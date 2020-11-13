@@ -18,15 +18,15 @@ using namespace std;
 
 class AStar {
     public:
-        AStar();
-        AStar(World map);
+        AStar(GLDebugContext *context = &debugContext);
+        AStar(World map, GLDebugContext *context = &debugContext);
         ~AStar();
 
         vector<Coords>* rebuildPath(unordered_map<GraphNode, GraphNode>& traversals, GraphNode start, GraphNode goal);
         vector<Coords>* find(Coords start_loc, Coords end_loc);
         void renderPath(vector<Coords>* path, Colour::ColorRGB path_colour, int sw, int sh, float scalingX, float scalingY);
 
-       private:
+    private:
         inline int heuristic(GraphNode next, GraphNode goal);
         inline bool inMap(GraphNode loc);
         vector<GraphNode> neighbors(GraphNode node);
@@ -35,12 +35,16 @@ class AStar {
         void logPath(vector<Coords>& path);
 
         World map;
+        GLDebugContext *context;
 };
 
-AStar::AStar(){};
+AStar::AStar(GLDebugContext *context){
+    this->context = context;
+};
 
-AStar::AStar(World map) {
+AStar::AStar(World map, GLDebugContext *context) {
     this->map = map;
+    this->context = context;
 };
 
 AStar::~AStar(){};
@@ -126,11 +130,11 @@ inline int AStar::heuristic(GraphNode next, GraphNode goal) {
 };
 
 void AStar::logPath(vector<Coords>& path) {
-    debugContext.logAppVerb(
+    this->context->logAppVerb(
         "Found path for " + map.start.asString() + " -> " + map.end.asString()
     );
-    for_each(path.begin(), path.end(), [](Coords c) {
-        debugContext.logAppVerb(c.asString());
+    for_each(path.begin(), path.end(), [this](Coords c) {
+        this->context->logAppVerb(c.asString());
     });
 }
 

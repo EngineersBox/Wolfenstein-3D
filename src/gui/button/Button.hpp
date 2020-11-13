@@ -17,7 +17,7 @@ namespace GUI {
 
 enum BUTTON_STATE : int {
     CLICKED = 0,
-    NOT_PRESSED = 1,
+    NOT_CLICKED = 1,
     HOVERED = 2
 };
 
@@ -57,7 +57,7 @@ class Button : public IBaseElement {
         bool inside(int posx, int ypos);
 
         string text;
-        BUTTON_STATE state;
+        BUTTON_STATE state = BUTTON_STATE::NOT_CLICKED;
         Colour::ColorRGB hover_colour;
         Colour::ColorRGB click_colour;
         ButtonCallback callback;
@@ -157,7 +157,7 @@ void Button::render(Rendering::PBO& pbo) {
         case BUTTON_STATE::HOVERED:
             render_colour = this->hover_colour;
             break;
-        case BUTTON_STATE::NOT_PRESSED:
+        case BUTTON_STATE::NOT_CLICKED:
             render_colour = this->background_colour;
             break;
         default:
@@ -182,7 +182,7 @@ void Button::render() {
         case BUTTON_STATE::HOVERED:
             render_colour = this->hover_colour;
             break;
-        case BUTTON_STATE::NOT_PRESSED:
+        case BUTTON_STATE::NOT_CLICKED:
             render_colour = this->background_colour;
             break;
     }
@@ -195,8 +195,8 @@ void Button::render() {
         current_colour[1],
         current_colour[2]
     );
-    displayText(IDIV_2(this->width - glutBitmapLength(GLUT_BITMAP_HELVETICA_18, (unsigned char*) this->text.c_str())),
-        IDIV_2(this->height - 18),
+    displayText(this->x + this->width - glutBitmapLength(GLUT_BITMAP_HELVETICA_18, reinterpret_cast<const unsigned char*>(this->text.c_str())),
+        this->y + IDIV_2(this->height),
         Colour::RGB_Red, GLUT_BITMAP_HELVETICA_18, this->text);
 }
 
@@ -214,7 +214,7 @@ void Button::handleMouse(int button, int state, int posx, int posy) {
             this->state = BUTTON_STATE::HOVERED;
         }
     } else {
-        this->state = BUTTON_STATE::NOT_PRESSED;
+        this->state = BUTTON_STATE::NOT_CLICKED;
     }
 }
 }

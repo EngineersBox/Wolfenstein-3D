@@ -21,8 +21,8 @@ using namespace std;
 #define MAP_DELIM ";"
 
 struct World {
-    World(vector<Constructs::AABB> walls, int width, int height);
-    World();
+    World(vector<Constructs::AABB> walls, int width, int height, GLDebugContext* context = &debugContext);
+    World(GLDebugContext *context = &debugContext);
 
     void fromArray(Constructs::AABB walls[], int width, int height);
     void readMapFromJSON(string filename);
@@ -52,20 +52,24 @@ struct World {
 
     string ceiling_texture;
     string floor_texture;
+
+    GLDebugContext* context;
 };
 
-World::World(vector<Constructs::AABB> walls, int width, int height) {
+World::World(vector<Constructs::AABB> walls, int width, int height, GLDebugContext *context) {
     this->map_width = width;
     this->map_width = height;
     this->walls = walls;
     this->size = width * height;
+    this->context = context;
 }
 
-World::World(){
+World::World(GLDebugContext *context){
     this->walls = vector<Constructs::AABB>(0);
     this->map_width = 0;
     this->map_height = 0;
     this->size = 0;
+    this->context = context;
 };
 
 void World::fromArray(Constructs::AABB walls[], int width, int height) {
@@ -98,23 +102,23 @@ void World::readMapFromJSON(string filename) {
         jsonres = ResourceManager::RSJresource(is);
         fileBuffer.close();
     } else {
-        debugContext.glDebugMessageCallback(
+        this->context->glDebugMessageCallback(
             GL_DEBUG_SOURCE::DEBUG_SOURCE_SYSTEM,
             GL_DEBUG_TYPE::DEBUG_TYPE_ERROR,
             GL_DEBUG_SEVERITY::DEBUG_SEVERITY_HIGH,
             "Unable to load map file: " + filename
         );
     }
-    debugContext.logSysInfo("Retrieved map file: " + filename);
-    debugContext.logAppInfo("---- STARTED MAP PROCESSING [" + filename +"] ----");
+    this->context->logSysInfo("Retrieved map file: " + filename);
+    this->context->logAppInfo("---- STARTED MAP PROCESSING [" + filename +"] ----");
     this->map_width = jsonres["Params"]["Width"].as<int>();
     this->map_height = jsonres["Params"]["Height"].as<int>();
-    debugContext.logAppInfo("Loading map with dimensions: W = " + to_string(this->map_width) + ", H = " + to_string(this->map_height));
+    this->context->logAppInfo("Loading map with dimensions: W = " + to_string(this->map_width) + ", H = " + to_string(this->map_height));
     this->size = this->map_height * this->map_width;
     this->start = Coords(jsonres["Params"]["Start"]["x"].as<int>(),jsonres["Params"]["Start"]["y"].as<int>());
     this->end = Coords(jsonres["Params"]["End"]["x"].as<int>(),jsonres["Params"]["End"]["y"].as<int>());
-    debugContext.logAppInfo("Map start location: " + this->start.asString());
-    debugContext.logAppInfo("Map end location: " + this->end.asString());
+    this->context->logAppInfo("Map start location: " + this->start.asString());
+    this->context->logAppInfo("Map end location: " + this->end.asString());
     ResourceManager::RSJarray wallarr = jsonres["Walls"].as_array();
     for (ResourceManager::RSJresource wallObj : wallarr) {
         int x = wallObj["x"].as<int>();
@@ -150,39 +154,41 @@ void World::readMapFromJSON(string filename) {
             this->tree_order_walls.push_back(Coords(x,y));
         }
     }
-    debugContext.logAppInfo("Processed " + to_string(wallarr.size()) + " AABB objects");
+    this->context->logAppInfo("Processed " + to_string(wallarr.size()) + " AABB objects");
     ResourceManager::RSJarray spritearr = jsonres["Sprites"].as_array();
-    for (ResourceManager::RSJresource spriteObj : spritearr) {
-        double x = spriteObj["x"].as<double>();
-        double y = spriteObj["y"].as<double>();
-        string texture = spriteObj["Texture"].as<string>();
-        ResourceManager::RSJresource isEnemyObj = spriteObj["Enemy"];
-        bool isEnemy = isEnemyObj.exists() ? isEnemyObj.as<bool>() : false;
-        if (isEnemy) {
-            ResourceManager::RSJarray animation_frames = spriteObj["Animation Frames"].as_array();
-            vector<string> frames(animation_frames.size());
-            for_each(animation_frames.begin(), animation_frames.end(), [&frames](ResourceManager::RSJresource frame) {
-                frames.push_back(frame.as<string>());
-            });
-            int tick_rate = spriteObj["Tick Rate"].as<int>();
-            this->sprites.push_back(Constructs::Enemy(
-                x,y,
-                frames,
-                tick_rate
-            ));
-        } else {
-            this->sprites.push_back(Constructs::Sprite(
-                x, y,
-                texture
-            ));
+    if (spritearr.size() > 0) {
+        for (ResourceManager::RSJresource spriteObj : spritearr) {
+            double x = spriteObj["x"].as<double>();
+            double y = spriteObj["y"].as<double>();
+            string texture = spriteObj["Texture"].as<string>();
+            ResourceManager::RSJresource isEnemyObj = spriteObj["Enemy"];
+            bool isEnemy = isEnemyObj.exists() ? isEnemyObj.as<bool>() : false;
+            if (isEnemy) {
+                ResourceManager::RSJarray animation_frames = spriteObj["Animation Frames"].as_array();
+                vector<string> frames(animation_frames.size());
+                for_each(animation_frames.begin(), animation_frames.end(), [&frames](ResourceManager::RSJresource frame) {
+                    frames.push_back(frame.as<string>());
+                });
+                int tick_rate = spriteObj["Tick Rate"].as<int>();
+                this->sprites.push_back(Constructs::Enemy(
+                    x,y,
+                    frames,
+                    tick_rate
+                ));
+            } else {
+                this->sprites.push_back(Constructs::Sprite(
+                    x, y,
+                    texture
+                ));
+            }
         }
+        this->context->logAppInfo("Processed " + to_string(spritearr.size()) + " Sprite entities");
     }
-    debugContext.logAppInfo("Processed " + to_string(spritearr.size()) + " Sprite entities");
     this->ceiling_texture = jsonres["Ceiling"].as<string>();
-    debugContext.logAppInfo("Loaded ceiling texture [" + this->ceiling_texture + "]");
+    this->context->logAppInfo("Loaded ceiling texture [" + this->ceiling_texture + "]");
     this->floor_texture = jsonres["Floor"].as<string>();
-    debugContext.logAppInfo("Loaded floor texture [" + this->floor_texture + "]");
-    debugContext.logAppInfo("---- FINISHED MAP PROCESSING [" + filename + "] ----");
+    this->context->logAppInfo("Loaded floor texture [" + this->floor_texture + "]");
+    this->context->logAppInfo("---- FINISHED MAP PROCESSING [" + filename + "] ----");
 };
 
 Constructs::AABB World::getAt(int x, int y) {

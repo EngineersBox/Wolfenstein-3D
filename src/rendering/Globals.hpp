@@ -73,3 +73,5 @@ namespace Rendering {
 }
 
 Tick global_tick;
+
+#define __EMTPY_VOID_FUNC__() (void (func*)())

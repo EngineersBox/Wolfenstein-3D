@@ -67,10 +67,10 @@ RM = /Applications/CMake.app/Contents/bin/cmake -E rm -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = "/Users/jackkilrain/Desktop/Work/Second-Year/COMP3600/Final Project/QSPMinimalRendering"
+CMAKE_SOURCE_DIR = /Users/jackkilrain/desktop/Projects/C:C++/Wolfenstein-3D
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = "/Users/jackkilrain/Desktop/Work/Second-Year/COMP3600/Final Project/QSPMinimalRendering"
+CMAKE_BINARY_DIR = /Users/jackkilrain/desktop/Projects/C:C++/Wolfenstein-3D
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -99,9 +99,9 @@ rebuild_cache/fast: rebuild_cache
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start "/Users/jackkilrain/Desktop/Work/Second-Year/COMP3600/Final Project/QSPMinimalRendering/CMakeFiles" "/Users/jackkilrain/Desktop/Work/Second-Year/COMP3600/Final Project/QSPMinimalRendering//CMakeFiles/progress.marks"
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/jackkilrain/desktop/Projects/C:C++/Wolfenstein-3D/CMakeFiles /Users/jackkilrain/desktop/Projects/C:C++/Wolfenstein-3D//CMakeFiles/progress.marks
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start "/Users/jackkilrain/Desktop/Work/Second-Year/COMP3600/Final Project/QSPMinimalRendering/CMakeFiles" 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/jackkilrain/desktop/Projects/C:C++/Wolfenstein-3D/CMakeFiles 0
 .PHONY : all
 
 # The main clean target
@@ -130,17 +130,17 @@ depend:
 .PHONY : depend
 
 #=============================================================================
-# Target rules for targets named QSP
+# Target rules for targets named W3D
 
 # Build rule for target.
-QSP: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 QSP
-.PHONY : QSP
+W3D: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 W3D
+.PHONY : W3D
 
 # fast build rule for target.
-QSP/fast:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/QSP.dir/build.make CMakeFiles/QSP.dir/build
-.PHONY : QSP/fast
+W3D/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/W3D.dir/build.make CMakeFiles/W3D.dir/build
+.PHONY : W3D/fast
 
 #=============================================================================
 # Target rules for targets named run_tests_wo
@@ -317,7 +317,7 @@ src/rendering/raycaster/Raytracer.o: src/rendering/raycaster/Raytracer.cpp.o
 
 # target to build an object file
 src/rendering/raycaster/Raytracer.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/QSP.dir/build.make CMakeFiles/QSP.dir/src/rendering/raycaster/Raytracer.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/W3D.dir/build.make CMakeFiles/W3D.dir/src/rendering/raycaster/Raytracer.cpp.o
 .PHONY : src/rendering/raycaster/Raytracer.cpp.o
 
 src/rendering/raycaster/Raytracer.i: src/rendering/raycaster/Raytracer.cpp.i
@@ -326,7 +326,7 @@ src/rendering/raycaster/Raytracer.i: src/rendering/raycaster/Raytracer.cpp.i
 
 # target to preprocess a source file
 src/rendering/raycaster/Raytracer.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/QSP.dir/build.make CMakeFiles/QSP.dir/src/rendering/raycaster/Raytracer.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/W3D.dir/build.make CMakeFiles/W3D.dir/src/rendering/raycaster/Raytracer.cpp.i
 .PHONY : src/rendering/raycaster/Raytracer.cpp.i
 
 src/rendering/raycaster/Raytracer.s: src/rendering/raycaster/Raytracer.cpp.s
@@ -335,7 +335,7 @@ src/rendering/raycaster/Raytracer.s: src/rendering/raycaster/Raytracer.cpp.s
 
 # target to generate assembly for a file
 src/rendering/raycaster/Raytracer.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/QSP.dir/build.make CMakeFiles/QSP.dir/src/rendering/raycaster/Raytracer.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/W3D.dir/build.make CMakeFiles/W3D.dir/src/rendering/raycaster/Raytracer.cpp.s
 .PHONY : src/rendering/raycaster/Raytracer.cpp.s
 
 # Help Target
@@ -359,7 +359,7 @@ help:
 	@echo "... run_memprof"
 	@echo "... run_tests"
 	@echo "... run_tests_wo"
-	@echo "... QSP"
+	@echo "... W3D"
 	@echo "... src/rendering/raycaster/Raytracer.o"
 	@echo "... src/rendering/raycaster/Raytracer.i"
 	@echo "... src/rendering/raycaster/Raytracer.s"

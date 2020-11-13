@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
 
-set(PROJECT_NAME QSP)
+set(PROJECT_NAME W3D)
 project(${PROJECT_NAME})
 
 # SET CXX VERSION
@@ -212,5 +212,5 @@ add_custom_command(
 )
 
 # SET THE EXECUTABLE TO THE SOURCE AND LINK LIBRARIES
-add_executable(QSP ${SOURCES})
+add_executable(W3D ${SOURCES})
 target_link_libraries(${PROJECT_NAME} ${OPENGL_LIBRARIES} ${GLUT_LIBRARY} )

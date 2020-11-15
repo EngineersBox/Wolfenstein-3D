@@ -42,58 +42,16 @@ Rendering::ZBuffer zBuf;
 
 GUI::Canvas canvas;
 
-inline static void renderFloorCeiling() {
-    float ray_dir_x0, ray_dir_y0, ray_dir_x1, ray_dir_y1, pos_z, dist, step_x, step_y, floor_x, floor_y;
-    int p, cell_x, cell_y, tex_coord_x, tex_coord_y;
-    Texture tex;
-    uint32_t color;
-    for (int y = screen_height - 1; y >= IDIV_2(screen_height) + 1; --y) {
-        ray_dir_x0 = player.camera.frustrum.getFovX() - player.camera.clip_plane_x;
-        ray_dir_y0 = player.camera.frustrum.getFovY() - player.camera.clip_plane_y;
-        ray_dir_x1 = player.camera.frustrum.getFovX() + player.camera.clip_plane_x;
-        ray_dir_y1 = player.camera.frustrum.getFovY() + player.camera.clip_plane_y;
-
-        p = y - IDIV_2(screen_height);
-
-        pos_z = 0.5 * screen_height;
-
-        dist = pos_z / p;
-
-        step_x = dist * (ray_dir_x1 - ray_dir_x0) / screen_width;
-        step_y = dist * (ray_dir_y1 - ray_dir_y0) / screen_width;
-
-        floor_x = player.location.x + dist * ray_dir_x0;
-        floor_y = player.location.y + dist * ray_dir_y0;
-
-        for (int x = screen_width - 1; x >= 0; --x) {
-            cell_x = (int)(floor_x);
-            cell_y = (int)(floor_y);
-
-            tex_coord_x = (int)(renderCfg.texture_width * (floor_x - cell_x)) & (renderCfg.texture_width - 1);
-            tex_coord_y = (int)(renderCfg.texture_height * (floor_y - cell_y)) & (renderCfg.texture_height - 1);
-
-            floor_x += step_x;
-            floor_y += step_y;
-
-            textures.get(world.floor_texture, tex);
-            color = tex.texture[renderCfg.texture_width * tex_coord_y + tex_coord_x];
-            color = (color >> 1) & DARK_SHADER;
-            pixelBuffer.pushToBuffer(screen_width - x, screen_height - y, Colour::INTtoRGB(color));
-
-            textures.get(world.ceiling_texture, tex);
-            color = tex.texture[renderCfg.texture_width * tex_coord_y + tex_coord_x];
-            color = (color >> 1) & DARK_SHADER;
-            pixelBuffer.pushToBuffer(screen_width - x, y - 1, Colour::INTtoRGB(color));
-        }
-    }
-}
-
-inline static void renderWalls() {
+inline static void renderWallsFloorCeiling() {
     double ray_dir_x, ray_dir_y, side_dist_x, side_dist_y, delta_x, delta_y, perp_wall_dist, wall_x, step, tex_pos;
     int map_x, map_y, step_x, step_y, hit, side, line_height, draw_start_pos, draw_end_pos, tex_coord_x, tex_coord_y;
     string wall_tex;
     uint32_t color;
     Texture tex;
+    float ray_dir_x0, ray_dir_y0, ray_dir_x1, ray_dir_y1, pos_z, dist, step_x_cf, step_y_cf, floor_x, floor_y;
+    int p, cell_x, cell_y, tex_coord_x_cf, tex_coord_y_cf;
+    Texture tex_cf;
+    uint32_t color_cf;
     for (int x = screen_width - 1; x >= 0; x--) {
         player.camera.x = 2 * x / double(screen_width) - 1;
         ray_dir_x = player.camera.frustrum.getFovX() + player.camera.clip_plane_x * player.camera.x;
@@ -154,15 +112,51 @@ inline static void renderWalls() {
 
         step = 1.0 * renderCfg.texture_height / line_height;
         tex_pos = (draw_start_pos - IDIV_2(screen_height) + IDIV_2(line_height)) * step;
-        for (int y = draw_end_pos - 1; y >= draw_start_pos; y--) {
-            tex_coord_y = (int)tex_pos & (renderCfg.texture_height - 1);
-            tex_pos += step;
-            textures.get(wall_tex, tex);
-            color = tex.texture[renderCfg.texture_height * tex_coord_y + tex_coord_x];
-            if (side == 1) {
-                color = (color >> 1) & DARK_SHADER;
+
+        ray_dir_x0 = player.camera.frustrum.getFovX() - player.camera.clip_plane_x;
+        ray_dir_y0 = player.camera.frustrum.getFovY() - player.camera.clip_plane_y;
+        ray_dir_x1 = player.camera.frustrum.getFovX() + player.camera.clip_plane_x;
+        ray_dir_y1 = player.camera.frustrum.getFovY() + player.camera.clip_plane_y;
+        
+        for (int y = screen_height - 1; y >= 0; y--) {
+            if (renderCfg.render_walls && y < draw_end_pos && y >= draw_start_pos) {
+                tex_coord_y = (int)tex_pos & (renderCfg.texture_height - 1);
+                tex_pos += step;
+                textures.get(wall_tex, tex);
+                color = tex.texture[renderCfg.texture_height * tex_coord_y + tex_coord_x];
+                if (side == 1) {
+                    color = (color >> 1) & DARK_SHADER;
+                }
+                pixelBuffer.pushToBuffer(x, y, Colour::INTtoRGB(color));
+            } else if (renderCfg.render_floor_ceiling && y >= IDIV_2(screen_height) + 1) {
+                p = y - IDIV_2(screen_height);
+
+                pos_z = 0.5 * screen_width;
+
+                dist = pos_z / p;
+
+                step_x_cf = dist * (ray_dir_x1 - ray_dir_x0) / screen_width;
+                step_y_cf = dist * (ray_dir_y1 - ray_dir_y0) / screen_width;
+
+                floor_x = (player.location.x + dist * ray_dir_x0) + (step_x_cf * x);
+                floor_y = (player.location.y + dist * ray_dir_y0) + (step_y_cf * x);
+
+                cell_x = (int)(floor_x);
+                cell_y = (int)(floor_y);
+
+                tex_coord_x_cf = (int)(renderCfg.texture_width * (floor_x - cell_x)) & (renderCfg.texture_width - 1);
+                tex_coord_y_cf = (int)(renderCfg.texture_height * (floor_y - cell_y)) & (renderCfg.texture_height - 1);
+
+                textures.get(world.floor_texture, tex_cf);
+                color_cf = tex_cf.texture[renderCfg.texture_width * tex_coord_y_cf + tex_coord_x_cf];
+                color_cf = (color_cf >> 1) & DARK_SHADER;
+                pixelBuffer.pushToBuffer(x, screen_height - y, Colour::INTtoRGB(color_cf));
+
+                textures.get(world.ceiling_texture, tex_cf);
+                color_cf = tex_cf.texture[renderCfg.texture_width * tex_coord_y_cf + tex_coord_x_cf];
+                color_cf = (color_cf >> 1) & DARK_SHADER;
+                pixelBuffer.pushToBuffer(x, y, Colour::INTtoRGB(color_cf));
             }
-            pixelBuffer.pushToBuffer(x, y, Colour::INTtoRGB(color));
         }
 
         zBuf[x] = perp_wall_dist;
@@ -238,13 +232,9 @@ inline static void updateTimeTick() {
     player.update();
 }
 
-static void display(void) {
-    if (renderCfg.render_floor_ceiling) {
-        renderFloorCeiling();
-    }
-    if (renderCfg.render_walls) {
-        renderWalls();
-    }
+static void __DISPLAY(void) {
+    renderWallsFloorCeiling();
+
     if (renderCfg.render_sprites) {
         renderSprites();
     }
@@ -366,8 +356,8 @@ int main(int argc, char* argv[]) {
         debugContext.logAppInfo("Running in headless mode, glutDisplayFun not initialised");
         glutDisplayFunc(__DEFAULT_DISPLAY_FUNC);
     } else {
-        glutDisplayFunc(display);
-        debugContext.logApiInfo("Initialised glutDisplayFunc [display] at: " + ADDR_OF(display));
+        glutDisplayFunc(__DISPLAY);
+        debugContext.logApiInfo("Initialised glutDisplayFunc [__DISPLAY] at: " + ADDR_OF(__DISPLAY));
     }
     glutReshapeFunc(__WINDOW_RESHAPE);
     debugContext.logApiInfo("Initialised glutReshapeFunc [__WINDOW_RESHAPE] at: " + ADDR_OF(__WINDOW_RESHAPE));

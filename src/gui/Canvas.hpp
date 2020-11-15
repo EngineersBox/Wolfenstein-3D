@@ -40,7 +40,7 @@ class Canvas {
 };
 
 void Canvas::addButton(Button* element) {
-    this->buttons.emplace(element->id, element);
+    this->buttons.emplace(make_pair(element->id, element));
 };
 
 void Canvas::removeButton(int_id id) {
@@ -72,7 +72,7 @@ StatsBar& Canvas::getStatsBar() {
 };
 
 void Canvas::handleMouse(int button, int state, int posx, int posy) {
-    for (pair<int_id, Button*> elem : this->buttons) {
+    for (pair<const int_id, Button*> elem : this->buttons) {
         elem.second->handleMouse(button, state, posx, posy);
     }
 };
@@ -80,7 +80,7 @@ void Canvas::handleMouse(int button, int state, int posx, int posy) {
 void Canvas::handleKeypress(unsigned char key, int x, int y){};
 
 void Canvas::render(double frame_time) {
-    for(pair<int_id, Button*> elem : this->buttons) {
+    for(pair<const int_id, Button*> elem : this->buttons) {
         elem.second->render();
     }
     this->minimap.render(glutGet(GLUT_SCREEN_WIDTH), glutGet(GLUT_SCREEN_HEIGHT));

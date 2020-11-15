@@ -1,10 +1,22 @@
 # Wolfenstein 3D
 
-![GitHub Workflow Status](https://img.shields.io/github/workflow/status/EngineersBox/BSPMinimalRendering/CMake?style=for-the-badge) ![TODO Status](https://img.shields.io/badge/TODO-outstanding-yellow?style=for-the-badge&logo=markdown)
+![GitHub Workflow Status](https://img.shields.io/github/workflow/status/EngineersBox/Wolfenstein-3D/CMake?style=for-the-badge) ![TODO Status](https://img.shields.io/badge/TODO-outstanding-yellow?style=for-the-badge&logo=markdown)
 
 A faithful re-creation of Id Software's, Wolfensetin 3D from 1992.
 
 Something important to note about this repo and its implementation. The idea behind this is to use the most low level OpenGL functionality and handle of all of the graphics processing manually. This means not using OpenGL/GLUT texturing managing and perspective polygon rendering + scaling. Instead all of this is calculated as part of the raycasting implementation.
+
+## Creditations
+
+There are some crediations that need to be made for certain pieces of software used or based around in this project:
+
+* Textures used are property of ID Software
+* Raycasting based on implementation by Lode Vandevenne at [https://lodev.org/cgtutor/raycasting.html#Textured Raycaster](https://lodev.org/cgtutor/raycasting.html#Textured%sRaycaster)
+* PNG Reader attributed to Lode Vandevenne at [https://lodev.org/](https://lodev.org/)
+* JSON Reader attributed to Subhrajit Bhattacharya at [http://subhrajit.net/](http://subhrajit.net/)
+* INI Reader attributed to Ben Hoyt at [https://github.com/benhoyt/inih](https://github.com/benhoyt/inih)
+* Color RGB, Color RGB8bit, Color HSV and Color HSL attributed to Lode Vandevenne at [https://lodev.org/](https://lodev.org/)
+All other sources and modications of the above are my own work and attributed as such.
 
 ## Building and running
 

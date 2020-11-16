@@ -29,7 +29,7 @@ void displayText(float x, float y, Colour::ColorRGB text_colour, void* font, con
     );
 }
 
-void displayTextStroke(float x, float y, Colour::ColorRGB text_colour, const string& string) {
+void displayTextStroke(float x, float y, double scale, Colour::ColorRGB text_colour, const string& string) {
     GLint current_colour[4];
     glGetIntegerv(GL_CURRENT_COLOR, current_colour);
     text_colour.toColour4d();
@@ -37,7 +37,7 @@ void displayTextStroke(float x, float y, Colour::ColorRGB text_colour, const str
     glPushMatrix();
     glTranslatef(x, y, 0);
     gluOrtho2D(0, 1, 1, 0);
-    glScaled(0.035, 0.035, 0.035);
+    glScaled(scale, scale, scale);
     for (int i = 0; i < string.length(); i++) {
         glutStrokeCharacter(GLUT_STROKE_ROMAN, string[i]);
     }

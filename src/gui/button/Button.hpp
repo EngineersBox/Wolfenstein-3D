@@ -168,9 +168,9 @@ void Button::render(Rendering::PBO& pbo) {
             pbo.pushToBuffer(x_pos, y_pos, render_colour);
         }
     }
-    displayText(IDIV_2(this->width - glutBitmapLength(GLUT_BITMAP_HELVETICA_18, (unsigned char*) this->text.c_str())),
-        IDIV_2(this->height - 18),
-        Colour::RGB_Red, GLUT_BITMAP_HELVETICA_18, this->text);
+    displayText(this->x + IDIV_2(this->width - glutBitmapLength(GLUT_BITMAP_HELVETICA_12, reinterpret_cast<const unsigned char*>(this->text.c_str()))),
+        this->y + IDIV_2(this->height + 6),
+        Colour::RGB_Red, GLUT_BITMAP_HELVETICA_12, this->text);
 };
 
 void Button::render() {
@@ -185,6 +185,8 @@ void Button::render() {
         case BUTTON_STATE::NOT_CLICKED:
             render_colour = this->background_colour;
             break;
+        default:
+            render_colour = this->background_colour;
     }
     GLint current_colour[4];
     glGetIntegerv(GL_CURRENT_COLOR, current_colour);
@@ -195,9 +197,9 @@ void Button::render() {
         current_colour[1],
         current_colour[2]
     );
-    displayText(this->x + this->width - glutBitmapLength(GLUT_BITMAP_HELVETICA_18, reinterpret_cast<const unsigned char*>(this->text.c_str())),
-        this->y + IDIV_2(this->height),
-        Colour::RGB_Red, GLUT_BITMAP_HELVETICA_18, this->text);
+    displayText(this->x + IDIV_2(this->width - glutBitmapLength(GLUT_BITMAP_HELVETICA_12, reinterpret_cast<const unsigned char*>(this->text.c_str()))),
+        this->y + IDIV_2(this->height + 6),
+        Colour::RGB_Red, GLUT_BITMAP_HELVETICA_12, this->text);
 }
 
 bool Button::inside(int posx, int posy) {

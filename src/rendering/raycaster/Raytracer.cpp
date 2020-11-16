@@ -43,15 +43,13 @@ Rendering::ZBuffer zBuf;
 GUI::Canvas canvas;
 
 inline static void renderWallsFloorCeiling() {
-    double ray_dir_x, ray_dir_y, side_dist_x, side_dist_y, delta_x, delta_y, perp_wall_dist, wall_x, step, tex_pos;
-    int map_x, map_y, step_x, step_y, hit, side, line_height, draw_start_pos, draw_end_pos, tex_coord_x, tex_coord_y;
+    double ray_dir_x, ray_dir_y, side_dist_x, side_dist_y, delta_x, delta_y, perp_wall_dist, wall_x, step, tex_pos,
+        ray_dir_x0, ray_dir_y0, ray_dir_x1, ray_dir_y1, pos_z, dist, step_x_cf, step_y_cf, floor_x, floor_y;
+    int map_x, map_y, step_x, step_y, hit, side, line_height, draw_start_pos, draw_end_pos, tex_coord_x, tex_coord_y,
+        p, cell_x, cell_y, tex_coord_x_cf, tex_coord_y_cf;
     string wall_tex;
     uint32_t color;
     Texture tex;
-    float ray_dir_x0, ray_dir_y0, ray_dir_x1, ray_dir_y1, pos_z, dist, step_x_cf, step_y_cf, floor_x, floor_y;
-    int p, cell_x, cell_y, tex_coord_x_cf, tex_coord_y_cf;
-    Texture tex_cf;
-    uint32_t color_cf;
     for (int x = screen_width - 1; x >= 0; x--) {
         player.camera.x = 2 * x / double(screen_width) - 1;
         ray_dir_x = player.camera.frustrum.getFovX() + player.camera.clip_plane_x * player.camera.x;
@@ -129,11 +127,11 @@ inline static void renderWallsFloorCeiling() {
                 }
                 pixelBuffer.pushToBuffer(x, y, Colour::INTtoRGB(color));
             } else if (renderCfg.render_floor_ceiling && y >= IDIV_2(screen_height) + 1) {
-                p = y - IDIV_2(screen_height);
+                // p = y - IDIV_2(screen_height);
+                // pos_z = 0.5 * screen_width;
+                // dist = pos_x / p;
 
-                pos_z = 0.5 * screen_width;
-
-                dist = pos_z / p;
+                dist = (0.5 * screen_width) / (y - IDIV_2(screen_height));
 
                 step_x_cf = dist * (ray_dir_x1 - ray_dir_x0) / screen_width;
                 step_y_cf = dist * (ray_dir_y1 - ray_dir_y0) / screen_width;
@@ -147,18 +145,17 @@ inline static void renderWallsFloorCeiling() {
                 tex_coord_x_cf = (int)(renderCfg.texture_width * (floor_x - cell_x)) & (renderCfg.texture_width - 1);
                 tex_coord_y_cf = (int)(renderCfg.texture_height * (floor_y - cell_y)) & (renderCfg.texture_height - 1);
 
-                textures.get(world.floor_texture, tex_cf);
-                color_cf = tex_cf.texture[renderCfg.texture_width * tex_coord_y_cf + tex_coord_x_cf];
-                color_cf = (color_cf >> 1) & DARK_SHADER;
-                pixelBuffer.pushToBuffer(x, screen_height - y, Colour::INTtoRGB(color_cf));
+                textures.get(world.floor_texture, tex);
+                color = tex.texture[renderCfg.texture_width * tex_coord_y_cf + tex_coord_x_cf];
+                color = (color >> 1) & DARK_SHADER;
+                pixelBuffer.pushToBuffer(x, screen_height - y, Colour::INTtoRGB(color));
 
-                textures.get(world.ceiling_texture, tex_cf);
-                color_cf = tex_cf.texture[renderCfg.texture_width * tex_coord_y_cf + tex_coord_x_cf];
-                color_cf = (color_cf >> 1) & DARK_SHADER;
-                pixelBuffer.pushToBuffer(x, y, Colour::INTtoRGB(color_cf));
+                textures.get(world.ceiling_texture, tex);
+                color = tex.texture[renderCfg.texture_width * tex_coord_y_cf + tex_coord_x_cf];
+                color = (color >> 1) & DARK_SHADER;
+                pixelBuffer.pushToBuffer(x, y, Colour::INTtoRGB(color));
             }
         }
-
         zBuf[x] = perp_wall_dist;
     }
 }
@@ -295,7 +292,7 @@ void __INIT() {
     canvas.setMinimap(GUI::Minimap(&player, &world, screen_width, screen_height));
     debugContext.logAppInfo("Initialised Minimap object at: " + ADDR_OF(canvas.getMinimap()));
 
-    canvas.setDebugOverlay(GUI::DebugOverlay(&player, &canvas.getMinimap(), &world, GLUT_BITMAP_HELVETICA_18));
+    canvas.setDebugOverlay(GUI::DebugOverlay(&player, &canvas.getMinimap(), &world, GLUT_BITMAP_HELVETICA_12));
     debugContext.logAppInfo("Initialised DebugOverlay object at: " + ADDR_OF(canvas.getDebugOverlay()));
 
     canvas.setStatsBar(GUI::StatsBar(screen_width, screen_height,

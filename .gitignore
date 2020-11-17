@@ -21,3 +21,6 @@ build/*
 
 memory_analysis
 memory_analysis/*
+
+.cache
+.cache/*

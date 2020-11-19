@@ -24,3 +24,5 @@ memory_analysis/*
 
 .cache
 .cache/*
+
+compile_commands.json

@@ -2,8 +2,8 @@
 
 #include "../../../rendering/Globals.hpp"
 #include "../../../physics/Interaction.hpp"
-#include "../../../logic/id/IDGenerator.hpp"
-#include "../element/ITickedBased.hpp"
+#include "../../../logic/id/IDGenerator.cpp"
+#include "../element/ITickedBased.cpp"
 
 using namespace std;
 

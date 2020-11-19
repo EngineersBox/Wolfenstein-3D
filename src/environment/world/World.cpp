@@ -6,16 +6,16 @@
 #include <vector>
 #include <numeric>
 
-#include "../constructs/walls//AABBFace.hpp"
-#include "../constructs/walls/AABB.hpp"
+#include "../constructs/walls//AABBFace.cpp"
+#include "../constructs/walls/AABB.cpp"
 #include "../../exceptions/map/MapFormatError.hpp"
 #include "../../io/resource_management/JSONParser.hpp"
-#include "../../io/logging/GLDebug.hpp"
+#include "../../io/logging/GLDebug.cpp"
 #include "Coordinates.hpp"
 #include "../../rendering/Globals.hpp"
-#include "../constructs/sprites/Sprite.hpp"
-#include "../constructs/sprites/Enemy.hpp"
-#include "../../rendering/colour/Colours.hpp"
+#include "../constructs/sprites/Sprite.cpp"
+#include "../constructs/sprites/Enemy.cpp"
+#include "../../rendering/colour/Colours.cpp"
 
 using namespace std;
 #define MAP_DELIM ";"

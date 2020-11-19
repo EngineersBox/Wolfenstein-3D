@@ -20,7 +20,7 @@ int screen_width = __DEFAULT_SCREEN_WIDTH;
 int screen_height = __DEFAULT_SCREEN_HEIGHT;
 
 ResourceManager::TextureLoader texLoader;
-HashTable<Texture> textures;
+map<string, Texture> textures;
 AStar astar;
 vector<Coords> *path = new vector<Coords>();
 // Player
@@ -120,7 +120,7 @@ inline static void renderWallsFloorCeiling() {
             if (renderCfg.render_walls && y < draw_end_pos && y >= draw_start_pos) {
                 tex_coord_y = (int)tex_pos & (renderCfg.texture_height - 1);
                 tex_pos += step;
-                textures.get(wall_tex, tex);
+                tex = textures[wall_tex];
                 color = tex.texture[renderCfg.texture_height * tex_coord_y + tex_coord_x];
                 if (side == 1) {
                     color = (color >> 1) & DARK_SHADER;
@@ -145,12 +145,12 @@ inline static void renderWallsFloorCeiling() {
                 tex_coord_x_cf = (int)(renderCfg.texture_width * (floor_x - cell_x)) & (renderCfg.texture_width - 1);
                 tex_coord_y_cf = (int)(renderCfg.texture_height * (floor_y - cell_y)) & (renderCfg.texture_height - 1);
 
-                textures.get(world.floor_texture, tex);
+                tex = textures[world.floor_texture];
                 color = tex.texture[renderCfg.texture_width * tex_coord_y_cf + tex_coord_x_cf];
                 color = (color >> 1) & DARK_SHADER;
                 pixelBuffer.pushToBuffer(x, screen_height - y, Colour::INTtoRGB(color));
 
-                textures.get(world.ceiling_texture, tex);
+                tex = textures[world.ceiling_texture];
                 color = tex.texture[renderCfg.texture_width * tex_coord_y_cf + tex_coord_x_cf];
                 color = (color >> 1) & DARK_SHADER;
                 pixelBuffer.pushToBuffer(x, y, Colour::INTtoRGB(color));
@@ -198,7 +198,7 @@ inline static void renderSprites() {
         if (draw_end_pos_x >= screen_width) {
             draw_end_pos_x = screen_width - 1;
         }
-        textures.get(world.sprites[i].texture, tex);
+        tex = textures[world.sprites[i].texture];
         for (int pixel_row = draw_end_pos_x - 1; pixel_row >= draw_start_pos_x; pixel_row--) {
             tex_coord_x = (int)IDIV_256((IMUL_256((pixel_row - (IDIV_2(-sprite_width) + sprite_screen_x))) * renderCfg.texture_width / sprite_width));
             if (!(transform_y > 0 && pixel_row > 0 && pixel_row < screen_width && transform_y < zBuf[pixel_row])) {

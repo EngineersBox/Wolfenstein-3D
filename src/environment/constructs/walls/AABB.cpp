@@ -3,11 +3,11 @@
 #include <cmath>
 #include <string>
 
-#include "../../../rendering/colour/Colours.hpp"
-#include "../../../rendering/texturing/texture.hpp"
-#include "AABBFace.hpp"
+#include "../../../rendering/colour/Colours.cpp"
+#include "../../../rendering/texturing/texture.cpp"
+#include "AABBFace.cpp"
 #include "../../../rendering/raycaster/Ray.hpp"
-#include "../../base/object/IObjectBase.hpp"
+#include "../../base/object/IObjectBase.cpp"
 #include "../../world/Coordinates.hpp"
 
 using namespace std;

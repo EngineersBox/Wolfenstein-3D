@@ -3,7 +3,7 @@
 #include <vector>
 #include <string>
 
-#include "Sprite.hpp"
+#include "Sprite.cpp"
 
 using namespace std;
 

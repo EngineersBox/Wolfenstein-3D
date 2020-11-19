@@ -1,4 +1,5 @@
 #pragma once
+#define GL_SILENCE_DEPRECATION
 
 #include <iostream>
 #include <sstream>
@@ -7,7 +8,7 @@
 #include "../io/configuration/sections/LoggingCfg.hpp"
 #include "../io/configuration/sections/MinimapCfg.hpp"
 #include "../io/configuration/sections/RenderCfg.hpp"
-#include "../io/logging/GLDebug.hpp"
+#include "../io/logging/GLDebug.cpp"
 #include "../environment/world/Coordinates.hpp"
 #include "raycaster/Ray.hpp"
 
@@ -46,7 +47,7 @@ using namespace std;
 // ../../../~
 #define DEFAULT_CONFIG CFG_DIR + "config.ini"
 
-string toHex(int value) noexcept {
+inline string toHex(int value) noexcept {
     stringstream sstream;
     sstream << hex << value;
     return sstream.str();
@@ -61,7 +62,7 @@ static ConfigSection::MinimapCfg minimapCfg = ConfigSection::MinimapCfg();
 static ConfigSection::LoggingCfg loggingCfg = ConfigSection::LoggingCfg();
 static ConfigSection::RenderCfg renderCfg = ConfigSection::RenderCfg();
 
-static GLDebugContext debugContext = GLDebugContext();
+static GLDebugContext debugContext;
 
 typedef unsigned long int int_id;
 typedef vector<uint32_t> PNGTex;
@@ -72,6 +73,6 @@ namespace Rendering {
     typedef vector<double> ZBuffer;
 }
 
-Tick global_tick;
+static Tick global_tick;
 
 #define __EMTPY_VOID_FUNC__() (void (func*)())

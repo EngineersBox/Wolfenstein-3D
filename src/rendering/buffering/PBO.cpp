@@ -13,7 +13,7 @@
 #include <string>
 
 #include "../Globals.hpp"
-#include "../colour/Colours.hpp"
+#include "../colour/Colours.cpp"
 #include "../../exceptions/buffering/BufferIndexOutOfRange.hpp"
 
 using namespace std;

@@ -2,8 +2,8 @@
 
 #include "../../rendering/Globals.hpp"
 #include "../../rendering/drawing/DrawingUtils.hpp"
-#include "../../rendering/colour/Colours.hpp"
-#include "../../environment/player/Player.hpp"
+#include "../../rendering/colour/Colours.cpp"
+#include "../../environment/player/Player.cpp"
 
 using namespace std;
 

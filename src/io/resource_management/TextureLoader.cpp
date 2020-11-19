@@ -8,10 +8,9 @@
 #include <string>
 #include <vector>
 
-#include "../../rendering/texturing/texture.hpp"
+#include "../../rendering/texturing/texture.cpp"
 #include "../../exceptions/image/FileFormatError.hpp"
 #include "../../exceptions/textureLoader/ExceededMaxTextureImport.hpp"
-#include "../../logic/hashing/HashTable.hpp"
 #include "../../rendering/Globals.hpp"
 
 namespace ResourceManager {
@@ -23,7 +22,7 @@ class TextureLoader {
         TextureLoader();
         TextureLoader(std::vector<std::string>& filenames);
 
-        void loadTextures(HashTable<Texture>& textures);
+        void loadTextures(map<string, Texture>& textures);
         std::vector<std::string> filenames;
     private:
         void listFiles(const string& path, std::vector<std::string>& files);
@@ -75,7 +74,7 @@ void TextureLoader::getTextureFileNames() {
     }
 };
 
-void TextureLoader::loadTextures(HashTable<Texture> &textures) {
+void TextureLoader::loadTextures(map<string, Texture> &textures) {
     getTextureFileNames();
     int textureCount = this->filenames.size();
     for (int i = 0; i < textureCount; i++) {
@@ -85,7 +84,7 @@ void TextureLoader::loadTextures(HashTable<Texture> &textures) {
         }
         std::string stripped_fname = fname.substr(fname.find_last_of("/") + 1, fname.size() - 1);
         std::string pure_fname = stripped_fname.substr(0, stripped_fname.find_first_of("."));
-        textures.insert(pure_fname, Texture(fname, pure_fname));
+        textures.emplace(pure_fname, Texture(fname, pure_fname));
         debugContext.logAppVerb("Loaded texture [" + fname + "]");
     }
 }

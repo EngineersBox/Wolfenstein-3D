@@ -1,11 +1,11 @@
 #pragma once
 
-#include "../../io/logging/GLDebug.hpp"
+#include "../../io/logging/GLDebug.cpp"
 #include "../../rendering/Globals.hpp"
 #include "../../rendering/viewmodel/Camera.hpp"
 #include "../../rendering/viewmodel/Frustrum.hpp"
-#include "../../environment/base/entity/IEntityBase.hpp"
-#include "../world/World.hpp"
+#include "../../environment/base/entity/IEntityBase.cpp"
+#include "../world/World.cpp"
 
 using namespace std;
 

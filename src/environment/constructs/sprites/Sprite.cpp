@@ -2,7 +2,7 @@
 
 #include <string>
 
-#include "../../base/entity/IEntityBase.hpp"
+#include "../../base/entity/IEntityBase.cpp"
 
 using namespace std;
 

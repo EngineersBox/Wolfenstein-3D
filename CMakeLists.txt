@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.10)
 
 set(PROJECT_NAME W3D)
 project(${PROJECT_NAME})
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # SET CXX VERSION
 set(CMAKE_CXX_STANDARD 11)
@@ -9,6 +10,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 # INCLUDE LIBRARIES
 add_compile_options(-stdlib=libc++)
+add_compile_options(-Wdeprecated-declarations)
 find_package(OpenGL REQUIRED)
 find_package(GLUT REQUIRED)
 include_directories(${OPENGL_INCLUDE_DIRS}  ${GLUT_INCLUDE_DIRS})
@@ -213,4 +215,4 @@ add_custom_command(
 
 # SET THE EXECUTABLE TO THE SOURCE AND LINK LIBRARIES
 add_executable(W3D ${SOURCES})
-target_link_libraries(${PROJECT_NAME} ${OPENGL_LIBRARIES} ${GLUT_LIBRARY} )
+target_link_libraries(${PROJECT_NAME} ${OPENGL_LIBRARIES} ${GLUT_LIBRARY})

@@ -2,11 +2,11 @@
 
 #include <unordered_map>
 
-#include "base/IBaseElement.hpp"
-#include "button/Button.hpp"
-#include "debug_overlay/DebugOverlay.hpp"
-#include "minimap/Minimap.hpp"
-#include "stats_bar/StatsBar.hpp"
+#include "base/IBaseElement.cpp"
+#include "button/Button.cpp"
+#include "debug_overlay/DebugOverlay.cpp"
+#include "minimap/Minimap.cpp"
+#include "stats_bar/StatsBar.cpp"
 
 using namespace std;
 

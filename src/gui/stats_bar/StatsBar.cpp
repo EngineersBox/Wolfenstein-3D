@@ -5,7 +5,7 @@
 
 #include "../../rendering/Globals.hpp"
 #include "../../rendering/drawing/DrawingUtils.hpp"
-#include "../../rendering/colour/Colours.hpp"
+#include "../../rendering/colour/Colours.cpp"
 
 using namespace std;
 

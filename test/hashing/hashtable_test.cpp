@@ -2,7 +2,7 @@
 
 #include <string>
 
-#include "../../src/logic/hashing/HashTable.hpp"
+#include "../../src/logic/hashing/HashTable.cpp"
 #include "../../src/exceptions/hashing/HashTableCapacity.hpp"
 #include "../framework/catch.hpp"
 

@@ -1,0 +1,7 @@
+[
+{
+  "directory": "/Users/jackkilrain/Desktop/Projects/C:C++/Wolfenstein-3D",
+  "command": "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/c++    -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX11.0.sdk -stdlib=libc++ -Wdeprecated-declarations -std=gnu++11 -o CMakeFiles/W3D.dir/src/rendering/raycaster/Raytracer.cpp.o -c /Users/jackkilrain/Desktop/Projects/C:C++/Wolfenstein-3D/src/rendering/raycaster/Raytracer.cpp",
+  "file": "/Users/jackkilrain/Desktop/Projects/C:C++/Wolfenstein-3D/src/rendering/raycaster/Raytracer.cpp"
+}
+]

@@ -1,8 +1,8 @@
 #pragma once
 
-#include "../../logic/id/IDGenerator.hpp"
-#include "../../rendering/buffering/PBO.hpp"
-#include "../../rendering/colour/Colours.hpp"
+#include "../../logic/id/IDGenerator.cpp"
+#include "../../rendering/buffering/PBO.cpp"
+#include "../../rendering/colour/Colours.cpp"
 
 using namespace std;
 

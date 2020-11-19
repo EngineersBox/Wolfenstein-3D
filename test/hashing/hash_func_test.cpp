@@ -6,7 +6,7 @@
 #include <unordered_set>
 
 #include "../../src/exceptions/hashing/InvalidKeySize.hpp"
-#include "../../src/logic/hashing/HashTable.hpp"
+#include "../../src/logic/hashing/HashTable.cpp"
 #include "../framework/catch.hpp"
 
 using namespace std;

@@ -2,8 +2,8 @@
 
 #include <string>
 
-#include "../../../rendering/colour/Colours.hpp"
-#include "../../../rendering/texturing/texture.hpp"
+#include "../../../rendering/colour/Colours.cpp"
+#include "../../../rendering/texturing/texture.cpp"
 
 using namespace std;
 

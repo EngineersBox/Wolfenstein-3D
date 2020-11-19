@@ -4,12 +4,12 @@
 #include <stack>
 #include <vector>
 
-#include "../../environment/constructs/walls/AABB.hpp"
+#include "../../environment/constructs/walls/AABB.cpp"
 #include "../../environment/world/Coordinates.hpp"
-#include "../../environment/world/World.hpp"
+#include "../../environment/world/World.cpp"
 #include "../Globals.hpp"
 #include "../raycaster/Ray.hpp"
-#include "QuadNode.hpp"
+#include "QuadNode.cpp"
 
 using namespace std;
 

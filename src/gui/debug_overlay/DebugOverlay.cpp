@@ -2,9 +2,9 @@
 
 #include "../../rendering/Globals.hpp"
 #include "../../rendering/drawing/RasterText.hpp"
-#include "../../environment/player/Player.hpp"
-#include "../../environment/world/World.hpp"
-#include "../minimap/Minimap.hpp"
+#include "../../environment/player/Player.cpp"
+#include "../../environment/world/World.cpp"
+#include "../minimap/Minimap.cpp"
 
 using namespace std;
 

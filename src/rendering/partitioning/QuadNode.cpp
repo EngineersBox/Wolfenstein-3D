@@ -5,8 +5,8 @@
 #include <stack>
 #include <vector>
 
-#include "../../environment/constructs/walls/AABB.hpp"
-#include "../../environment/world/World.hpp"
+#include "../../environment/constructs/walls/AABB.cpp"
+#include "../../environment/world/World.cpp"
 #include "../../rendering/Globals.hpp"
 #include "../../rendering/raycaster/Ray.hpp"
 

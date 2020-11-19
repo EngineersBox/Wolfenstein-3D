@@ -4,15 +4,16 @@
 #include <iostream>
 #include <unordered_map>
 #include <vector>
+#include <queue>
 
-#include "../../environment/world/World.hpp"
+#include "../../environment/world/World.cpp"
 #include "../../environment/world/Coordinates.hpp"
 #include "../../exceptions/pathfinding/InvalidPathTargets.hpp"
 #include "../../rendering/Globals.hpp"
 #include "../../rendering/drawing/DrawingUtils.hpp"
-#include "../../rendering/colour/Colours.hpp"
-#include "GraphNode.hpp"
-#include "../queue/MinHeap.hpp"
+#include "../../rendering/colour/Colours.cpp"
+#include "GraphNode.cpp"
+#include "../queue/MinHeap.cpp"
 
 using namespace std;
 
@@ -145,7 +146,9 @@ vector<Coords>* AStar::find(Coords start_loc, Coords end_loc) {
     GraphNode start(start_loc);
     GraphNode goal(end_loc);
 
-    MinHeap<int, GraphNode> min_heap;
+    // By default, std::priority_queue implements<T,E,F> a min-heap when using F = std::greater<T>
+    typedef pair<int, GraphNode> QueueEntry;
+    priority_queue<QueueEntry, vector<QueueEntry>, greater<QueueEntry>> min_heap;
     min_heap.emplace(0, start);
 
     unordered_map<GraphNode, GraphNode> traversals;
@@ -155,8 +158,8 @@ vector<Coords>* AStar::find(Coords start_loc, Coords end_loc) {
     traversals[start] = start;
     cost[start] = 0;
 
-    while (!min_heap.isEmpty()) {
-        GraphNode current = min_heap.top();
+    while (!min_heap.empty()) {
+        GraphNode current = min_heap.top().second;
         min_heap.pop();
 
         if (current == goal) {

@@ -12,7 +12,7 @@
     #include <GL/glut.h>
 #endif
 
-#include "../colour/Colours.hpp"
+#include "../colour/Colours.cpp"
 
 using namespace std;
 

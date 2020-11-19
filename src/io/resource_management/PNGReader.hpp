@@ -29,7 +29,7 @@
 #include "../../exceptions/image/PNGzLibDataSize.hpp"
 #include "../../exceptions/image/PNGzLibInvalidFlags.hpp"
 #include "../../rendering/Globals.hpp"
-#include "../../rendering/colour/Colours.hpp"
+#include "../../rendering/colour/Colours.cpp"
 
 namespace ResourceManager {
 namespace PNG {

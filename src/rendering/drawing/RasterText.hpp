@@ -9,12 +9,12 @@
     #include <GL/glut.h>
 #endif
 
-#include "../colour/Colours.hpp"
+#include "../colour/Colours.cpp"
 #include <string>
 
 using namespace std;
 
-void displayText(float x, float y, Colour::ColorRGB text_colour, void* font, const string& string) {
+inline void displayText(float x, float y, Colour::ColorRGB text_colour, void* font, const string& string) {
     GLint current_colour[4];
     glGetIntegerv(GL_CURRENT_COLOR, current_colour);
     text_colour.toColour4d();
@@ -29,7 +29,7 @@ void displayText(float x, float y, Colour::ColorRGB text_colour, void* font, con
     );
 }
 
-void displayTextStroke(float x, float y, double scale, Colour::ColorRGB text_colour, const string& string) {
+inline void displayTextStroke(float x, float y, double scale, Colour::ColorRGB text_colour, const string& string) {
     GLint current_colour[4];
     glGetIntegerv(GL_CURRENT_COLOR, current_colour);
     text_colour.toColour4d();

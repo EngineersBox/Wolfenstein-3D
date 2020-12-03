@@ -15,6 +15,7 @@ namespace Equipment {
 
 class Weapon {
     public:
+        Weapon(){};
         Weapon(Animation::Sequence sequence, int posx, int posy);
 
         void render(Rendering::PBO &pbo, map<string, Texture> &textures);

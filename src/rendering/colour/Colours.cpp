@@ -15,116 +15,116 @@ using namespace std;
 
 namespace Colour {
 
-struct ColorRGB8bit;
+struct RGB8bit;
 // a color with 3 components: r, g and b
-struct ColorRGB {
+struct RGB {
     int r;
     int g;
     int b;
 
-    ColorRGB(uint8_t r, uint8_t g, uint8_t b);
-    ColorRGB(const ColorRGB8bit& color);
-    ColorRGB();
+    RGB(uint8_t r, uint8_t g, uint8_t b);
+    RGB(const RGB8bit& color);
+    RGB();
     void toClearColour();
     void toClearColour()const;
     void toColour4d();
     void toColour4d() const;
 };
 
-ColorRGB operator+(const ColorRGB& color, const ColorRGB& color2);
-ColorRGB operator-(const ColorRGB& color, const ColorRGB& color2);
-ColorRGB operator*(const ColorRGB& color, int a);
-ColorRGB operator*(int a, const ColorRGB& color);
-ColorRGB operator/(const ColorRGB& color, int a);
-bool operator==(const ColorRGB& color, const ColorRGB& color2);
-bool operator!=(const ColorRGB& color, const ColorRGB& color2);
+RGB operator+(const RGB& color, const RGB& color2);
+RGB operator-(const RGB& color, const RGB& color2);
+RGB operator*(const RGB& color, int a);
+RGB operator*(int a, const RGB& color);
+RGB operator/(const RGB& color, int a);
+bool operator==(const RGB& color, const RGB& color2);
+bool operator!=(const RGB& color, const RGB& color2);
 
-static const ColorRGB RGB_Black(0, 0, 0);
-static const ColorRGB RGB_Red(255, 0, 0);
-static const ColorRGB RGB_Green(0, 255, 0);
-static const ColorRGB RGB_Blue(0, 0, 255);
-static const ColorRGB RGB_Cyan(0, 255, 255);
-static const ColorRGB RGB_Magenta(255, 0, 255);
-static const ColorRGB RGB_Yellow(255, 255, 0);
-static const ColorRGB RGB_White(255, 255, 255);
-static const ColorRGB RGB_Gray(128, 128, 128);
-static const ColorRGB RGB_Grey(192, 192, 192);
-static const ColorRGB RGB_Maroon(128, 0, 0);
-static const ColorRGB RGB_Darkgreen(0, 128, 0);
-static const ColorRGB RGB_Navy(0, 0, 128);
-static const ColorRGB RGB_Teal(0, 128, 128);
-static const ColorRGB RGB_Purple(128, 0, 128);
-static const ColorRGB RGB_Olive(128, 128, 0);
-static const ColorRGB RGB_None(-1,-1,-1);
+static const RGB RGB_Black(0, 0, 0);
+static const RGB RGB_Red(255, 0, 0);
+static const RGB RGB_Green(0, 255, 0);
+static const RGB RGB_Blue(0, 0, 255);
+static const RGB RGB_Cyan(0, 255, 255);
+static const RGB RGB_Magenta(255, 0, 255);
+static const RGB RGB_Yellow(255, 255, 0);
+static const RGB RGB_White(255, 255, 255);
+static const RGB RGB_Gray(128, 128, 128);
+static const RGB RGB_Grey(192, 192, 192);
+static const RGB RGB_Maroon(128, 0, 0);
+static const RGB RGB_Darkgreen(0, 128, 0);
+static const RGB RGB_Navy(0, 0, 128);
+static const RGB RGB_Teal(0, 128, 128);
+static const RGB RGB_Purple(128, 0, 128);
+static const RGB RGB_Olive(128, 128, 0);
+static const RGB RGB_None(-1,-1,-1);
 
 // a color with 3 components: r, g and b
-struct ColorRGB8bit {
+struct RGB8bit {
     uint8_t r;
     uint8_t g;
     uint8_t b;
 
-    ColorRGB8bit(uint8_t r, uint8_t g, uint8_t b);
-    ColorRGB8bit(const ColorRGB& color);
-    ColorRGB8bit();
+    RGB8bit(uint8_t r, uint8_t g, uint8_t b);
+    RGB8bit(const RGB& color);
+    RGB8bit();
 };
 
 // a color with 3 components: h, s and l
-struct ColorHSL {
+struct HSL {
     int h;
     int s;
     int l;
 
-    ColorHSL(uint8_t h, uint8_t s, uint8_t l);
-    ColorHSL();
+    HSL(uint8_t h, uint8_t s, uint8_t l);
+    HSL();
 };
 
 // a color with 3 components: h, s and v
-struct ColorHSV {
+struct HSV {
     int h;
     int s;
     int v;
 
-    ColorHSV(uint8_t h, uint8_t s, uint8_t v);
-    ColorHSV();
+    HSV(uint8_t h, uint8_t s, uint8_t v);
+    HSV();
 };
 
 ////////////////////////////////////////////////////////////////////////////////
 // COLOR STRUCTS////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
-ColorRGB::ColorRGB(uint8_t r, uint8_t g, uint8_t b) {
+RGB::RGB(uint8_t r, uint8_t g, uint8_t b) {
     this->r = r;
     this->g = g;
     this->b = b;
 }
-ColorRGB::ColorRGB(const ColorRGB8bit& color) {
+RGB::RGB(const RGB8bit& color) {
     this->r = color.r;
     this->g = color.g;
     this->b = color.b;
 }
-ColorRGB::ColorRGB() {
+RGB::RGB() {
     this->r = 0;
     this->g = 0;
     this->b = 0;
 }
-ColorRGB8bit::ColorRGB8bit(uint8_t r, uint8_t g, uint8_t b) {
+RGB8bit::RGB8bit(uint8_t r, uint8_t g, uint8_t b) {
     this->r = r;
     this->g = g;
     this->b = b;
 }
-ColorRGB8bit::ColorRGB8bit(const ColorRGB& color) {
+RGB8bit::RGB8bit(const RGB& color) {
     this->r = color.r;
     this->g = color.g;
     this->b = color.b;
 }
-ColorRGB8bit::ColorRGB8bit() {
+RGB8bit::RGB8bit() {
     this->r = 0;
     this->g = 0;
     this->b = 0;
 }
 
 // Add two colors
-ColorRGB operator+(const ColorRGB& color, const ColorRGB& color2) {
-    ColorRGB c;
+RGB operator+(const RGB& color, const RGB& color2) {
+    RGB c;
     c.r = color.r + color2.r;
     c.g = color.g + color2.g;
     c.b = color.b + color2.b;
@@ -132,8 +132,8 @@ ColorRGB operator+(const ColorRGB& color, const ColorRGB& color2) {
 }
 
 // Subtract two colors
-ColorRGB operator-(const ColorRGB& color, const ColorRGB& color2) {
-    ColorRGB c;
+RGB operator-(const RGB& color, const RGB& color2) {
+    RGB c;
     c.r = color.r - color2.r;
     c.g = color.g - color2.g;
     c.b = color.b - color2.b;
@@ -141,8 +141,8 @@ ColorRGB operator-(const ColorRGB& color, const ColorRGB& color2) {
 }
 
 // Multiplies a color with an integer
-ColorRGB operator*(const ColorRGB& color, int a) {
-    ColorRGB c;
+RGB operator*(const RGB& color, int a) {
+    RGB c;
     c.r = color.r * a;
     c.g = color.g * a;
     c.b = color.b * a;
@@ -150,8 +150,8 @@ ColorRGB operator*(const ColorRGB& color, int a) {
 }
 
 // Multiplies a color with an integer
-ColorRGB operator*(int a, const ColorRGB& color) {
-    ColorRGB c;
+RGB operator*(int a, const RGB& color) {
+    RGB c;
     c.r = color.r * a;
     c.g = color.g * a;
     c.b = color.b * a;
@@ -159,9 +159,9 @@ ColorRGB operator*(int a, const ColorRGB& color) {
 }
 
 // Divides a color through an integer
-ColorRGB operator/(const ColorRGB& color, int a) {
+RGB operator/(const RGB& color, int a) {
     if (a == 0) return color;
-    ColorRGB c;
+    RGB c;
     c.r = color.r / a;
     c.g = color.g / a;
     c.b = color.b / a;
@@ -169,31 +169,31 @@ ColorRGB operator/(const ColorRGB& color, int a) {
 }
 
 // Are both colors equal?
-bool operator==(const ColorRGB& color, const ColorRGB& color2) {
+bool operator==(const RGB& color, const RGB& color2) {
     return (color.r == color2.r && color.g == color2.g && color.b == color2.b);
 }
 
 // Are both colors not equal?
-bool operator!=(const ColorRGB& color, const ColorRGB& color2) {
+bool operator!=(const RGB& color, const RGB& color2) {
     return (!(color.r == color2.r && color.g == color2.g && color.b == color2.b));
 }
 
-ColorHSL::ColorHSL(uint8_t h, uint8_t s, uint8_t l) {
+HSL::HSL(uint8_t h, uint8_t s, uint8_t l) {
     this->h = h;
     this->s = s;
     this->l = l;
 }
-ColorHSL::ColorHSL() {
+HSL::HSL() {
     this->h = 0;
     this->s = 0;
     this->l = 0;
 }
-ColorHSV::ColorHSV(uint8_t h, uint8_t s, uint8_t v) {
+HSV::HSV(uint8_t h, uint8_t s, uint8_t v) {
     this->h = h;
     this->s = s;
     this->v = v;
 }
-ColorHSV::ColorHSV() {
+HSV::HSV() {
     this->h = 0;
     this->s = 0;
     this->v = 0;
@@ -202,7 +202,7 @@ ColorHSV::ColorHSV() {
 ///
 /// Render colour with OpenGL glColor4d
 ///
-void ColorRGB::toColour4d() const {
+void RGB::toColour4d() const {
     glColor4d(
         this->r,
         this->g,
@@ -213,7 +213,7 @@ void ColorRGB::toColour4d() const {
 ///
 /// Render colour with OpenGL glColor4d
 ///
-void ColorRGB::toColour4d() {
+void RGB::toColour4d() {
     glColor4d(
         this->r,
         this->g,
@@ -224,7 +224,7 @@ void ColorRGB::toColour4d() {
 ///
 /// Render colour with OpenGL glClearColour
 ///
-void ColorRGB::toClearColour() {
+void RGB::toClearColour() {
     glClearColor(
         this->r / 255,
         this->g / 255,
@@ -235,7 +235,7 @@ void ColorRGB::toClearColour() {
 ///
 /// Render colour with OpenGL glClearColour
 ///
-void ColorRGB::toClearColour() const {
+void RGB::toClearColour() const {
     glClearColor(
         this->r / 255,
         this->g / 255,
@@ -255,7 +255,7 @@ color components used in the calculations are normalized between 0.0-1.0
 */
 
 //Converts an RGB color to HSL color
-ColorHSL RGBtoHSL(const ColorRGB& colorRGB) {
+HSL RGBtoHSL(const RGB& colorRGB) {
     float r, g, b, h = 0, s = 0, l;  // this function works with floats between 0 and 1
     r = colorRGB.r / 256.0;
     g = colorRGB.g / 256.0;
@@ -283,7 +283,7 @@ ColorHSL RGBtoHSL(const ColorRGB& colorRGB) {
         if (h < 0) h += 1;
     }
 
-    ColorHSL colorHSL;
+    HSL colorHSL;
     colorHSL.h = int(h * 255.0);
     colorHSL.s = int(s * 255.0);
     colorHSL.l = int(l * 255.0);
@@ -291,7 +291,7 @@ ColorHSL RGBtoHSL(const ColorRGB& colorRGB) {
 }
 
 // Converts an HSL color to RGB color
-ColorRGB HSLtoRGB(const ColorHSL& colorHSL) {
+RGB HSLtoRGB(const HSL& colorHSL) {
     float r, g, b, h, s, l;  // this function works with floats between 0 and 1
     float temp1, temp2, tempr, tempg, tempb;
     h = colorHSL.h / 256.0;
@@ -345,7 +345,7 @@ ColorRGB HSLtoRGB(const ColorHSL& colorHSL) {
             b = temp1;
     }
 
-    ColorRGB colorRGB;
+    RGB colorRGB;
     colorRGB.r = int(r * 255.0);
     colorRGB.g = int(g * 255.0);
     colorRGB.b = int(b * 255.0);
@@ -353,7 +353,7 @@ ColorRGB HSLtoRGB(const ColorHSL& colorHSL) {
 }
 
 //Converts an RGB color to HSV color
-ColorHSV RGBtoHSV(const ColorRGB& colorRGB) {
+HSV RGBtoHSV(const RGB& colorRGB) {
     float r, g, b, h = 0.0, s = 0.0, v;  // this function works with floats between 0 and 1
     r = colorRGB.r / 256.0;
     g = colorRGB.g / 256.0;
@@ -380,7 +380,7 @@ ColorHSV RGBtoHSV(const ColorRGB& colorRGB) {
         if (h < 0.0) h++;
     }
 
-    ColorHSV colorHSV;
+    HSV colorHSV;
     colorHSV.h = int(h * 255.0);
     colorHSV.s = int(s * 255.0);
     colorHSV.v = int(v * 255.0);
@@ -388,7 +388,7 @@ ColorHSV RGBtoHSV(const ColorRGB& colorRGB) {
 }
 
 // Converts an HSV color to RGB color
-ColorRGB HSVtoRGB(const ColorHSV& colorHSV) {
+RGB HSVtoRGB(const HSV& colorHSV) {
     float r, g, b, h, s, v;  // this function works with floats between 0 and 1
     h = colorHSV.h / 256.0;
     s = colorHSV.s / 256.0;
@@ -444,26 +444,26 @@ ColorRGB HSVtoRGB(const ColorHSV& colorHSV) {
                 break;
         }
     }
-    ColorRGB colorRGB;
+    RGB colorRGB;
     colorRGB.r = int(r * 255.0);
     colorRGB.g = int(g * 255.0);
     colorRGB.b = int(b * 255.0);
     return colorRGB;
 }
 
-uint32_t RGBtoINT(const ColorRGB& colorRGB) {
+uint32_t RGBtoINT(const RGB& colorRGB) {
     return 65536 * colorRGB.r + 256 * colorRGB.g + colorRGB.b;
 }
 
-ColorRGB INTtoRGB(uint32_t colorINT) {
-    ColorRGB colorRGB;
+RGB INTtoRGB(uint32_t colorINT) {
+    RGB colorRGB;
     colorRGB.r = (colorINT / 65536) % 256;
     colorRGB.g = (colorINT / 256) % 256;
     colorRGB.b = colorINT % 256;
     return colorRGB;
 }
 
-ColorRGB STRtoRGB(const string& colorSTR) {
+RGB STRtoRGB(const string& colorSTR) {
     if (colorSTR == "") {
         return RGB_None;
     }

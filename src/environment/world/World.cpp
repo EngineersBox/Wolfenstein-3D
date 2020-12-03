@@ -115,8 +115,14 @@ void World::readMapFromJSON(string filename) {
     this->map_height = jsonres["Params"]["Height"].as<int>();
     this->context->logAppInfo("Loading map with dimensions: W = " + to_string(this->map_width) + ", H = " + to_string(this->map_height));
     this->size = this->map_height * this->map_width;
-    this->start = Coords(jsonres["Params"]["Start"]["x"].as<int>(),jsonres["Params"]["Start"]["y"].as<int>());
-    this->end = Coords(jsonres["Params"]["End"]["x"].as<int>(),jsonres["Params"]["End"]["y"].as<int>());
+    this->start = Coords(
+        jsonres["Params"]["Start"]["x"].as<int>(),
+        jsonres["Params"]["Start"]["y"].as<int>()
+    );
+    this->end = Coords(
+        jsonres["Params"]["End"]["x"].as<int>(),
+        jsonres["Params"]["End"]["y"].as<int>()
+    );
     this->context->logAppInfo("Map start location: " + this->start.asString());
     this->context->logAppInfo("Map end location: " + this->end.asString());
     ResourceManager::RSJarray wallarr = jsonres["Walls"].as_array();
@@ -127,21 +133,25 @@ void World::readMapFromJSON(string filename) {
         ResourceManager::RSJobject right = wallObj["Right"].as<ResourceManager::RSJobject>();
         ResourceManager::RSJobject up = wallObj["Up"].as<ResourceManager::RSJobject>();
         ResourceManager::RSJobject down = wallObj["Down"].as<ResourceManager::RSJobject>();
-        this->walls.push_back(Constructs::AABB(
-            x, y,
-            Colour::STRtoRGB(left["Colour"].as<string>()),
-            Constructs::AABBFace(
+        this->walls.push_back(
+            Constructs::AABB(
+                x, y,
                 Colour::STRtoRGB(left["Colour"].as<string>()),
-                left["Texture"].as<string>()),
-            Constructs::AABBFace(
-                Colour::STRtoRGB(right["Colour"].as<string>()),
-                right["Texture"].as<string>()),
-            Constructs::AABBFace(
-                Colour::STRtoRGB(up["Colour"].as<string>()),
-                up["Texture"].as<string>()),
-            Constructs::AABBFace(
-                Colour::STRtoRGB(down["Colour"].as<string>()),
-                down["Texture"].as<string>())));
+                Constructs::AABBFace(
+                    Colour::STRtoRGB(left["Colour"].as<string>()),
+                    left["Texture"].as<string>()),
+                Constructs::AABBFace(
+                    Colour::STRtoRGB(right["Colour"].as<string>()),
+                    right["Texture"].as<string>()),
+                Constructs::AABBFace(
+                    Colour::STRtoRGB(up["Colour"].as<string>()),
+                    up["Texture"].as<string>()),
+                Constructs::AABBFace(
+                    Colour::STRtoRGB(down["Colour"].as<string>()),
+                    down["Texture"].as<string>()),
+                Constructs::parseWallType(wallObj["Type"].as<string>())
+            )
+        );
         if (x == 0) {
             this->left_boundary.push_back(Coords(x,y));
         } else if (x == this->map_width - 1) {

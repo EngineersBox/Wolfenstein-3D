@@ -11,6 +11,8 @@ using namespace std;
 
 namespace GUI {
 
+#define SB_SECTION_COUNT 8
+
 #define SB_LEVEL_RATIO 0.1
 #define SB_SCORE_RATIO 0.2
 #define SB_LIVES_RATIO 0.1
@@ -20,7 +22,7 @@ namespace GUI {
 #define SB_TOOLS_RATIO 0.05
 #define SB_WEAPON_RATIO 0.2
 
-static const float sectionRatios[] = {
+static const float sectionRatios[SB_SECTION_COUNT] = {
     SB_LEVEL_RATIO,
     SB_SCORE_RATIO,
     SB_LIVES_RATIO,
@@ -39,7 +41,7 @@ static const float sectionRatios[] = {
 class StatsBar {
     public:
         StatsBar(){};
-        StatsBar(int screen_width, int screen_height, Colour::ColorRGB background_colour, Colour::ColorRGB section_colour, Colour::ColorRGB text_colour);
+        StatsBar(int screen_width, int screen_height, Colour::RGB background_colour, Colour::RGB section_colour, Colour::RGB text_colour);
 
         void render(int screen_width, int screen_height);
     private:
@@ -67,12 +69,12 @@ class StatsBar {
         vector<int> tools;
         string weapon;
 
-        Colour::ColorRGB background_colour;
-        Colour::ColorRGB section_colour;
-        Colour::ColorRGB text_colour;
+        Colour::RGB background_colour;
+        Colour::RGB section_colour;
+        Colour::RGB text_colour;
 };
 
-StatsBar::StatsBar(int screen_width, int screen_height, Colour::ColorRGB background_colour, Colour::ColorRGB section_colour, Colour::ColorRGB text_colour) {
+StatsBar::StatsBar(int screen_width, int screen_height, Colour::RGB background_colour, Colour::RGB section_colour, Colour::RGB text_colour) {
     this->posY = screen_height - BAR_HEIGHT;
     this->posX = 0;
     this->background_colour = background_colour;
@@ -92,7 +94,7 @@ inline void StatsBar::renderBarBackground(int screen_width, int screen_height) {
 inline void StatsBar::renderBarSections(int screen_width, int screen_height) {
     float runningOffset = this->innerXOffset;
     float innerBarOffsetY = screen_height - BAR_HEIGHT + this->innerYOffset;
-    for (int i = 0; i < (sizeof(sectionRatios)/sizeof(sectionRatios[0])); i++) {
+    for (int i = 0; i < SB_SECTION_COUNT; i++) {
         this->section_colour.toColour4d();
         drawRectangle(
             runningOffset,

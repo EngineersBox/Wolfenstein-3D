@@ -1,5 +1,7 @@
 #pragma once
 
+#define GL_SILENCE_DEPRECATION
+
 #if _WIN64 || _WIN32
     #include <windows.h>
     #include <GL/glut.h>
@@ -32,17 +34,18 @@ class PBO {
         void init();
         void swapBuffer();
 
-        inline void pushToBuffer(int x, int y, Colour::ColorRGB colour);
+        inline void pushToBuffer(int x, int y, Colour::RGB colour);
         inline void resize(int newWidth, int newHeight);
         inline void clear();
+        inline void blankOut();
+
+        int width;
+        int height;
     private:
         bool inRange(int value, int min, int max);
 
         vector<GLubyte> buffer;
         GLuint buffer_id;
-
-        int width;
-        int height;
 };
 
 PBO::PBO(){};
@@ -87,7 +90,7 @@ bool PBO::inRange(int value, int min, int max) {
     return !(value < min) && !(max < value);
 }
 
-inline void PBO::pushToBuffer(int x, int y, Colour::ColorRGB colour) {
+inline void PBO::pushToBuffer(int x, int y, Colour::RGB colour) {
     int idx = y * this->width + x;
     if (!inRange(x, 0, this->width) || !inRange(y, 0, this->height)) {
         throw BufferIndexOutOfRange(idx);
@@ -106,6 +109,10 @@ inline void PBO::resize(int newWidth, int newHeight) {
 
 inline void PBO::clear() {
     this->buffer.clear();
+}
+
+inline void PBO::blankOut() {
+    fill(this->buffer.begin(), this->buffer.end(), 0);
 }
 
 }

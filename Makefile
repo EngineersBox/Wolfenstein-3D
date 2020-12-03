@@ -70,7 +70,7 @@ EQUALS = =
 CMAKE_SOURCE_DIR = /Users/jackkilrain/Desktop/Projects/C:C++/Wolfenstein-3D
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /Users/jackkilrain/Desktop/Projects/C:C++/Wolfenstein-3D
+CMAKE_BINARY_DIR = /Users/jackkilrain/desktop/Projects/C:C++/Wolfenstein-3D
 
 #=============================================================================
 # Targets provided globally by CMake.
@@ -99,9 +99,9 @@ rebuild_cache/fast: rebuild_cache
 
 # The main all target
 all: cmake_check_build_system
-	$(CMAKE_COMMAND) -E cmake_progress_start /Users/jackkilrain/Desktop/Projects/C:C++/Wolfenstein-3D/CMakeFiles /Users/jackkilrain/Desktop/Projects/C:C++/Wolfenstein-3D//CMakeFiles/progress.marks
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/jackkilrain/desktop/Projects/C:C++/Wolfenstein-3D/CMakeFiles /Users/jackkilrain/desktop/Projects/C:C++/Wolfenstein-3D//CMakeFiles/progress.marks
 	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 all
-	$(CMAKE_COMMAND) -E cmake_progress_start /Users/jackkilrain/Desktop/Projects/C:C++/Wolfenstein-3D/CMakeFiles 0
+	$(CMAKE_COMMAND) -E cmake_progress_start /Users/jackkilrain/desktop/Projects/C:C++/Wolfenstein-3D/CMakeFiles 0
 .PHONY : all
 
 # The main clean target

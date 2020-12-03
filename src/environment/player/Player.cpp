@@ -6,6 +6,7 @@
 #include "../../rendering/viewmodel/Frustrum.hpp"
 #include "../../environment/base/entity/IEntityBase.cpp"
 #include "../world/World.cpp"
+#include "../constructs/walls/AABB.cpp"
 
 using namespace std;
 
@@ -55,17 +56,17 @@ void Player::logLocation() {
 
 void Player::handleKeyPress(unsigned char key, int x, int y, World &world) {
     if (key == 'w') {
-        if (world.getAt((int)(this->location.x + this->camera.frustrum.getFovX() * this->moveSpeed), (int)this->location.y).wf_left.texture == "") {
+        if (world.getAt((int)(this->location.x + this->camera.frustrum.getFovX() * this->moveSpeed), (int)this->location.y).type == Constructs::WallType::NONE) {
             this->location.x += this->camera.frustrum.getFovX() * this->moveSpeed;
         }
-        if (world.getAt((int)this->location.x, (int)(this->location.y + this->camera.frustrum.getFovY() * this->moveSpeed)).wf_left.texture == "") {
+        if (world.getAt((int)this->location.x, (int)(this->location.y + this->camera.frustrum.getFovY() * this->moveSpeed)).type == Constructs::WallType::NONE) {
             this->location.y += this->camera.frustrum.getFovY() * this->moveSpeed;
         }
     } else if (key == 's') {
-        if (world.getAt((int)(this->location.x - this->camera.frustrum.getFovX() * this->moveSpeed), (int)this->location.y).wf_left.texture == "") {
+        if (world.getAt((int)(this->location.x - this->camera.frustrum.getFovX() * this->moveSpeed), (int)this->location.y).type == Constructs::WallType::NONE) {
             this->location.x -= this->camera.frustrum.getFovX() * this->moveSpeed;
         }
-        if (world.getAt((int)this->location.x, (int)(this->location.y - this->camera.frustrum.getFovY() * this->moveSpeed)).wf_left.texture == "") {
+        if (world.getAt((int)this->location.x, (int)(this->location.y - this->camera.frustrum.getFovY() * this->moveSpeed)).type == Constructs::WallType::NONE) {
             this->location.y -= this->camera.frustrum.getFovY() * this->moveSpeed;
         }
     } else if (key == 'a') {

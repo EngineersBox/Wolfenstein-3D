@@ -12,10 +12,10 @@ namespace Constructs {
 class AABBFace {
     public:
         AABBFace();
-        AABBFace(Colour::ColorRGB colour, string tex);
+        AABBFace(Colour::RGB colour, string tex);
         ~AABBFace();
 
-        Colour::ColorRGB colour;
+        Colour::RGB colour;
         string texture;
 };
 
@@ -24,7 +24,7 @@ AABBFace::AABBFace() {
     this->texture = "";
 }
 
-AABBFace::AABBFace(Colour::ColorRGB colour, string tex) {
+AABBFace::AABBFace(Colour::RGB colour, string tex) {
     this->colour = colour;
     this->texture = tex;
 };

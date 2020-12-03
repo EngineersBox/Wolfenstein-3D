@@ -760,7 +760,7 @@ int decodePNG(std::vector<unsigned char>& out_image_32bit, unsigned long& image_
     return decodePNG(out_image_32bit, image_width, image_height, in_png.size() ? &in_png[0] : 0, in_png.size());
 }
 
-int loadImage(std::vector<Colour::ColorRGB>& out, unsigned long& w, unsigned long& h, const std::string& filename) {
+int loadImage(std::vector<Colour::RGB>& out, unsigned long& w, unsigned long& h, const std::string& filename) {
     std::vector<unsigned char> file, image;
     loadFile(file, filename);
     if (decodePNG(image, w, h, file)) return 1;

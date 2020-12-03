@@ -25,6 +25,7 @@ AStar astar;
 vector<Coords> *path = new vector<Coords>();
 // Player
 Player player;
+Equipment::Weapon playerWeapon;
 
 // Configs
 ResourceManager::ConfigInit cfgInit;
@@ -77,7 +78,7 @@ inline static void renderWallsFloorCeiling() {
                 map_y += step_y;
                 side = 1;
             }
-            hit = world.getAt(map_x, map_y).wf_left.texture != "";
+            hit = world.getAt(map_x, map_y).type != Constructs::WallType::NONE;
         }
 
         if (side == 0) {
@@ -129,8 +130,7 @@ inline static void renderWallsFloorCeiling() {
             } else if (renderCfg.render_floor_ceiling && y >= IDIV_2(screen_height) + 1) {
                 // p = y - IDIV_2(screen_height);
                 // pos_z = 0.5 * screen_width;
-                // dist = pos_x / p;
-
+                // dist = pos_z / p;
                 dist = (0.5 * screen_width) / (y - IDIV_2(screen_height));
 
                 step_x_cf = dist * (ray_dir_x1 - ray_dir_x0) / screen_width;
@@ -230,6 +230,9 @@ inline static void updateTimeTick() {
 }
 
 static void __DISPLAY(void) {
+    if (!renderCfg.render_floor_ceiling) {
+        pixelBuffer.blankOut();
+    }
     renderWallsFloorCeiling();
 
     if (renderCfg.render_sprites) {
@@ -246,11 +249,6 @@ static void __DISPLAY(void) {
         canvas.getMinimap().getScalingX(), canvas.getMinimap().getScalingY()
     );
     glutSwapBuffers();
-}
-
-static void __KEY_HANDLER(unsigned char key, int x, int y) {
-    player.handleKeyPress(key, x, y, world);
-    glutPostRedisplay();
 }
 
 
@@ -317,6 +315,11 @@ static void __WINDOW_RESHAPE(int width, int height) {
 }
 
 static void __GLUT_IDLE(void) {
+    glutPostRedisplay();
+}
+
+static void __KEY_HANDLER(unsigned char key, int x, int y) {
+    player.handleKeyPress(key, x, y, world);
     glutPostRedisplay();
 }
 

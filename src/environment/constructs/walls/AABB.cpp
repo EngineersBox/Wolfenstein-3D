@@ -2,6 +2,7 @@
 
 #include <cmath>
 #include <string>
+#include <algorithm>
 
 #include "../../../rendering/colour/Colours.cpp"
 #include "../../../rendering/texturing/texture.cpp"
@@ -28,12 +29,29 @@ static const string NormalDirLUT[] = {
     "DOWN"
 };
 
+typedef enum E_WallType {
+    NONE,
+    WALL,
+    DOOR
+} WallType;
+
+WallType parseWallType(string wall_type_string) {
+    transform(wall_type_string.begin(), wall_type_string.end(),
+        wall_type_string.begin(), ::toupper);
+    if (wall_type_string == "WALL")  {
+        return WallType::WALL;
+    } else if (wall_type_string == "DOOR") {
+        return WallType::DOOR;
+    }
+    return WallType::NONE;
+}
+
 class AABB : public BaseInterface::IObjectBase<int, Coordinates> {
    public:
-    AABB(int x, int y, Colour::ColorRGB colour, string texture);
-    AABB(int x, int y, Colour::ColorRGB colour);
-    AABB(int x, int y, string texture);
-    AABB(int x, int y, Colour::ColorRGB colour, AABBFace wf_left, AABBFace wf_right, AABBFace wf_up, AABBFace wf_down);
+    AABB(int x, int y, Colour::RGB colour, string texture, WallType type);
+    AABB(int x, int y, Colour::RGB colour, WallType type);
+    AABB(int x, int y, string texture, WallType type);
+    AABB(int x, int y, Colour::RGB colour, AABBFace wf_left, AABBFace wf_right, AABBFace wf_up, AABBFace wf_down, WallType type);
     AABB();
 
     bool operator==(AABB& other);
@@ -43,13 +61,15 @@ class AABB : public BaseInterface::IObjectBase<int, Coordinates> {
     AABBFace getFace(int x, int y);
     bool intersect(const Ray& ray, Coords& intersect_point);
 
-    Colour::ColorRGB texColour;
+    Colour::RGB texColour;
     string texture_name;
 
     AABBFace wf_left;
     AABBFace wf_right;
     AABBFace wf_up;
     AABBFace wf_down;
+
+    WallType type;
 };
 
 ///
@@ -62,7 +82,7 @@ class AABB : public BaseInterface::IObjectBase<int, Coordinates> {
 ///
 /// @returns AABB
 ///
-AABB::AABB(int x, int y, Colour::ColorRGB colour, string texture):
+AABB::AABB(int x, int y, Colour::RGB colour, string texture, WallType type):
     IObjectBase<int, Coordinates>(
         Coordinates<int>(x,y),
         INTERACTION_TYPE::BLOCK_ALL
@@ -70,9 +90,10 @@ AABB::AABB(int x, int y, Colour::ColorRGB colour, string texture):
 {
     this->texColour = colour;
     this->texture_name = texture;
+    this->type = type;
 }
 
-AABB::AABB(int x, int y, Colour::ColorRGB colour, AABBFace wf_left, AABBFace wf_right, AABBFace wf_up, AABBFace wf_down):
+AABB::AABB(int x, int y, Colour::RGB colour, AABBFace wf_left, AABBFace wf_right, AABBFace wf_up, AABBFace wf_down, WallType type):
     IObjectBase<int, Coordinates>(
         Coordinates<int>(x,y),
         INTERACTION_TYPE::BLOCK_ALL
@@ -83,13 +104,14 @@ AABB::AABB(int x, int y, Colour::ColorRGB colour, AABBFace wf_left, AABBFace wf_
     this->wf_right = wf_right;
     this->wf_up = wf_up;
     this->wf_down = wf_down;
+    this->type = type;
 };
 
-AABB::AABB() : AABB(0, 0, Colour::RGB_None, "") {};
+AABB::AABB() : AABB(0, 0, Colour::RGB_None, "", WallType::NONE) {};
 
-AABB::AABB(int x, int y, string texture) : AABB(x, y, Colour::RGB_None, texture) {};
+AABB::AABB(int x, int y, string texture, WallType type) : AABB(x, y, Colour::RGB_None, texture, type) {};
 
-AABB::AABB(int x, int y, Colour::ColorRGB colour) : AABB(x, y, colour, "") {};
+AABB::AABB(int x, int y, Colour::RGB colour, WallType type) : AABB(x, y, colour, "", type) {};
 
 bool AABB::operator==(AABB& other) {
     return (this->location.x == other.location.x)

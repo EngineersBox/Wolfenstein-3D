@@ -9,7 +9,7 @@ using namespace std;
 namespace GUI {
 
 struct IBaseElement {
-    IBaseElement(int x, int y, int width, int height, Colour::ColorRGB background_colour);
+    IBaseElement(int x, int y, int width, int height, Colour::RGB background_colour);
     virtual void render(Rendering::PBO &pbo) = 0;
     virtual void render() = 0;
 
@@ -18,11 +18,11 @@ struct IBaseElement {
     int width;
     int height;
 
-    Colour::ColorRGB background_colour;
+    Colour::RGB background_colour;
     int_id id;
 };
 
-IBaseElement::IBaseElement(int x, int y, int width, int height, Colour::ColorRGB background_colour) {
+IBaseElement::IBaseElement(int x, int y, int width, int height, Colour::RGB background_colour) {
     this->x = x;
     this->y = y;
     this->width = width;

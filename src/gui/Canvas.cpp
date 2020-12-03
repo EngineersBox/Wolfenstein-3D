@@ -80,7 +80,7 @@ void Canvas::handleMouse(int button, int state, int posx, int posy) {
 void Canvas::handleKeypress(unsigned char key, int x, int y){};
 
 void Canvas::render(double frame_time) {
-    for(pair<const int_id, Button*> elem : this->buttons) {
+    for (pair<const int_id, Button*> elem : this->buttons) {
         elem.second->render();
     }
     this->minimap.render(glutGet(GLUT_SCREEN_WIDTH), glutGet(GLUT_SCREEN_HEIGHT));

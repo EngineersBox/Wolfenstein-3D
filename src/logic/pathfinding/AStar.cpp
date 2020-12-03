@@ -25,7 +25,7 @@ class AStar {
 
         vector<Coords>* rebuildPath(unordered_map<GraphNode, GraphNode>& traversals, GraphNode start, GraphNode goal);
         vector<Coords>* find(Coords start_loc, Coords end_loc);
-        void renderPath(vector<Coords>* path, Colour::ColorRGB path_colour, int sw, int sh, float scalingX, float scalingY);
+        void renderPath(vector<Coords>* path, Colour::RGB path_colour, int sw, int sh, float scalingX, float scalingY);
 
     private:
         inline int heuristic(GraphNode next, GraphNode goal);
@@ -183,7 +183,7 @@ vector<Coords>* AStar::find(Coords start_loc, Coords end_loc) {
     return rebuildPath(traversals, start, goal);
 };
 
-void AStar::renderPath(vector<Coords>* path, Colour::ColorRGB path_colour, int sw, int sh, float mapScalingX, float mapScalingY) {
+void AStar::renderPath(vector<Coords>* path, Colour::RGB path_colour, int sw, int sh, float mapScalingX, float mapScalingY) {
     if (path->size() < 2) {
         return;
     }

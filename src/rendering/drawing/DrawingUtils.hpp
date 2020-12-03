@@ -1,5 +1,7 @@
 #pragma once
 
+#define GL_SILENCE_DEPRECATION
+
 #if _WIN64
     #include <windows.h>
     #include <GL/glut.h>
@@ -67,7 +69,7 @@ inline static void drawSquare(float x, float y, float sidelength, bool beginEnd 
 ///
 /// @return void
 ///
-inline static void renderRay(float ax, float ay, float bx, float by, int line_width, Colour::ColorRGB ray_colour) {
+inline static void renderRay(float ax, float ay, float bx, float by, int line_width, Colour::RGB ray_colour) {
     ray_colour.toColour4d();
     glLineWidth((float)line_width);
 
@@ -91,7 +93,7 @@ inline static void renderRay(float ax, float ay, float bx, float by, int line_wi
 ///
 /// @return void
 ///
-inline static void drawOutline(float x, float y, float xSideLength, float ySideLength, int lineWidth, Colour::ColorRGB colour) {
+inline static void drawOutline(float x, float y, float xSideLength, float ySideLength, int lineWidth, Colour::RGB colour) {
     renderRay(x, y, xSideLength, y, lineWidth, colour);
     renderRay(x, ySideLength, xSideLength, ySideLength, lineWidth, colour);
     renderRay(x, y, x, ySideLength, lineWidth, colour);

@@ -48,3 +48,4 @@
 #include "../../gui/debug_overlay/DebugOverlay.cpp"
 #include "../../gui/stats_bar/StatsBar.cpp"
 #include "../../gui/Canvas.cpp"
+#include "../../equipment/weapons/Weapon.cpp"

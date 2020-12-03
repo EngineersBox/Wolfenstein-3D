@@ -28,18 +28,18 @@ class Button : public IBaseElement {
         Button();
         Button(string text, ButtonCallback callback);
         Button(int x, int y, int width, int height, string text, ButtonCallback callback);
-        Button(int x, int y, int width, int height, string text, Colour::ColorRGB background_colour, Colour::ColorRGB hover_colour, Colour::ColorRGB click_colour, ButtonCallback callback);
+        Button(int x, int y, int width, int height, string text, Colour::RGB background_colour, Colour::RGB hover_colour, Colour::RGB click_colour, ButtonCallback callback);
 
         void render(Rendering::PBO& pbo);
         void render();
 
-        void setBackgroundColour(Colour::ColorRGB colour);
-        void setHoverColour(Colour::ColorRGB colour);
-        void setClickColour(Colour::ColorRGB colour);
+        void setBackgroundColour(Colour::RGB colour);
+        void setHoverColour(Colour::RGB colour);
+        void setClickColour(Colour::RGB colour);
 
-        Colour::ColorRGB getBackgroundColour();
-        Colour::ColorRGB getHoverColour();
-        Colour::ColorRGB getClickColour();
+        Colour::RGB getBackgroundColour();
+        Colour::RGB getHoverColour();
+        Colour::RGB getClickColour();
 
         void setX(int x);
         void setY(int y);
@@ -58,8 +58,8 @@ class Button : public IBaseElement {
 
         string text;
         BUTTON_STATE state = BUTTON_STATE::NOT_CLICKED;
-        Colour::ColorRGB hover_colour;
-        Colour::ColorRGB click_colour;
+        Colour::RGB hover_colour;
+        Colour::RGB click_colour;
         ButtonCallback callback;
 };
 
@@ -74,8 +74,8 @@ Button::Button(int x, int y, int width, int height, string text,ButtonCallback c
 {};
 
 Button::Button(int x, int y, int width, int height, string text,
-			   Colour::ColorRGB background_colour,
-			   Colour::ColorRGB hover_colour, Colour::ColorRGB click_colour,
+			   Colour::RGB background_colour,
+			   Colour::RGB hover_colour, Colour::RGB click_colour,
 			   ButtonCallback callback):
 	IBaseElement(x, y, width, height, background_colour)
 {
@@ -85,15 +85,15 @@ Button::Button(int x, int y, int width, int height, string text,
 	this->callback = callback;
 };
 
-void Button::setBackgroundColour(Colour::ColorRGB colour) {
+void Button::setBackgroundColour(Colour::RGB colour) {
   	this->background_colour = colour;
 };
 
-void Button::setHoverColour(Colour::ColorRGB colour) {
+void Button::setHoverColour(Colour::RGB colour) {
   	this->hover_colour = colour;
 };
 
-void Button::setClickColour(Colour::ColorRGB colour) {
+void Button::setClickColour(Colour::RGB colour) {
   	this->click_colour = colour;
 };
 
@@ -107,13 +107,13 @@ void Button::setHeight(int height) { this->height = height; };
 
 void Button::setText(string text) { this->text = text; };
 
-Colour::ColorRGB Button::getBackgroundColour() {
+Colour::RGB Button::getBackgroundColour() {
   	return this->background_colour;
 };
 
-Colour::ColorRGB Button::getHoverColour() { return this->hover_colour; };
+Colour::RGB Button::getHoverColour() { return this->hover_colour; };
 
-Colour::ColorRGB Button::getClickColour() { return this->click_colour; };
+Colour::RGB Button::getClickColour() { return this->click_colour; };
 
 int Button::getX() { return this->x; };
 
@@ -126,7 +126,7 @@ int Button::getHeight() { return this->height; };
 string Button::getText() { return this->text; };
 
 void Button::render(Rendering::PBO &pbo) {
-	Colour::ColorRGB render_colour = this->background_colour;
+	Colour::RGB render_colour = this->background_colour;
 	switch (this->state) {
 		case BUTTON_STATE::CLICKED:
 			render_colour = this->click_colour;
@@ -152,7 +152,7 @@ void Button::render(Rendering::PBO &pbo) {
 };
 
 void Button::render() {
-	Colour::ColorRGB render_colour = this->background_colour;
+	Colour::RGB render_colour = this->background_colour;
 	switch (this->state) {
 		case BUTTON_STATE::CLICKED:
 			render_colour = this->click_colour;

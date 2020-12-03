@@ -14,7 +14,7 @@
 
 using namespace std;
 
-inline void displayText(float x, float y, Colour::ColorRGB text_colour, void* font, const string& string) {
+inline void displayText(float x, float y, Colour::RGB text_colour, void* font, const string& string) {
     GLint current_colour[4];
     glGetIntegerv(GL_CURRENT_COLOR, current_colour);
     text_colour.toColour4d();
@@ -29,7 +29,7 @@ inline void displayText(float x, float y, Colour::ColorRGB text_colour, void* fo
     );
 }
 
-inline void displayTextStroke(float x, float y, double scale, Colour::ColorRGB text_colour, const string& string) {
+inline void displayTextStroke(float x, float y, double scale, Colour::RGB text_colour, const string& string) {
     GLint current_colour[4];
     glGetIntegerv(GL_CURRENT_COLOR, current_colour);
     text_colour.toColour4d();

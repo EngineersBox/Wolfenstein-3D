@@ -28,7 +28,7 @@ If you have CMake installed then running the raycaster is really straight forwar
 
 1. Open up a terminal window and cd to this repo
 2. Run `cmake .` to set up the cmake build environment
-3. Build the raycaster with `make QSP`
+3. Build the raycaster with `make W3D`
 4. Start the built raycaster with `make run`
 
 Below is a full list of commands and their usages:
@@ -37,7 +37,7 @@ _NOTE: All commands have supported equivalents in the `makefile.alt` for non CMa
 | Command                | Description                                                                                                                                          |
 | ---------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `cmake .`              | Initialise the build environment                                                                                                                     |
-| `make QSP`             | Build the raycaster to `out/`                                                                                                                        |
+| `make W3D`             | Build the raycaster to `out/`                                                                                                                        |
 | `make run`             | Execute a build in `out/`                                                                                                                            |
 | `make run_memprof`     | Execute a build in `out/` within a call of `leaks` _(UNIX only)_                                                                                     |
 | `make destroy`         | Removes all files in the `out/`                                                                                                                      |
